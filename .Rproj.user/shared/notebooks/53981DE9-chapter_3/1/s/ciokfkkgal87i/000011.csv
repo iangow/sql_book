@@ -1,0 +1,7 @@
+"0","retail_sales %>%"
+"0","  filter(kind_of_business == ""Women's clothing stores"") %>%"
+"0","  window_order(sales_month) %>%"
+"0","  window_frame(-11, 0) %>%"
+"0","  mutate(moving_avg = mean(sales, na.rm = TRUE),"
+"0","         records_count = n()) %>%"
+"0","  select(sales_month, moving_avg, records_count)"

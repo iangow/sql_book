@@ -1,0 +1,26 @@
+{
+    "id": "256DA529",
+    "path": "~/git/sql_book/Chapter 2: Preparing Data for Analysis/create_date_dimension.sql",
+    "project_path": "Chapter 2: Preparing Data for Analysis/create_date_dimension.sql",
+    "type": "sql",
+    "hash": "689994063",
+    "contents": "",
+    "dirty": false,
+    "created": 1679651073721.0,
+    "source_on_save": false,
+    "relative_order": 2,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "5,0",
+        "scrollLine": "0"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1679650555,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1679650555,
+    "read_only": false,
+    "read_only_alternatives": []
+}

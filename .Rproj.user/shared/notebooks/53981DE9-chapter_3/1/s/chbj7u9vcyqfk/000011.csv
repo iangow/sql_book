@@ -1,0 +1,7 @@
+"0","retail_sales <- tbl(pg, ""retail_sales"")"
+"0","retail_sales %>%"
+"0","  filter(kind_of_business == 'Retail and food services sales, total') %>%"
+"0","  select(sales_month, sales) %>%"
+"0","  arrange(sales_month) %>%"
+"0","  ggplot(aes(x = sales_month, y = sales)) +"
+"0","  geom_line()"

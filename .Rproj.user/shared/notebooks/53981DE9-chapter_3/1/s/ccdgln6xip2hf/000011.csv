@@ -1,0 +1,8 @@
+"0","retail_sales %>%"
+"0","  filter(kind_of_business == 'Retail and food services sales, total') %>%"
+"0","  mutate(sales_year = date_part('year', sales_month)) %>%"
+"0","  group_by(sales_year) %>%"
+"0","  summarize(sales = sum(sales, na.rm = TRUE)) %>%"
+"0","  arrange(sales_year) %>%"
+"0","  ggplot(aes(x = sales_year, y = sales)) +"
+"0","  geom_line()"

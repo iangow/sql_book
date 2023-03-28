@@ -1,0 +1,106 @@
+# Preparing Data for Analysis
+
+Chapter 2 of @tanimura2021sql provides a good foundation discussion of issues related to preparing data for analysis.
+While the discussion is couched in terms of SQL, in reality the issues are not specific to SQL or databases.
+For this reason, I recommend that you read the chapter.
+
+While Chapter 2 of @tanimura2021sql contains many code snippets, few of these seem to be intended for users to run (in part because they assume a database set-up that users would not have).
+For this reason, I do not attempt to provide `dplyr` equivalents to the code there except for a couple of exceptions that I discuss below.
+
+## Missing data
+
+```{r}
+#| message: false
+library(tidyverse)
+library(DBI)
+```
+
+```{r}
+pg <- dbConnect(RPostgres::Postgres())
+
+dates_sql <-
+   "SELECT * 
+    FROM generate_series('2000-01-01'::timestamp,'2030-12-31', '1 day')"
+
+dates <- 
+  tbl(pg, sql(dates_sql)) %>%
+  rename(date = generate_series)
+
+dates_processed <-
+  dates %>%
+  mutate(date_key = as.integer(to_char(date, 'yyyymmdd')),
+         day_of_month = as.integer(date_part('day',date)),
+         day_of_year = as.integer(date_part('doy', date)),
+         day_of_week = as.integer(date_part('dow', date)),
+         day_name  = trim(to_char(date, 'Day')),
+         day_short_name = trim(to_char(date, 'Dy')),
+         week_number = as.integer(date_part('week', date)),
+         week_of_month = as.integer(to_char(date,'W')),
+         week = as.Date(date_trunc('week', date)),
+         month_number = as.integer(date_part('month',date)),
+         month_name = trim(to_char(date, 'Month')),
+         month_short_name = trim(to_char(date, 'Mon')),
+         first_day_of_month = as.Date(date_trunc('month', date)),
+         last_day_of_month = as.Date(date_trunc('month', date) +
+                                       sql("interval '1 month' -
+                                            interval '1 day'")),
+         quarter_number = as.integer(date_part('quarter', date)),
+         quarter_name = trim('Q' %||% as.integer(date_part('quarter', date))),
+         first_day_of_quarter = as.Date(date_trunc('quarter', date)),
+         last_day_of_quarter = as.Date(date_trunc('quarter', date) + 
+                                         sql("interval '3 months' -
+                                              interval '1 day'")),
+         year = as.integer(date_part('year', date)),
+         decade = as.integer(date_part('decade', date)) * 10,
+         century = as.integer(date_part('century', date)))
+
+dates_processed %>%
+  collect(n = 10)
+
+dates_processed %>%
+  show_query()
+```
+
+
+```{sql}
+#| eval: false
+
+
+
+
+
+
+```
+
+
+
+```{r}
+ctry_pops <-
+  tribble(
+  ~country, ~year_1980,  ~year_1990, ~year_2000, ~year_2010,
+  "Canada", 24593, 27791, 31100, 34207,
+  "Mexico", 68347, 84634, 99775, 114061,
+  "United States", 227225, 249623, 282162, 309326
+)
+
+ctry_pops %>%
+  pivot_longer(cols = -country, 
+               names_to = "year",
+               names_prefix = "year_",
+               values_ptypes = integer(),
+               values_to = "population")
+```
+
+```{r}
+
+ctry_pops_db <- copy_to(pg, ctry_pops)
+```
+
+```{r}
+ctry_pops_db %>%
+  pivot_longer(cols = -country, 
+               names_to = "year",
+               names_prefix = "year_",
+               values_to = "population") %>%
+  show_query()
+```

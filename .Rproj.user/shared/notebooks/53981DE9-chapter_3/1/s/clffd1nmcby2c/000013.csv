@@ -1,0 +1,44 @@
+"0","pivoted_sales <-"
+"0","  retail_sales %>%"
+"0","  filter(kind_of_business %in% "
+"0","           c(""Men's clothing stores"","
+"0","             ""Women's clothing stores"")) %>%"
+"0","  mutate(kind_of_business = if_else(kind_of_business == ""Women's clothing stores"","
+"0","                                    ""womens"", ""mens""),"
+"0","         sales_year = date_part('year', sales_month)) %>%"
+"0","  group_by(sales_year, kind_of_business) %>%"
+"0","  summarize(sales = sum(sales, na.rm = TRUE), .groups = ""drop"") %>%"
+"0","  pivot_wider(id_cols = ""sales_year"","
+"0","              names_from = ""kind_of_business"","
+"0","              names_glue = ""{kind_of_business}_{.value}"","
+"0","              values_from = ""sales"")  "
+"0",""
+"0","pivoted_sales %>%"
+"0","  show_query()"
+"1","<SQL>
+"
+"1","[34mSELECT[39m
+  ""sales_year"",
+  MAX(CASE WHEN (""kind_of_business"" = 'mens') THEN ""sales"" END)[34m AS [39m""mens_sales"",
+  MAX(CASE WHEN (""kind_of_business"" = 'womens') THEN ""sales"" END)[34m AS [39m""womens_sales""
+[34mFROM[39m (
+  [34mSELECT[39m ""sales_year"", ""kind_of_business"", SUM(""sales"")[34m AS [39m""sales""
+  [34mFROM[39m (
+    [34mSELECT[39m
+      ""sales_month"",
+      ""naics_code"",
+      CASE WHEN (""kind_of_business"" = 'Women''s clothing stores') THEN 'womens' WHEN NOT (""kind_of_business"" = 'Women''s clothing stores') THEN 'mens' END[34m AS [39m""kind_of_business"",
+      ""reason_for_null"",
+      ""sales"",
+      date_part('year', ""sales_month"")[34m AS [39m""sales_year""
+    [34mFROM[39m ""retail_sales""
+    [34mWHERE[39m (""kind_of_business"" IN ('Men''s clothing stores', 'Women''s clothing stores'))
+  ) ""q01""
+  [34mGROUP BY[39m ""sales_year"", ""kind_of_business""
+) ""q02""
+[34mGROUP BY[39m ""sales_year""
+"
+"0","pivoted_sales %>%"
+"0","  arrange(sales_year) %>%"
+"0","  collect(n = 10) %>%"
+"0","  knitr::kable()"

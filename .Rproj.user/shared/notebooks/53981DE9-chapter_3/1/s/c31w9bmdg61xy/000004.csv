@@ -1,0 +1,1 @@
+"0","SELECT date_trunc('month','2020-10-04 12:33:35'::timestamp);"

@@ -1,0 +1,11 @@
+"0",""
+"0","a_time_df %>% "
+"0","  mutate(a_trunced_time = date_trunc('month', a_time)) %>%"
+"0","  show_query()"
+"1","<SQL>
+"
+"1","[34mSELECT[39m *, date_trunc('month', ""a_time"")[34m AS [39m""a_trunced_time""
+[34mFROM[39m (SELECT '2020-10-04 12:33:35 US/Pacific'::timestamp with time zone AS a_time) ""q01""
+"
+"0","a_time_df %>%"
+"0","  collect()"

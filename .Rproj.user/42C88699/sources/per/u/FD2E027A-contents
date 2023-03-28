@@ -1,0 +1,17 @@
+library(tidyverse)
+
+idb_df <- read_delim("/Users/iangow/Downloads/idbzip/idbsingleyear.all",
+                     delim = "|",
+                     col_names = c("year", "sex", "pop", "name", "genc",
+                                   "fips", "area", "age"), 
+                     skip = 1)
+                     
+idb_df %>%
+  filter(year %in% seq(from = 1980, to = 2010, by = 10),
+         sex == 0,
+         grepl("^Cana", name)) %>%
+  group_by(year, name) %>%
+  summarize(pop = sum(pop), .groups = "drop") %>%
+  arrange(desc(pop))
+idb_df %>% 
+  filter(name == "United States", year == 2010, age == 0)

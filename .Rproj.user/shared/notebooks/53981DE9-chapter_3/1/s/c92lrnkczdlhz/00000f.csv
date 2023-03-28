@@ -1,0 +1,7 @@
+"0","pivoted_sales %>%"
+"0","  filter(sales_year <= 2019) %>%"
+"0","  group_by(sales_year) %>%"
+"0","  mutate(womens_times_of_mens = womens_sales / mens_sales) %>%"
+"0","  arrange(sales_year) %>%"
+"0","  ggplot(aes(y = womens_times_of_mens, x = sales_year)) +"
+"0","  geom_line()"

@@ -1,0 +1,4 @@
+"0","SELECT sales_month, kind_of_business, sales
+FROM retail_sales
+WHERE kind_of_business IN ('Men''s clothing stores','Women''s clothing stores')
+ORDER BY 1,2;"

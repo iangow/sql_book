@@ -1,0 +1,9 @@
+"0","SELECT date_part('year',sales_month) as sales_year, 
+  kind_of_business, sum(sales) as sales
+FROM retail_sales
+WHERE kind_of_business IN 
+          ('Book stores',
+           'Sporting goods stores',
+           'Hobby, toy, and game stores')
+GROUP BY 1,2
+ORDER BY 1;"

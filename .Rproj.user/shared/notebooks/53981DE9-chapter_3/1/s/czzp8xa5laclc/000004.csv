@@ -1,0 +1,13 @@
+"0","SELECT date_part('year', sales_month) AS sales_year,
+  sum(CASE WHEN kind_of_business = 'Women''s clothing stores' 
+          then sales 
+          END) AS womens_sales,
+  sum(CASE WHEN kind_of_business = 'Men''s clothing stores' 
+          then sales 
+          END) AS mens_sales
+FROM retail_sales
+WHERE kind_of_business IN 
+   ('Men''s clothing stores',
+    'Women''s clothing stores')
+GROUP BY 1
+ORDER BY 1;"

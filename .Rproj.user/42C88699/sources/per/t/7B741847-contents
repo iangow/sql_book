@@ -1,0 +1,351 @@
+# Time Series Analysis
+
+## Date, Datetime, and Time Manipulations
+
+```{r}
+#| include: false
+library(DBI)
+library(tidyverse)
+library(dbplyr)
+pg <- dbConnect(RPostgres::Postgres(), bigint = "integer")
+```
+
+@tanimura2021sql points out that often "timestamps in the database are not encoded with the time zone, and you will need to consult with the source or developer to figure out how your data was stored."
+When pushing data to a PostgreSQL database, I use the `timestamp with time zone` type as much as possible.
+
+@tanimura2021sql provides the following example, which is interesting because the west coast of the United States would not be on the PST time zone at that time of year.
+Instead, it would be on PDT.
+
+```{sql, connection=pg}
+SELECT '2020-09-01 00:00:00 -0' AT TIME ZONE 'pst';
+```
+```{sql, connection=pg}
+SELECT '2020-09-01 00:00:00 -0' AT TIME ZONE 'pdt';
+```
+I think most people barely know the difference between PST and PDT and even fewer would know the exact dates that one switches from one to the other.
+A better approach is to use a time zone that encodes information about when PDT is used and when PST is used.
+In PostgreSQL, the table `pg_timezone_names` has information that we need.
+
+```{sql, connection=pg}
+SELECT * 
+FROM pg_timezone_names
+WHERE name ~ '^US/';
+```
+```{sql, connection=pg}
+SELECT * 
+FROM pg_timezone_names
+WHERE abbrev IN ('PDT', 'PST') 
+ORDER BY name DESC
+LIMIT 5;
+```
+
+```{sql, connection=pg}
+SELECT 
+    '2020-09-01 00:00:00 -0' AT TIME ZONE 'US/Pacific',
+    '2020-09-01 00:00:00 -0' AT TIME ZONE 'PDT';
+```
+
+```{sql, connection=pg}
+SELECT     
+    '2020-12-01 00:00:00 -0' AT TIME ZONE 'US/Pacific',
+    '2020-12-01 00:00:00 -0' AT TIME ZONE 'PST';
+```
+### Date and Timestamp Format Conversions
+
+As discussed in @tanimura2021sql, PostgreSQL has a rich array of functions for converting dates and times and extracting such information as months and days of the week.
+
+```{sql, connection=pg}
+SELECT date_trunc('month','2020-10-04 12:33:35'::timestamp);
+```
+One such function 
+
+```{r}
+a_time_df <- tbl(pg, sql("SELECT '2020-10-04 12:33:35'::timestamp AS a_time"))
+a_time_df %>% 
+  mutate(a_trunced_time = date_trunc('month', a_time))
+
+a_time_df %>% 
+  mutate(a_trunced_time = date_trunc('month', a_time)) %>%
+  show_query()
+
+a_time_df %>%
+  collect()
+```
+
+
+```{r}
+a_time_df <- tbl(pg, sql("SELECT '2020-10-04 12:33:35 US/Pacific'::timestamp with time zone AS a_time"))
+
+a_time_df %>% 
+  mutate(a_trunced_time = date_trunc('month', a_time)) 
+
+a_time_df %>% 
+  mutate(a_trunced_time = date_trunc('month', a_time)) %>%
+  show_query()
+
+a_time_df %>%
+  collect()
+```
+
+```{r}
+a_time_df %>%
+  mutate(new_time = a_time + sql("interval '3 hours'")) %>%
+  collect()
+```
+## The Retail Sales Data Set
+
+```{sql, connection=pg}
+SELECT sales_month, sales
+FROM retail_sales
+WHERE kind_of_business = 'Retail and food services sales, total'
+ORDER BY 1
+```
+
+```{r}
+retail_sales <- tbl(pg, "retail_sales")
+retail_sales %>%
+  filter(kind_of_business == 'Retail and food services sales, total') %>%
+  select(sales_month, sales) %>%
+  arrange(sales_month) %>%
+  ggplot(aes(x = sales_month, y = sales)) +
+  geom_line()
+```
+
+```{sql, connection=pg}
+SELECT date_part('year',sales_month) as sales_year,
+    sum(sales) as sales
+FROM retail_sales
+WHERE kind_of_business = 'Retail and food services sales, total'
+GROUP BY 1
+;
+```
+
+```{r}
+retail_sales %>%
+  filter(kind_of_business == 'Retail and food services sales, total') %>%
+  mutate(sales_year = date_part('year', sales_month)) %>%
+  group_by(sales_year) %>%
+  summarize(sales = sum(sales, na.rm = TRUE)) %>%
+  arrange(sales_year) %>%
+  ggplot(aes(x = sales_year, y = sales)) +
+  geom_line()
+```
+
+```{sql, connection=pg}
+SELECT date_part('year',sales_month) as sales_year, 
+  kind_of_business, sum(sales) as sales
+FROM retail_sales
+WHERE kind_of_business IN 
+          ('Book stores',
+           'Sporting goods stores',
+           'Hobby, toy, and game stores')
+GROUP BY 1,2
+ORDER BY 1;
+```
+
+
+```{r}
+retail_sales %>%
+  filter(kind_of_business %in% 
+           c('Book stores',
+             'Sporting goods stores',
+             'Hobby, toy, and game stores')) %>%
+  mutate(sales_year = date_part('year', sales_month)) %>%
+  group_by(sales_year, kind_of_business) %>%
+  summarize(sales = sum(sales, na.rm = TRUE), .groups = "drop") %>%
+  arrange(sales_year) %>%
+  ggplot(aes(x = sales_year, y = sales, color = kind_of_business)) +
+  geom_line() +
+  theme(legend.position = "top")
+```
+
+```{sql, connection=pg}
+SELECT sales_month, kind_of_business, sales
+FROM retail_sales
+WHERE kind_of_business IN ('Men''s clothing stores','Women''s clothing stores')
+ORDER BY 1,2;
+```
+
+```{r}
+retail_sales %>%
+  filter(kind_of_business %in% c("Men's clothing stores",
+                                 "Women's clothing stores")) %>%
+  select(sales_month, kind_of_business, sales) %>%
+  arrange(sales_month) %>%
+  ggplot(aes(x = sales_month, y = sales, color = kind_of_business)) +
+  geom_line() +
+  theme(legend.position = "top")
+```
+
+```{sql, connection=pg}
+SELECT date_part('year',sales_month) as sales_year,
+  kind_of_business, sum(sales) as sales
+FROM retail_sales
+WHERE kind_of_business IN 
+        ('Men''s clothing stores',
+        'Women''s clothing stores')
+GROUP BY 1, 2
+ORDER BY 1, 2;
+```
+
+```{r}
+retail_sales %>%
+  filter(kind_of_business %in% 
+           c("Men's clothing stores",
+             "Women's clothing stores")) %>%
+  mutate(sales_year = date_part('year', sales_month)) %>%
+  group_by(sales_year, kind_of_business) %>%
+  summarize(sales = sum(sales, na.rm = TRUE), .groups = "drop") %>%
+  arrange(sales_year) %>%
+  ggplot(aes(x = sales_year, y = sales, color = kind_of_business)) +
+  geom_line() +
+  theme(legend.position = "top")
+```
+
+```{sql, connection=pg}
+SELECT date_part('year', sales_month) AS sales_year,
+  sum(CASE WHEN kind_of_business = 'Women''s clothing stores' 
+          then sales 
+          END) AS womens_sales,
+  sum(CASE WHEN kind_of_business = 'Men''s clothing stores' 
+          then sales 
+          END) AS mens_sales
+FROM retail_sales
+WHERE kind_of_business IN 
+   ('Men''s clothing stores',
+    'Women''s clothing stores')
+GROUP BY 1
+ORDER BY 1;
+```
+
+```{r}
+pivoted_sales <-
+  retail_sales %>%
+  filter(kind_of_business %in% 
+           c("Men's clothing stores",
+             "Women's clothing stores")) %>%
+  mutate(kind_of_business = if_else(kind_of_business == "Women's clothing stores",
+                                    "womens", "mens"),
+         sales_year = date_part('year', sales_month)) %>%
+  group_by(sales_year, kind_of_business) %>%
+  summarize(sales = sum(sales, na.rm = TRUE), .groups = "drop") %>%
+  pivot_wider(id_cols = "sales_year",
+              names_from = "kind_of_business",
+              names_glue = "{kind_of_business}_{.value}",
+              values_from = "sales")  
+
+pivoted_sales %>%
+  show_query()
+
+pivoted_sales %>%
+  arrange(sales_year) %>%
+  collect(n = 10) %>%
+  knitr::kable()
+```
+
+```{r}
+pivoted_sales %>%
+  filter(sales_year <= 2019) %>%
+  group_by(sales_year) %>%
+  mutate(womens_minus_mens = womens_sales - mens_sales,
+         mens_minus_womens = mens_sales - womens_sales) %>%
+  select(sales_year, womens_minus_mens, mens_minus_womens) %>%
+  arrange(sales_year) %>%
+  ggplot(aes(y = womens_minus_mens, x = sales_year)) +
+  geom_line()
+```
+
+```{r}
+pivoted_sales %>%
+  filter(sales_year <= 2019) %>%
+  group_by(sales_year) %>%
+  mutate(womens_times_of_mens = womens_sales / mens_sales) %>%
+  arrange(sales_year) %>%
+  ggplot(aes(y = womens_times_of_mens, x = sales_year)) +
+  geom_line()
+```
+```{r}
+pivoted_sales %>%
+  filter(sales_year <= 2019) %>%
+  group_by(sales_year) %>%
+  mutate(womens_pct_of_mens = (womens_sales / mens_sales - 1) * 100) %>%
+  arrange(sales_year) %>%
+  ggplot(aes(y = womens_pct_of_mens, x = sales_year)) +
+  geom_line()
+```
+```{r}
+retail_sales %>%
+  filter(kind_of_business %in% 
+           c("Men's clothing stores",
+             "Women's clothing stores")) %>%
+  group_by(sales_month) %>%
+  mutate(total_sales = sum(sales)) %>%
+  ungroup() %>%
+  mutate(pct_total_sales = sales * 100 / total_sales) %>%
+  select(sales_month, kind_of_business, pct_total_sales) %>%
+  collect(n = 3)
+```
+
+```{r}
+retail_sales %>%
+  filter(kind_of_business %in% 
+           c("Men's clothing stores",
+             "Women's clothing stores")) %>%
+  group_by(sales_month) %>%
+  mutate(total_sales = sum(sales)) %>%
+  ungroup() %>%
+  mutate(pct_total_sales = sales * 100 / total_sales) %>%
+  show_query()
+```
+
+```{r}
+retail_sales %>%
+  filter(kind_of_business %in% 
+           c("Men's clothing stores",
+             "Women's clothing stores")) %>%
+  group_by(sales_month) %>%
+  mutate(total_sales = sum(sales)) %>%
+  ungroup() %>%
+  mutate(pct_total_sales = sales * 100 / total_sales) %>%
+  ggplot(aes(y = pct_total_sales, x = sales_month, color = kind_of_business)) +
+  geom_line()
+```
+
+```{r}
+retail_sales %>%
+  filter(kind_of_business == "Women's clothing stores") %>%
+  mutate(sales_year = date_part('year',sales_month)) %>%
+  group_by(sales_year) %>%
+  summarize(sales = sum(sales, na.rm = TRUE)) %>%
+  ungroup() %>%
+  window_order(sales_year) %>%
+  mutate(index_sales = first(sales),
+         pct_from_index = (sales/index_sales - 1) * 100)
+```
+
+```{r}
+retail_sales %>%
+  filter(kind_of_business %in% c("Women's clothing stores",
+                                 "Men's clothing stores"),
+         sales_month <= '2019-12-31') %>%
+  mutate(sales_year = date_part('year',sales_month)) %>%
+  group_by(kind_of_business, sales_year) %>%
+  summarize(sales = sum(sales, na.rm = TRUE), .groups = "drop") %>%
+  group_by(kind_of_business) %>%
+  window_order(sales_year) %>%
+  mutate(index_sales = first(sales),
+         pct_from_index = (sales/index_sales - 1) * 100) %>%
+  ungroup() %>%
+  ggplot(aes(y = pct_from_index, x = sales_year, color = kind_of_business)) +
+  geom_line()
+```
+```{r}
+retail_sales %>%
+  filter(kind_of_business == "Women's clothing stores") %>%
+  window_order(sales_month) %>%
+  window_frame(-11, 0) %>%
+  mutate(moving_avg = mean(sales, na.rm = TRUE),
+         records_count = n()) %>%
+  select(sales_month, moving_avg, records_count) %>%
+  collect(n = 10)
+```

@@ -1,0 +1,6 @@
+"0","SELECT date_part('year',sales_month) as sales_year,
+    sum(sales) as sales
+FROM retail_sales
+WHERE kind_of_business = 'Retail and food services sales, total'
+GROUP BY 1
+;"

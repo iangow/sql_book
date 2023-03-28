@@ -1,0 +1,38 @@
+"0","dates_processed %>%
+  show_query()
+"
+"1","<SQL>
+"
+"1","[34mSELECT[39m
+  *,
+  CAST(to_char(""date"", 'yyyymmdd') AS INTEGER)[34m AS [39m""date_key"",
+  CAST(date_part('day', ""date"") AS INTEGER)[34m AS [39m""day_of_month"",
+  CAST(date_part('doy', ""date"") AS INTEGER)[34m AS [39m""day_of_year"",
+  CAST(date_part('dow', ""date"") AS INTEGER)[34m AS [39m""day_of_week"",
+  trim(to_char(""date"", 'Day'))[34m AS [39m""day_name"",
+  trim(to_char(""date"", 'Dy'))[34m AS [39m""day_short_name"",
+  CAST(date_part('week', ""date"") AS INTEGER)[34m AS [39m""week_number"",
+  CAST(to_char(""date"", 'W') AS INTEGER)[34m AS [39m""week_of_month"",
+  CAST(date_trunc('week', ""date"") AS DATE)[34m AS [39m""week"",
+  CAST(date_part('month', ""date"") AS INTEGER)[34m AS [39m""month_number"",
+  trim(to_char(""date"", 'Month'))[34m AS [39m""month_name"",
+  trim(to_char(""date"", 'Mon'))[34m AS [39m""month_short_name"",
+  CAST(date_trunc('month', ""date"") AS DATE)[34m AS [39m""first_day_of_month"",
+  CAST(date_trunc('month', ""date"") + interval '1 month' -
+                                            interval '1 day' AS DATE)[34m AS [39m""last_day_of_month"",
+  CAST(date_part('quarter', ""date"") AS INTEGER)[34m AS [39m""quarter_number"",
+  trim('Q' || CAST(date_part('quarter', ""date"") AS INTEGER))[34m AS [39m""quarter_name"",
+  CAST(date_trunc('quarter', ""date"") AS DATE)[34m AS [39m""first_day_of_quarter"",
+  CAST(date_trunc('quarter', ""date"") + interval '3 months' -
+                                              interval '1 day' AS DATE)[34m AS [39m""last_day_of_quarter"",
+  CAST(date_part('year', ""date"") AS INTEGER)[34m AS [39m""year"",
+  CAST(date_part('decade', ""date"") AS INTEGER) * 10.0[34m AS [39m""decade"",
+  CAST(date_part('century', ""date"") AS INTEGER)[34m AS [39m""century""
+[34mFROM[39m (
+  [34mSELECT[39m ""generate_series""[34m AS [39m""date""
+  [34mFROM[39m (
+SELECT * 
+    FROM generate_series('2000-01-01'::timestamp,'2030-12-31', '1 day')
+  ) ""q01""
+) ""q02""
+"

@@ -1,0 +1,23 @@
+project:
+  type: book
+
+book:
+  title: "sql_book"
+  author: "Jane Doe"
+  date: "3/25/2023"
+  chapters:
+    - index.qmd
+    - chapter_2.qmd
+    - chapter_3.qmd
+    - references.qmd
+
+bibliography: references.bib
+
+format:
+  html:
+    theme: cosmo
+  pdf:
+    documentclass: scrreprt
+
+editor: visual
+

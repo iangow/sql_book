@@ -1,0 +1,1 @@
+{"classes":["tbl_PqConnection","tbl_dbi","tbl_sql","tbl_lazy","tbl"],"nrow":null,"ncol":2,"summary":{"Source":["SQL [?? x 2]"],"Database":["postgres  [iangow@/tmp:5432/iangow]"]}}

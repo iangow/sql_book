@@ -1,0 +1,3 @@
+"0","SELECT * 
+FROM pg_timezone_names
+WHERE name ~ '^US/';"

@@ -1,0 +1,4 @@
+"0","SELECT sales_month, sales
+FROM retail_sales
+WHERE kind_of_business = 'Retail and food services sales, total'
+ORDER BY 1"

@@ -1,0 +1,24 @@
+{
+    "id": "4FDD8BDA",
+    "path": "~/git/sql_book/Chapter 3: Time Series Analysis/create_retail_sales_table.sql",
+    "project_path": "Chapter 3: Time Series Analysis/create_retail_sales_table.sql",
+    "type": "sql",
+    "hash": "4060713415",
+    "contents": "",
+    "dirty": false,
+    "created": 1679651213632.0,
+    "source_on_save": false,
+    "relative_order": 3,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1679650870,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1679650870,
+    "read_only": false,
+    "read_only_alternatives": []
+}

@@ -1,0 +1,8 @@
+"0","retail_sales %>%"
+"0","  filter(kind_of_business %in% c(""Men's clothing stores"","
+"0","                                 ""Women's clothing stores"")) %>%"
+"0","  select(sales_month, kind_of_business, sales) %>%"
+"0","  arrange(sales_month) %>%"
+"0","  ggplot(aes(x = sales_month, y = sales, color = kind_of_business)) +"
+"0","  geom_line() +"
+"0","  theme(legend.position = ""top"")"
