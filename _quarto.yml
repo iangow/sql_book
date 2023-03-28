@@ -1,10 +1,12 @@
 project:
   type: book
+  output-dir: docs
 
 book:
   title: "sql_book"
-  author: "Jane Doe"
+  author: "Ian Gow"
   date: "3/25/2023"
+  
   chapters:
     - index.qmd
     - chapter_2.qmd
