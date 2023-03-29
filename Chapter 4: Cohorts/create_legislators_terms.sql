@@ -25,7 +25,7 @@ id_bioguide varchar
 ;
 
 COPY legislators_terms
-FROM '/localpath/legislators_terms.csv' -- change to the location you saved the csv file
+FROM '/Users/iangow/git/sql_book/Chapter 4: Cohorts/legislators_terms.csv' -- change to the location you saved the csv file
 DELIMITER ','
 CSV HEADER
 ;

@@ -35,7 +35,7 @@ full_name varchar--name_official_full
 ;
 
 COPY legislators
-FROM '/localpath/legislators.csv' -- change to the location you saved the csv file
+FROM '/Users/iangow/git/sql_book/Chapter 4: Cohorts/legislators.csv' -- change to the location you saved the csv file
 DELIMITER ','
 CSV HEADER
 ;
