@@ -1,0 +1,131 @@
+# Cohorts
+
+```{r}
+#| include: false
+library(DBI)
+library(tidyverse)
+library(dbplyr)
+library(ggplot2)
+```
+
+```{r}
+pg <- dbConnect(RPostgres::Postgres(), bigint = "integer")
+```
+
+```{sql, connection=pg}
+SELECT id_bioguide ,min(term_start) AS first_term
+FROM legislators_terms 
+GROUP BY 1
+LIMIT 10;
+```
+```{sql, connection=pg}
+WITH first_terms AS (
+      SELECT id_bioguide, min(term_start) AS first_term
+      FROM legislators_terms 
+      GROUP BY 1) 
+SELECT date_part('year', age(b.term_start, a.first_term)) AS period,
+    count(distinct a.id_bioguide) as cohort_retained
+FROM first_terms a
+JOIN legislators_terms b on a.id_bioguide = b.id_bioguide 
+GROUP BY 1
+LIMIT 10;
+```
+
+```{r}
+legislators_terms <- tbl(pg, "legislators_terms")
+first_terms <- 
+  legislators_terms %>%
+  group_by(id_bioguide) %>%
+  summarize(first_term = min(term_start, na.rm = TRUE))
+
+cohorts <-
+  legislators_terms %>%
+  inner_join(first_terms, by = "id_bioguide") %>%
+  mutate(period = date_part('year', age(term_start, first_term))) %>%
+  group_by(period) %>%
+  summarize(cohort_retained = sql("count(distinct id_bioguide)")) 
+
+cohorts %>%
+  collect(n = 10)
+```
+
+```{sql, connection=pg}
+WITH 
+first_terms AS (
+  SELECT id_bioguide, min(term_start) AS first_term
+  FROM legislators_terms 
+  GROUP BY 1),
+
+cohorts AS (
+  SELECT date_part('year', age(b.term_start, a.first_term)) AS period,
+      count(distinct a.id_bioguide) as cohort_retained
+  FROM first_terms a
+  JOIN legislators_terms b on a.id_bioguide = b.id_bioguide 
+  GROUP BY 1)
+  
+SELECT period,
+  first_value(cohort_retained) OVER (ORDER BY period) AS cohort_size,
+  cohort_retained,
+  cohort_retained * 1.0 / first_value(cohort_retained) OVER (ORDER BY period) AS pct_retained
+FROM cohorts;
+```
+
+```{r}
+retained_data <-
+  cohorts %>%
+  window_order(period) %>%
+  mutate(cohort_size = first(cohort_retained)) %>%
+  mutate(pct_retained = cohort_retained * 1.0/cohort_size) %>%
+  select(period, cohort_size, cohort_retained, pct_retained) 
+
+retained_data %>%
+  collect(n = 10)
+```
+
+```{r}
+retained_data %>%
+  ggplot(aes(x = period, y = pct_retained)) +
+  geom_line()
+```
+
+```{sql, connection=pg}
+WITH 
+first_terms AS (
+  SELECT id_bioguide, min(term_start) AS first_term
+  FROM legislators_terms 
+  GROUP BY 1),
+
+cohorts AS (
+  SELECT date_part('year', age(b.term_start, a.first_term)) AS period,
+      count(distinct a.id_bioguide) as cohort_retained
+  FROM first_terms a
+  JOIN legislators_terms b on a.id_bioguide = b.id_bioguide 
+  GROUP BY 1),
+  
+retained_data AS (
+  SELECT period,
+    first_value(cohort_retained) OVER (ORDER BY period) AS cohort_size,
+    cohort_retained,
+    cohort_retained * 1.0 / first_value(cohort_retained) OVER (ORDER BY period) AS pct_retained
+  FROM cohorts)
+
+SELECT cohort_size,
+  max(case when period = 0 then pct_retained end) as yr0,
+  max(case when period = 1 then pct_retained end) as yr1,
+  max(case when period = 2 then pct_retained end) as yr2,
+  max(case when period = 3 then pct_retained end) as yr3,
+  max(case when period = 4 then pct_retained end) as yr4
+FROM retained_data
+GROUP BY 1;
+```
+
+```{r}
+retained_data %>%
+  select(period, pct_retained) %>%
+  collect() %>%
+  arrange(period) %>%
+  pivot_wider(names_from = period, 
+              names_prefix = "yr",
+              values_from = pct_retained) %>%
+  collect()
+```
