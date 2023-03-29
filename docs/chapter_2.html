@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>SQL for Data Analysis using R - 1&nbsp; Preparing Data for Analysis</title>
+<title>SQL for Data Analysis using R - 2&nbsp; Preparing Data for Analysis</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -113,7 +113,7 @@ div.csl-indent {
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
 <link href="./chapter_3.html" rel="next">
-<link href="./index.html" rel="prev">
+<link href="./chapter_1.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -152,7 +152,7 @@ div.csl-indent {
   <header id="quarto-header" class="headroom fixed-top">
   <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
     <div class="container-fluid d-flex justify-content-between">
-      <h1 class="quarto-secondary-nav-title"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Preparing Data for Analysis</span></h1>
+      <h1 class="quarto-secondary-nav-title"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Preparing Data for Analysis</span></h1>
       <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
         <i class="bi bi-chevron-right"></i>
       </button>
@@ -182,12 +182,22 @@ div.csl-indent {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./chapter_2.html" class="sidebar-item-text sidebar-link active"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Preparing Data for Analysis</span></a>
+  <a href="./chapter_1.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Analysis with SQL</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./chapter_3.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Time Series Analysis</span></a>
+  <a href="./chapter_2.html" class="sidebar-item-text sidebar-link active"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Preparing Data for Analysis</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./chapter_3.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Time Series Analysis</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./chapter_4.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Cohorts</span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -204,7 +214,7 @@ div.csl-indent {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#missing-data" id="toc-missing-data" class="nav-link active" data-scroll-target="#missing-data"><span class="toc-section-number">1.1</span>  Missing data</a></li>
+  <li><a href="#missing-data" id="toc-missing-data" class="nav-link active" data-scroll-target="#missing-data"><span class="toc-section-number">2.1</span>  Missing data</a></li>
   </ul>
 </nav>
     </div>
@@ -213,7 +223,7 @@ div.csl-indent {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title d-none d-lg-block"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Preparing Data for Analysis</span></h1>
+<h1 class="title d-none d-lg-block"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Preparing Data for Analysis</span></h1>
 </div>
 
 
@@ -230,8 +240,8 @@ div.csl-indent {
 
 <p>Chapter 2 of <span class="citation" data-cites="tanimura2021sql">Tanimura (<a href="references.html#ref-tanimura2021sql" role="doc-biblioref">2021</a>)</span> provides a good foundation discussion of issues related to preparing data for analysis. While the discussion is couched in terms of SQL, in reality the issues are not specific to SQL or databases. For this reason, I recommend that you read the chapter.</p>
 <p>While Chapter 2 of <span class="citation" data-cites="tanimura2021sql">Tanimura (<a href="references.html#ref-tanimura2021sql" role="doc-biblioref">2021</a>)</span> contains many code snippets, few of these seem to be intended for users to run (in part because they assume a database set-up that users would not have). For this reason, I do not attempt to provide <code>dplyr</code> equivalents to the code there except for a couple of exceptions that I discuss below.</p>
-<section id="missing-data" class="level2" data-number="1.1">
-<h2 data-number="1.1" class="anchored" data-anchor-id="missing-data"><span class="header-section-number">1.1</span> Missing data</h2>
+<section id="missing-data" class="level2" data-number="2.1">
+<h2 data-number="2.1" class="anchored" data-anchor-id="missing-data"><span class="header-section-number">2.1</span> Missing data</h2>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(DBI)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -555,13 +565,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="./index.html" class="pagination-link">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Preface</span>
+      <a href="./chapter_1.html" class="pagination-link">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Analysis with SQL</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
       <a href="./chapter_3.html" class="pagination-link">
-        <span class="nav-page-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Time Series Analysis</span></span> <i class="bi bi-arrow-right-short"></i>
+        <span class="nav-page-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Time Series Analysis</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

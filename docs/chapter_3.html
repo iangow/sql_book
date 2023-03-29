@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>SQL for Data Analysis using R - 2&nbsp; Time Series Analysis</title>
+<title>SQL for Data Analysis using R - 3&nbsp; Time Series Analysis</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -112,7 +112,7 @@ div.csl-indent {
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
-<link href="./references.html" rel="next">
+<link href="./chapter_4.html" rel="next">
 <link href="./chapter_2.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
@@ -152,7 +152,7 @@ div.csl-indent {
   <header id="quarto-header" class="headroom fixed-top">
   <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
     <div class="container-fluid d-flex justify-content-between">
-      <h1 class="quarto-secondary-nav-title"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Time Series Analysis</span></h1>
+      <h1 class="quarto-secondary-nav-title"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Time Series Analysis</span></h1>
       <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
         <i class="bi bi-chevron-right"></i>
       </button>
@@ -182,12 +182,22 @@ div.csl-indent {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./chapter_2.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Preparing Data for Analysis</span></a>
+  <a href="./chapter_1.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Analysis with SQL</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./chapter_3.html" class="sidebar-item-text sidebar-link active"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Time Series Analysis</span></a>
+  <a href="./chapter_2.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Preparing Data for Analysis</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./chapter_3.html" class="sidebar-item-text sidebar-link active"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Time Series Analysis</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./chapter_4.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Cohorts</span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -204,11 +214,11 @@ div.csl-indent {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#date-datetime-and-time-manipulations" id="toc-date-datetime-and-time-manipulations" class="nav-link active" data-scroll-target="#date-datetime-and-time-manipulations"><span class="toc-section-number">2.1</span>  Date, Datetime, and Time Manipulations</a>
+  <li><a href="#date-datetime-and-time-manipulations" id="toc-date-datetime-and-time-manipulations" class="nav-link active" data-scroll-target="#date-datetime-and-time-manipulations"><span class="toc-section-number">3.1</span>  Date, Datetime, and Time Manipulations</a>
   <ul class="collapse">
-  <li><a href="#date-and-timestamp-format-conversions" id="toc-date-and-timestamp-format-conversions" class="nav-link" data-scroll-target="#date-and-timestamp-format-conversions"><span class="toc-section-number">2.1.1</span>  Date and Timestamp Format Conversions</a></li>
+  <li><a href="#date-and-timestamp-format-conversions" id="toc-date-and-timestamp-format-conversions" class="nav-link" data-scroll-target="#date-and-timestamp-format-conversions"><span class="toc-section-number">3.1.1</span>  Date and Timestamp Format Conversions</a></li>
   </ul></li>
-  <li><a href="#the-retail-sales-data-set" id="toc-the-retail-sales-data-set" class="nav-link" data-scroll-target="#the-retail-sales-data-set"><span class="toc-section-number">2.2</span>  The Retail Sales Data Set</a></li>
+  <li><a href="#the-retail-sales-data-set" id="toc-the-retail-sales-data-set" class="nav-link" data-scroll-target="#the-retail-sales-data-set"><span class="toc-section-number">3.2</span>  The Retail Sales Data Set</a></li>
   </ul>
 </nav>
     </div>
@@ -217,7 +227,7 @@ div.csl-indent {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title d-none d-lg-block"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Time Series Analysis</span></h1>
+<h1 class="title d-none d-lg-block"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Time Series Analysis</span></h1>
 </div>
 
 
@@ -232,8 +242,8 @@ div.csl-indent {
 
 </header>
 
-<section id="date-datetime-and-time-manipulations" class="level2" data-number="2.1">
-<h2 data-number="2.1" class="anchored" data-anchor-id="date-datetime-and-time-manipulations"><span class="header-section-number">2.1</span> Date, Datetime, and Time Manipulations</h2>
+<section id="date-datetime-and-time-manipulations" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="date-datetime-and-time-manipulations"><span class="header-section-number">3.1</span> Date, Datetime, and Time Manipulations</h2>
 <p><span class="citation" data-cites="tanimura2021sql">Tanimura (<a href="references.html#ref-tanimura2021sql" role="doc-biblioref">2021</a>)</span> points out that often “timestamps in the database are not encoded with the time zone, and you will need to consult with the source or developer to figure out how your data was stored.” When pushing data to a PostgreSQL database, I use the <code>timestamp with time zone</code> type as much as possible.</p>
 <p><span class="citation" data-cites="tanimura2021sql">Tanimura (<a href="references.html#ref-tanimura2021sql" role="doc-biblioref">2021</a>)</span> provides the following example, which is interesting because the west coast of the United States would not be on the PST time zone at that time of year. Instead, it would be on PDT.</p>
 <div class="cell">
@@ -449,8 +459,8 @@ div.csl-indent {
 </table>
 </div>
 </div>
-<section id="date-and-timestamp-format-conversions" class="level3" data-number="2.1.1">
-<h3 data-number="2.1.1" class="anchored" data-anchor-id="date-and-timestamp-format-conversions"><span class="header-section-number">2.1.1</span> Date and Timestamp Format Conversions</h3>
+<section id="date-and-timestamp-format-conversions" class="level3" data-number="3.1.1">
+<h3 data-number="3.1.1" class="anchored" data-anchor-id="date-and-timestamp-format-conversions"><span class="header-section-number">3.1.1</span> Date and Timestamp Format Conversions</h3>
 <p>As discussed in <span class="citation" data-cites="tanimura2021sql">Tanimura (<a href="references.html#ref-tanimura2021sql" role="doc-biblioref">2021</a>)</span>, PostgreSQL has a rich array of functions for converting dates and times and extracting such information as months and days of the week.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> date_trunc(<span class="st">'month'</span>,<span class="st">'2020-10-04 12:33:35'</span>:<span class="ch">:timestamp</span>);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -541,8 +551,8 @@ FROM (SELECT '2020-10-04 12:33:35 US/Pacific'::timestamp with time zone AS a_tim
 </div>
 </section>
 </section>
-<section id="the-retail-sales-data-set" class="level2" data-number="2.2">
-<h2 data-number="2.2" class="anchored" data-anchor-id="the-retail-sales-data-set"><span class="header-section-number">2.2</span> The Retail Sales Data Set</h2>
+<section id="the-retail-sales-data-set" class="level2" data-number="3.2">
+<h2 data-number="3.2" class="anchored" data-anchor-id="the-retail-sales-data-set"><span class="header-section-number">3.2</span> The Retail Sales Data Set</h2>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> sales_month, sales</span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> retail_sales</span>
@@ -1458,12 +1468,12 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
       <a href="./chapter_2.html" class="pagination-link">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Preparing Data for Analysis</span></span>
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Preparing Data for Analysis</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./references.html" class="pagination-link">
-        <span class="nav-page-text">References</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="./chapter_4.html" class="pagination-link">
+        <span class="nav-page-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Cohorts</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
