@@ -3,9 +3,10 @@ project:
   output-dir: docs
 
 book:
-  title: "sql_book"
+  title: "SQL for Data Analysis using R"
   author: "Ian Gow"
-  date: "3/25/2023"
+  date: today
+  date-format: "D MMMM YYYY"
   
   chapters:
     - index.qmd
@@ -18,8 +19,3 @@ bibliography: references.bib
 format:
   html:
     theme: cosmo
-  pdf:
-    documentclass: scrreprt
-
-editor: visual
-

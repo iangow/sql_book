@@ -1,3 +1,21 @@
 # Preface {.unnumbered}
 
-Some stuff.
+This "book" is a collection of notes made as I work through @tanimura2021sql.
+An alternative title might have been "Data Analysis with Data Stored in Databases"; while SQL is the language used in @tanimura2021sql to do the analysis, this is in some ways a minor detail.
+My view is that one can easy do "SQL" analysis using the `dplyr` package in R (this uses `dbplyr` behind the scenes ... mostly).
+The `dplyr` package will quietly translate R code into SQL for the user.
+
+An advantage of using `dplyr` rather than SQL directly is that one doesn't need to learn as much SQL.
+In principle, one could use `dplyr` without knowing *any* SQL.
+Given that `dplyr` and R can be used to analyse data from other data sources, this reduces the amount that is needed to be learnt to do analysis.
+Additionally, one could write code to analyse data from a database and then easily reuse the code for data from a CSV file.
+
+Notwithstanding the discussion in the previous paragraph, I recommend that people who find themselves using SQL-driven databases a lot learn some SQL.
+This view is implicitly endorsed by Hadley Wickham with the inclusion of a significant amount of [material intended to teach SQL](https://r4ds.hadley.nz/databases.html) to readers of "R for Data Science".
+While we include a brief primer on SQL for `dplyr` users [here](https://iangow.github.io/far_book/sql-primer.html), clearly an excellent source for learning SQL is @tanimura2021sql itself.
+
+Another benefit of using R is that we can do more with R.
+@tanimura2021sql includes many plots of data produced using SQL, but the code to make the plots is not included.
+In contrast, here I will include code to produce the data as well as code to make plots (where applicable).
+
+My view is that the material here might be useful to someone who is using @tanimura2021sql and wants to see how the ideas there can be implemented using R, while at the same time being useful to someone who knows (or is looking to learn) R and is looking for realistic data sets to work on.
