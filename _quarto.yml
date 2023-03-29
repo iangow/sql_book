@@ -10,8 +10,10 @@ book:
   
   chapters:
     - index.qmd
+    - chapter_1.qmd
     - chapter_2.qmd
     - chapter_3.qmd
+    - chapter_4.qmd
     - references.qmd
 
 bibliography: references.bib
