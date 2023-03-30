@@ -214,7 +214,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </header>
 
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pg <span class="ot">&lt;-</span> <span class="fu">dbConnect</span>(RPostgres<span class="sc">::</span><span class="fu">Postgres</span>(), <span class="at">bigint =</span> <span class="st">"integer"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pg <span class="ot">&lt;-</span> <span class="fu">dbConnect</span>(RPostgres<span class="sc">::</span><span class="fu">Postgres</span>(), <span class="at">bigint =</span> <span class="st">"integer"</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">dbExecute</span>(pg, <span class="st">"SET search_path TO sql_book"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> id_bioguide ,<span class="fu">min</span>(term_start) <span class="kw">AS</span> first_term</span>
@@ -577,6 +578,624 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 #   yr34 &lt;dbl&gt;, yr35 &lt;dbl&gt;, yr36 &lt;dbl&gt;, yr37 &lt;dbl&gt;, yr38 &lt;dbl&gt;, yr39 &lt;dbl&gt;,
 #   yr40 &lt;dbl&gt;, yr41 &lt;dbl&gt;, yr42 &lt;dbl&gt;, yr43 &lt;dbl&gt;, yr44 &lt;dbl&gt;, yr45 &lt;dbl&gt;,
 #   yr46 &lt;dbl&gt;, yr47 &lt;dbl&gt;, yr48 &lt;dbl&gt;, yr49 &lt;dbl&gt;, yr50 &lt;dbl&gt;, yr51 &lt;dbl&gt;, …</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span> </span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>first_terms <span class="kw">AS</span> (</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">SELECT</span> id_bioguide, <span class="fu">min</span>(term_start) <span class="kw">AS</span> first_term</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> legislators_terms </span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  <span class="kw">GROUP</span> <span class="kw">BY</span> <span class="dv">1</span>)</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> a.id_bioguide, a.first_term, b.term_start, b.term_end,</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  c.<span class="dt">date</span>,</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>  date_part(<span class="st">'year'</span>,age(c.<span class="dt">date</span>, a.first_term)) <span class="kw">AS</span> period</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> first_terms a</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> legislators_terms b <span class="kw">ON</span> a.id_bioguide <span class="op">=</span> b.id_bioguide </span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a><span class="kw">LEFT</span> <span class="kw">JOIN</span> date_dim c <span class="kw">ON</span> c.<span class="dt">date</span> <span class="kw">BETWEEN</span> b.term_start <span class="kw">and</span> b.term_end </span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a><span class="kw">and</span> c.month_name <span class="op">=</span> <span class="st">'December'</span> <span class="kw">and</span> c.day_of_month <span class="op">=</span> <span class="dv">31</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="knitsql-table">
+<table class="table table-sm table-striped">
+<caption>Displaying records 1 - 10</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">id_bioguide</th>
+<th style="text-align: left;">first_term</th>
+<th style="text-align: left;">term_start</th>
+<th style="text-align: left;">term_end</th>
+<th style="text-align: left;">date</th>
+<th style="text-align: right;">period</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">B000944</td>
+<td style="text-align: left;">1993-01-05</td>
+<td style="text-align: left;">1993-01-05</td>
+<td style="text-align: left;">1995-01-03</td>
+<td style="text-align: left;">1993-12-31</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">B000944</td>
+<td style="text-align: left;">1993-01-05</td>
+<td style="text-align: left;">1993-01-05</td>
+<td style="text-align: left;">1995-01-03</td>
+<td style="text-align: left;">1994-12-31</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">C000127</td>
+<td style="text-align: left;">1993-01-05</td>
+<td style="text-align: left;">1993-01-05</td>
+<td style="text-align: left;">1995-01-03</td>
+<td style="text-align: left;">1993-12-31</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">C000127</td>
+<td style="text-align: left;">1993-01-05</td>
+<td style="text-align: left;">1993-01-05</td>
+<td style="text-align: left;">1995-01-03</td>
+<td style="text-align: left;">1994-12-31</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">C000141</td>
+<td style="text-align: left;">1987-01-06</td>
+<td style="text-align: left;">1987-01-06</td>
+<td style="text-align: left;">1989-01-03</td>
+<td style="text-align: left;">1987-12-31</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">C000141</td>
+<td style="text-align: left;">1987-01-06</td>
+<td style="text-align: left;">1987-01-06</td>
+<td style="text-align: left;">1989-01-03</td>
+<td style="text-align: left;">1988-12-31</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">C000174</td>
+<td style="text-align: left;">1983-01-03</td>
+<td style="text-align: left;">1983-01-03</td>
+<td style="text-align: left;">1985-01-03</td>
+<td style="text-align: left;">1983-12-31</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">C000174</td>
+<td style="text-align: left;">1983-01-03</td>
+<td style="text-align: left;">1983-01-03</td>
+<td style="text-align: left;">1985-01-03</td>
+<td style="text-align: left;">1984-12-31</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">C001070</td>
+<td style="text-align: left;">2007-01-04</td>
+<td style="text-align: left;">2007-01-04</td>
+<td style="text-align: left;">2013-01-03</td>
+<td style="text-align: left;">2007-12-31</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">C001070</td>
+<td style="text-align: left;">2007-01-04</td>
+<td style="text-align: left;">2007-01-04</td>
+<td style="text-align: left;">2013-01-03</td>
+<td style="text-align: left;">2008-12-31</td>
+<td style="text-align: right;">1</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>year_ends <span class="ot">&lt;-</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tbl</span>(pg, <span class="fu">sql</span>(<span class="st">"</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="st">    SELECT generate_series::date AS date</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="st">    FROM generate_series('1770-12-31', '2030-12-31', interval '1 year')"</span>))</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>cohorts <span class="ot">&lt;-</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>  first_terms <span class="sc">%&gt;%</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">inner_join</span>(legislators_terms, <span class="at">by =</span> <span class="fu">join_by</span>(id_bioguide)) <span class="sc">%&gt;%</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(year_ends, </span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>            <span class="at">by =</span> <span class="fu">join_by</span>(<span class="fu">between</span>(y<span class="sc">$</span>date, x<span class="sc">$</span>term_start, x<span class="sc">$</span>term_end))) <span class="sc">%&gt;%</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">period =</span> <span class="fu">date_part</span>(<span class="st">'year'</span>, <span class="fu">age</span>(date, first_term))) <span class="sc">%&gt;%</span></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(id_bioguide, first_term, term_start, term_end, date, period) </span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>cohorts <span class="sc">%&gt;%</span></span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>(<span class="at">n =</span> <span class="dv">10</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped">
+<thead>
+<tr class="header">
+<th style="text-align: left;">id_bioguide</th>
+<th style="text-align: left;">first_term</th>
+<th style="text-align: left;">term_start</th>
+<th style="text-align: left;">term_end</th>
+<th style="text-align: left;">date</th>
+<th style="text-align: right;">period</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">B000944</td>
+<td style="text-align: left;">1993-01-05</td>
+<td style="text-align: left;">1993-01-05</td>
+<td style="text-align: left;">1995-01-03</td>
+<td style="text-align: left;">1993-12-31</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">B000944</td>
+<td style="text-align: left;">1993-01-05</td>
+<td style="text-align: left;">1993-01-05</td>
+<td style="text-align: left;">1995-01-03</td>
+<td style="text-align: left;">1994-12-31</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">C000127</td>
+<td style="text-align: left;">1993-01-05</td>
+<td style="text-align: left;">1993-01-05</td>
+<td style="text-align: left;">1995-01-03</td>
+<td style="text-align: left;">1993-12-31</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">C000127</td>
+<td style="text-align: left;">1993-01-05</td>
+<td style="text-align: left;">1993-01-05</td>
+<td style="text-align: left;">1995-01-03</td>
+<td style="text-align: left;">1994-12-31</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">C000141</td>
+<td style="text-align: left;">1987-01-06</td>
+<td style="text-align: left;">1987-01-06</td>
+<td style="text-align: left;">1989-01-03</td>
+<td style="text-align: left;">1987-12-31</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">C000141</td>
+<td style="text-align: left;">1987-01-06</td>
+<td style="text-align: left;">1987-01-06</td>
+<td style="text-align: left;">1989-01-03</td>
+<td style="text-align: left;">1988-12-31</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">C000174</td>
+<td style="text-align: left;">1983-01-03</td>
+<td style="text-align: left;">1983-01-03</td>
+<td style="text-align: left;">1985-01-03</td>
+<td style="text-align: left;">1983-12-31</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">C000174</td>
+<td style="text-align: left;">1983-01-03</td>
+<td style="text-align: left;">1983-01-03</td>
+<td style="text-align: left;">1985-01-03</td>
+<td style="text-align: left;">1984-12-31</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">C001070</td>
+<td style="text-align: left;">2007-01-04</td>
+<td style="text-align: left;">2007-01-04</td>
+<td style="text-align: left;">2013-01-03</td>
+<td style="text-align: left;">2007-12-31</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">C001070</td>
+<td style="text-align: left;">2007-01-04</td>
+<td style="text-align: left;">2007-01-04</td>
+<td style="text-align: left;">2013-01-03</td>
+<td style="text-align: left;">2008-12-31</td>
+<td style="text-align: right;">1</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>year_ends <span class="ot">&lt;-</span> </span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tibble</span>(<span class="at">date =</span> <span class="fu">seq</span>(<span class="fu">as.Date</span>(<span class="st">"1770-12-31"</span>), </span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">as.Date</span>(<span class="st">"2030-12-31"</span>), </span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>                    <span class="at">by =</span> <span class="st">"year"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">copy_inline</span>(pg, .)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span> </span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>first_terms <span class="kw">AS</span> (</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">SELECT</span> id_bioguide, <span class="fu">min</span>(term_start) <span class="kw">AS</span> first_term</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> legislators_terms </span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="kw">GROUP</span> <span class="kw">BY</span> <span class="dv">1</span>),</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>year_ends <span class="kw">AS</span> (</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>  <span class="kw">SELECT</span> generate_series:<span class="ch">:date</span> <span class="kw">as</span> <span class="dt">date</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> generate_series(<span class="st">'1770-12-31'</span>, <span class="st">'2030-12-31'</span>, <span class="dt">interval</span> <span class="st">'1 year'</span>)</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coalesce</span>(date_part(<span class="st">'year'</span>, age(c.<span class="dt">date</span>, a.first_term)), <span class="dv">0</span>) <span class="kw">AS</span> period,</span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(<span class="kw">DISTINCT</span> a.id_bioguide) <span class="kw">AS</span> cohort_retained</span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> first_terms a</span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> legislators_terms b <span class="kw">ON</span> a.id_bioguide <span class="op">=</span> b.id_bioguide </span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a><span class="kw">LEFT</span> <span class="kw">JOIN</span> year_ends c <span class="kw">ON</span> c.<span class="dt">date</span> <span class="kw">BETWEEN</span> b.term_start <span class="kw">AND</span> b.term_end </span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> <span class="dv">1</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="knitsql-table">
+<table class="table table-sm table-striped">
+<caption>Displaying records 1 - 10</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">period</th>
+<th style="text-align: right;">cohort_retained</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">0</td>
+<td style="text-align: right;">12518</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">1</td>
+<td style="text-align: right;">12328</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2</td>
+<td style="text-align: right;">8166</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">3</td>
+<td style="text-align: right;">8069</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">4</td>
+<td style="text-align: right;">5862</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">5</td>
+<td style="text-align: right;">5795</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">6</td>
+<td style="text-align: right;">4361</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">7</td>
+<td style="text-align: right;">4339</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">8</td>
+<td style="text-align: right;">3521</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">9</td>
+<td style="text-align: right;">3485</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span> </span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>first_terms <span class="kw">AS</span> (</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">SELECT</span> id_bioguide, <span class="fu">min</span>(term_start) <span class="kw">AS</span> first_term</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> legislators_terms </span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="kw">GROUP</span> <span class="kw">BY</span> <span class="dv">1</span>),</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>cohorts <span class="kw">AS</span> (</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>  <span class="kw">SELECT</span> <span class="op">*</span> </span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> first_terms a</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>  <span class="kw">JOIN</span> legislators_terms b <span class="kw">USING</span> (id_bioguide)</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>  <span class="kw">LEFT</span> <span class="kw">JOIN</span> date_dim c <span class="kw">ON</span> c.<span class="dt">date</span> <span class="kw">BETWEEN</span> b.term_start <span class="kw">AND</span> b.term_end </span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> c.month_name <span class="op">=</span> <span class="st">'December'</span> <span class="kw">AND</span> c.day_of_month <span class="op">=</span> <span class="dv">31</span>)</span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coalesce</span>(date_part(<span class="st">'year'</span>, age(<span class="dt">date</span>, first_term)), <span class="dv">0</span>) <span class="kw">AS</span> period,</span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(<span class="kw">DISTINCT</span> id_bioguide) <span class="kw">AS</span> cohort_retained</span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> cohorts</span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> <span class="dv">1</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="knitsql-table">
+<table class="table table-sm table-striped">
+<caption>Displaying records 1 - 10</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">period</th>
+<th style="text-align: right;">cohort_retained</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">0</td>
+<td style="text-align: right;">12518</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">1</td>
+<td style="text-align: right;">12328</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2</td>
+<td style="text-align: right;">8166</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">3</td>
+<td style="text-align: right;">8069</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">4</td>
+<td style="text-align: right;">5862</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">5</td>
+<td style="text-align: right;">5795</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">6</td>
+<td style="text-align: right;">4361</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">7</td>
+<td style="text-align: right;">4339</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">8</td>
+<td style="text-align: right;">3521</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">9</td>
+<td style="text-align: right;">3485</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>cohorts_retained <span class="ot">&lt;-</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  cohorts <span class="sc">%&gt;%</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">period =</span> <span class="fu">coalesce</span>(<span class="fu">date_part</span>(<span class="st">'year'</span>, <span class="fu">age</span>(date, first_term)), <span class="dv">0</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(period, id_bioguide) <span class="sc">%&gt;%</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(period) <span class="sc">%&gt;%</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">cohort_retained =</span> <span class="fu">n</span>()) <span class="sc">%&gt;%</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(period)</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>cohorts_retained <span class="sc">%&gt;%</span></span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>(<span class="at">n =</span> <span class="dv">10</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped">
+<thead>
+<tr class="header">
+<th style="text-align: right;">period</th>
+<th style="text-align: right;">cohort_retained</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">12518</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">12328</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">8166</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">8069</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">5862</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5795</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">4361</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">4339</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">3521</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">3485</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span> </span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>first_terms <span class="kw">AS</span> (</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">SELECT</span> id_bioguide, <span class="fu">min</span>(term_start) <span class="kw">AS</span> first_term</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> legislators_terms </span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  <span class="kw">GROUP</span> <span class="kw">BY</span> <span class="dv">1</span>)</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> id_bioguide, a.first_term, b.term_start,</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">CASE</span> <span class="cf">WHEN</span> b.term_type <span class="op">=</span> <span class="st">'rep'</span> <span class="cf">THEN</span> b.term_start <span class="op">+</span> <span class="dt">interval</span> <span class="st">'2 years'</span></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>       <span class="cf">WHEN</span> b.term_type <span class="op">=</span> <span class="st">'sen'</span> <span class="cf">THEN</span> b.term_start <span class="op">+</span> <span class="dt">interval</span> <span class="st">'6 years'</span></span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>  <span class="cf">END</span> <span class="kw">AS</span> term_end</span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> first_terms a</span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> legislators_terms b <span class="kw">USING</span> (id_bioguide);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="knitsql-table">
+<table class="table table-sm table-striped">
+<caption>Displaying records 1 - 10</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">id_bioguide</th>
+<th style="text-align: left;">first_term</th>
+<th style="text-align: left;">term_start</th>
+<th style="text-align: left;">term_end</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">B000944</td>
+<td style="text-align: left;">1993-01-05</td>
+<td style="text-align: left;">1993-01-05</td>
+<td style="text-align: left;">1995-01-05</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">C000127</td>
+<td style="text-align: left;">1993-01-05</td>
+<td style="text-align: left;">1993-01-05</td>
+<td style="text-align: left;">1995-01-05</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">C000141</td>
+<td style="text-align: left;">1987-01-06</td>
+<td style="text-align: left;">1987-01-06</td>
+<td style="text-align: left;">1989-01-06</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">C000174</td>
+<td style="text-align: left;">1983-01-03</td>
+<td style="text-align: left;">1983-01-03</td>
+<td style="text-align: left;">1985-01-03</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">C001070</td>
+<td style="text-align: left;">2007-01-04</td>
+<td style="text-align: left;">2007-01-04</td>
+<td style="text-align: left;">2013-01-04</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">F000062</td>
+<td style="text-align: left;">1992-11-10</td>
+<td style="text-align: left;">1992-11-10</td>
+<td style="text-align: left;">1998-11-10</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">F000469</td>
+<td style="text-align: left;">2019-01-03</td>
+<td style="text-align: left;">2019-01-03</td>
+<td style="text-align: left;">2021-01-03</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">K000367</td>
+<td style="text-align: left;">2007-01-04</td>
+<td style="text-align: left;">2007-01-04</td>
+<td style="text-align: left;">2013-01-04</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">M000639</td>
+<td style="text-align: left;">1993-01-05</td>
+<td style="text-align: left;">1993-01-05</td>
+<td style="text-align: left;">1995-01-05</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">S000033</td>
+<td style="text-align: left;">1991-01-03</td>
+<td style="text-align: left;">1991-01-03</td>
+<td style="text-align: left;">1993-01-03</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>first_terms <span class="sc">%&gt;%</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">inner_join</span>(legislators_terms, <span class="at">by =</span> <span class="fu">join_by</span>(id_bioguide)) <span class="sc">%&gt;%</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">term_end =</span> </span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>           <span class="fu">case_when</span>(term_type <span class="sc">==</span> <span class="st">'rep'</span> <span class="sc">~</span> term_start <span class="sc">+</span> <span class="fu">years</span>(<span class="dv">2</span>),</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>                     term_type <span class="sc">==</span> <span class="st">'sen'</span> <span class="sc">~</span> term_start <span class="sc">+</span> <span class="fu">years</span>(<span class="dv">6</span>))) <span class="sc">%&gt;%</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(id_bioguide, first_term, term_start, term_end)  <span class="sc">%&gt;%</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>(<span class="at">n =</span> <span class="dv">10</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped">
+<thead>
+<tr class="header">
+<th style="text-align: left;">id_bioguide</th>
+<th style="text-align: left;">first_term</th>
+<th style="text-align: left;">term_start</th>
+<th style="text-align: left;">term_end</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">B000944</td>
+<td style="text-align: left;">1993-01-05</td>
+<td style="text-align: left;">1993-01-05</td>
+<td style="text-align: left;">1995-01-05</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">C000127</td>
+<td style="text-align: left;">1993-01-05</td>
+<td style="text-align: left;">1993-01-05</td>
+<td style="text-align: left;">1995-01-05</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">C000141</td>
+<td style="text-align: left;">1987-01-06</td>
+<td style="text-align: left;">1987-01-06</td>
+<td style="text-align: left;">1989-01-06</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">C000174</td>
+<td style="text-align: left;">1983-01-03</td>
+<td style="text-align: left;">1983-01-03</td>
+<td style="text-align: left;">1985-01-03</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">C001070</td>
+<td style="text-align: left;">2007-01-04</td>
+<td style="text-align: left;">2007-01-04</td>
+<td style="text-align: left;">2013-01-04</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">F000062</td>
+<td style="text-align: left;">1992-11-10</td>
+<td style="text-align: left;">1992-11-10</td>
+<td style="text-align: left;">1998-11-10</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">F000469</td>
+<td style="text-align: left;">2019-01-03</td>
+<td style="text-align: left;">2019-01-03</td>
+<td style="text-align: left;">2021-01-03</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">K000367</td>
+<td style="text-align: left;">2007-01-04</td>
+<td style="text-align: left;">2007-01-04</td>
+<td style="text-align: left;">2013-01-04</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">M000639</td>
+<td style="text-align: left;">1993-01-05</td>
+<td style="text-align: left;">1993-01-05</td>
+<td style="text-align: left;">1995-01-05</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">S000033</td>
+<td style="text-align: left;">1991-01-03</td>
+<td style="text-align: left;">1991-01-03</td>
+<td style="text-align: left;">1993-01-03</td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 
