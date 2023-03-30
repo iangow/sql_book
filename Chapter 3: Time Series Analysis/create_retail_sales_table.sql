@@ -12,7 +12,7 @@ sales_month date
 
 -- populate the table with data from the csv file. Download the file locally before completing this step
 COPY retail_sales 
-FROM '/Users/iangow/git/sql_book/Chapter 3: Time Series Analysis/us_retail_sales.csv' -- change to the location you saved the csv file
+FROM '/Users/igow/git/sql_book/Chapter 3: Time Series Analysis/us_retail_sales.csv' -- change to the location you saved the csv file
 DELIMITER ','
 CSV HEADER
 ;

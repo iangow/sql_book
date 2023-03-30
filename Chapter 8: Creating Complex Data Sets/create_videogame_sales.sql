@@ -2,11 +2,11 @@ DROP table if exists videogame_sales;
 CREATE table videogame_sales
 (
 rank int
-,name varchar
-,platform varchar
+,name text
+,platform text
 ,year int
-,genre varchar
-,publisher varchar
+,genre text
+,publisher text
 ,na_sales decimal
 ,eu_sales decimal
 ,jp_sales decimal
@@ -16,4 +16,4 @@ rank int
 ;
 
 -- change localpath to the location of the saved file
-COPY videogame_sales FROM '/localpath/videogame_sales.csv' DELIMITER ',' CSV HEADER;
+COPY videogame_sales FROM '/Users/igow/git/sql_book/Chapter 8: Creating Complex Data Sets/videogame_sales.csv' DELIMITER ',' CSV HEADER;
