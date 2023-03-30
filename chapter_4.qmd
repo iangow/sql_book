@@ -6,6 +6,7 @@ library(DBI)
 library(tidyverse)
 library(dbplyr)
 library(ggplot2)
+library(knitr)
 ```
 
 ```{r}
@@ -130,4 +131,130 @@ retained_data %>%
               names_prefix = "yr",
               values_from = pct_retained) %>%
   collect()
+```
+
+```{sql, connection=pg}
+WITH 
+first_terms AS (
+  SELECT id_bioguide, min(term_start) AS first_term
+  FROM legislators_terms 
+  GROUP BY 1)
+  
+SELECT a.id_bioguide, a.first_term, b.term_start, b.term_end,
+  c.date,
+  date_part('year',age(c.date, a.first_term)) AS period
+FROM first_terms a
+JOIN legislators_terms b ON a.id_bioguide = b.id_bioguide 
+LEFT JOIN date_dim c ON c.date BETWEEN b.term_start and b.term_end 
+and c.month_name = 'December' and c.day_of_month = 31;
+```
+
+```{r}
+year_ends <-
+  tbl(pg, sql("
+    SELECT generate_series::date AS date
+    FROM generate_series('1770-12-31', '2030-12-31', interval '1 year')"))
+
+cohorts <-
+  first_terms %>%
+  inner_join(legislators_terms, by = join_by(id_bioguide)) %>%
+  left_join(year_ends, 
+            by = join_by(between(y$date, x$term_start, x$term_end))) %>%
+  mutate(period = date_part('year', age(date, first_term))) %>%
+  select(id_bioguide, first_term, term_start, term_end, date, period) 
+
+cohorts %>%
+  collect(n = 10) %>%
+  kable()
+```
+```{r}
+#| eval: false
+year_ends <- 
+  tibble(date = seq(as.Date("1770-12-31"), 
+                    as.Date("2030-12-31"), 
+                    by = "year")) %>%
+  copy_inline(pg, .)
+```
+
+```{sql, connection=pg}
+WITH 
+first_terms AS (
+  SELECT id_bioguide, min(term_start) AS first_term
+  FROM legislators_terms 
+  GROUP BY 1),
+  
+year_ends AS (
+  SELECT generate_series::date as date
+  FROM generate_series('1770-12-31', '2030-12-31', interval '1 year')
+)
+  
+SELECT 
+  coalesce(date_part('year', age(c.date, a.first_term)), 0) AS period,
+  count(DISTINCT a.id_bioguide) AS cohort_retained
+FROM first_terms a
+JOIN legislators_terms b ON a.id_bioguide = b.id_bioguide 
+LEFT JOIN year_ends c ON c.date BETWEEN b.term_start AND b.term_end 
+GROUP BY 1;
+```
+
+```{sql, connection=pg}
+WITH 
+first_terms AS (
+  SELECT id_bioguide, min(term_start) AS first_term
+  FROM legislators_terms 
+  GROUP BY 1),
+  
+cohorts AS (
+  SELECT * 
+  FROM first_terms a
+  JOIN legislators_terms b USING (id_bioguide)
+  LEFT JOIN date_dim c ON c.date BETWEEN b.term_start AND b.term_end 
+    AND c.month_name = 'December' AND c.day_of_month = 31)
+  
+SELECT 
+  coalesce(date_part('year', age(date, first_term)), 0) AS period,
+  count(DISTINCT id_bioguide) AS cohort_retained
+FROM cohorts
+GROUP BY 1;
+```
+
+```{r}
+cohorts_retained <-
+  cohorts %>%
+  mutate(period = coalesce(date_part('year', age(date, first_term)), 0)) %>%
+  select(period, id_bioguide) %>%
+  distinct() %>%
+  group_by(period) %>%
+  summarize(cohort_retained = n()) %>%
+  arrange(period)
+
+cohorts_retained %>%
+  collect(n = 10) %>%
+  kable()
+```
+
+```{sql, connection=pg}
+WITH 
+first_terms AS (
+  SELECT id_bioguide, min(term_start) AS first_term
+  FROM legislators_terms 
+  GROUP BY 1)
+  
+SELECT id_bioguide, a.first_term, b.term_start,
+  CASE WHEN b.term_type = 'rep' THEN b.term_start + interval '2 years'
+       WHEN b.term_type = 'sen' THEN b.term_start + interval '6 years'
+  END AS term_end
+FROM first_terms a
+JOIN legislators_terms b USING (id_bioguide);
+```
+
+```{r}
+first_terms %>%
+  inner_join(legislators_terms, by = join_by(id_bioguide)) %>%
+  mutate(term_end = 
+           case_when(term_type == 'rep' ~ term_start + years(2),
+                     term_type == 'sen' ~ term_start + years(6))) %>%
+  select(id_bioguide, first_term, term_start, term_end)  %>%
+  collect(n = 10) %>%
+  kable()
 ```
