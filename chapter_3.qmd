@@ -7,7 +7,12 @@
 library(DBI)
 library(tidyverse)
 library(dbplyr)
+```
+
+```{r}
+#| output: false
 pg <- dbConnect(RPostgres::Postgres(), bigint = "integer")
+dbExecute(pg, "SET search_path TO sql_book")
 ```
 
 @tanimura2021sql points out that often "timestamps in the database are not encoded with the time zone, and you will need to consult with the source or developer to figure out how your data was stored."
