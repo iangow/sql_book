@@ -16,7 +16,6 @@ library(DBI)
 ```
 
 ```{r}
-#| output: false
 pg <- dbConnect(RPostgres::Postgres(), bigint = "integer")
 dbExecute(pg, "SET search_path TO sql_book")
 ```

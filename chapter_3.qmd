@@ -10,7 +10,6 @@ library(dbplyr)
 ```
 
 ```{r}
-#| output: false
 pg <- dbConnect(RPostgres::Postgres(), bigint = "integer")
 dbExecute(pg, "SET search_path TO sql_book")
 ```
@@ -24,6 +23,7 @@ Instead, it would be on PDT.
 ```{sql, connection=pg}
 SELECT '2020-09-01 00:00:00 -0' AT TIME ZONE 'pst';
 ```
+
 ```{sql, connection=pg}
 SELECT '2020-09-01 00:00:00 -0' AT TIME ZONE 'pdt';
 ```
@@ -36,6 +36,7 @@ SELECT *
 FROM pg_timezone_names
 WHERE name ~ '^US/';
 ```
+
 ```{sql, connection=pg}
 SELECT * 
 FROM pg_timezone_names
