@@ -1,6 +1,6 @@
-DROP table if exists public.date_dim;
+DROP table if exists sql_book.date_dim;
 
-CREATE table public.date_dim
+CREATE table sql_book.date_dim
 as
 SELECT date::date
 ,to_char(date,'yyyymmdd')::int as date_key

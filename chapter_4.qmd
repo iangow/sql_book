@@ -1,5 +1,65 @@
 # Cohorts
 
+Chapter 4 examines the fascinating topic of cohorts, where a cohort is a group of observations (often people) who acquire a shared characteristic at (approximately) the same time.
+For example, children entering kindergarten in New Zealand in 2017 or the Harvard MBA Class of 2002.
+
+While cohort analysis has some attractive features, I guess that data do not often come in a format that facilitates such analysis.
+Instead, as is the case with the *legislators* data set studied in Chapter 4, the data analyst needs to rearrange the data to support cohort analysis.
+
+I found Chapter 4 a little confusing on a first pass through it.^[In writing this sentence, I am still working through the chapter.]
+The chapter launches into some SQL code intended to create cohorts, but it's a little unclear why we're doing what we're doing, and we quickly see that our cohort analysis does not make sense (e.g., we have more of our original cohort in period 5 than we had in period 4) and we must have done something wrong.
+I think I see the idea Cathy is going for here: one needs to think carefully about how to arrange the data to avoid subtle mistakes.
+The challenge I see is that it's not obvious that everyone would make the same mistake and one is too deep in the weeds of the code to really see the forest for the trees.
+
+So before I launch into the code, I will spend a little time thinking about things conceptually.
+I will start with a different example from that used in Chapter 4, but one that I think brings out some of the issues.
+
+For some reason I associate cohort analysis with life expectancy.
+The people who are born today form a cohort and one might ask: How long do we expect members of this cohort to live?
+One often hears life expectancy statistics quoted as something like: "In Australia, a boy born in 2018–2020 can expect to live to the age of 81.2 years and a girl would be expected to live to 85.3 years compared to 51.1 for boys and 54.8 years for girls born in in 1891–1900."^[See [here](https://www.aihw.gov.au/reports/life-expectancy-death/deaths-in-australia/contents/life-expectancy) for the source for these data.]
+
+The people who construct the life expectancies for the children must be veritable polymaths.
+They need to anticipate future developments in medical care and technology.
+Skin cancer is a significant cause of death in Australia, due to a mismatch between the median complexion and the intensity of the sun.
+But the analysts calculating life expectancy need to think about how medical technology is likely to affect rates of death from carcinoma in the future.
+I can imagine whole-body scanners a bit like the scanners in US airports that detect skin cancers before they become problematic.
+These analysts also need to understand how road safety will evolve.
+Will children today all be in driverless vehicles in fifty years time and will accidents then be a rarity?
+And what about war?
+The data analyst needs to be able to forecast the possibility of World War III breaking out and shortening life spans.
+Who are these people?
+
+Of course it seems unlikely these *über*-analysts exist.
+Rather they surely do something more prosaic.
+Here is my *guess* as to how life expectancies are constructed.^[I made no effort to research how they are constructed because (1) I am lazy and (2) my imagined version is probably better for my current purposes.]
+I guess that the data analyst gathers data on cohorts notionally formed at some point in the past and then looks at survival rates for that cohort over some period, then aggregates those data into a life expectancy.
+
+For example, the data analyst might gather data on people who turned 21 in 2018 and then data on whether those people surived to their 22nd birthday.
+The proportion of such people who make their 22nd birthday could be interpreted as a survival probability $p_{21}$.
+Repeat that for each age-based cohort to get probabilities $\left\{p_i: i = 0, 1, \dots, 119, 120 \right\}$.
+Now to find the median life expectancy, we could calculate something like this:^[There are some details I'm glossing over here, such as the fact that there will be some $j$ where the cumulative survival probability is just above one-half, but where that for $j + 1$ is just below one-half, so some interpolation will be required.]
+
+$$ \left\{j: \arg \min_{i} \left(\prod_{0}^{i} p_i\right) \leq \frac{1}{2} \right\} $$
+So we have a (fairly) well-defined procedure here.
+There are obviously some details to be worked out.
+For example, do we focus on one year (2018 in this case), or collect data over multiple years.
+Does it make sense to form cohorts by years?
+Or would grouping into larger cohorts (e.g., 20--25) make more sense?
+Do we identify people by birthdays?
+Or just use some kind of census date?
+(People who are 21 on 1 July might have just turned 21, or might be about to turn 22.)
+
+But what exactly have we calculated?
+In a sense it's a nonsensical number.
+Why would survival rates for 88-year-olds in 2018 be relevant for the life expectancy of newborns today, who will face a very different world when they turn 88 in 2111.
+First, perhaps the analysts really don't calculate it in this way (though I'm doubtful they are polymaths).
+Second, even though it's a "meaningless" number, it probably still has attractive properties, such as the ability to represent in a one or two numbers a lot about the quality of life in Australia.
+
+A final note is that it is not clear to me where the "51.1 for boys and 54.8 years for girls born in in 1891--1900" values come from.
+Are these the equivalent life expectancies calculated using data available around 1900?
+Or are these the observed lifespans of people born in 1891--1900?
+If the latter, how accurate were the former as estimates of these values?
+
 ```{r}
 #| include: false
 library(DBI)
