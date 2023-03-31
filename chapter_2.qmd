@@ -23,7 +23,8 @@ dbExecute(pg, "SET search_path TO sql_book")
 ```{r}
 dates_sql <-
    "SELECT * 
-    FROM generate_series('2000-01-01'::timestamp,'2030-12-31', '1 day')"
+    FROM generate_series('2000-01-01'::timestamp,
+                         '2030-12-31', '1 day')"
 
 dates <- 
   tbl(pg, sql(dates_sql)) %>%
