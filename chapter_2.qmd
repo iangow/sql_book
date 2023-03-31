@@ -65,18 +65,6 @@ dates_processed %>%
 ```
 
 
-```{sql}
-#| eval: false
-
-
-
-
-
-
-```
-
-
-
 ```{r}
 ctry_pops <-
   tribble(

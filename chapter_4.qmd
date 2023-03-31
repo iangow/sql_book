@@ -75,13 +75,16 @@ pg <- dbConnect(RPostgres::Postgres(), bigint = "integer")
 dbExecute(pg, "SET search_path TO sql_book")
 ```
 
-```{sql, connection=pg}
+```{sql}
+#| connection: pg
 SELECT id_bioguide ,min(term_start) AS first_term
 FROM legislators_terms 
 GROUP BY 1
 LIMIT 10;
 ```
-```{sql, connection=pg}
+
+```{sql}
+#| connection: pg
 WITH first_terms AS (
       SELECT id_bioguide, min(term_start) AS first_term
       FROM legislators_terms 
@@ -112,7 +115,8 @@ cohorts %>%
   collect(n = 10)
 ```
 
-```{sql, connection=pg}
+```{sql}
+#| connection: pg
 WITH 
 first_terms AS (
   SELECT id_bioguide, min(term_start) AS first_term
@@ -151,7 +155,8 @@ retained_data %>%
   geom_line()
 ```
 
-```{sql, connection=pg}
+```{sql}
+#| connection: pg
 WITH 
 first_terms AS (
   SELECT id_bioguide, min(term_start) AS first_term
@@ -193,7 +198,8 @@ retained_data %>%
   collect()
 ```
 
-```{sql, connection=pg}
+```{sql}
+#| connection: pg
 WITH 
 first_terms AS (
   SELECT id_bioguide, min(term_start) AS first_term
@@ -236,7 +242,8 @@ year_ends <-
   copy_inline(pg, .)
 ```
 
-```{sql, connection=pg}
+```{sql}
+#| connection: pg
 WITH 
 first_terms AS (
   SELECT id_bioguide, min(term_start) AS first_term
@@ -257,7 +264,8 @@ LEFT JOIN year_ends c ON c.date BETWEEN b.term_start AND b.term_end
 GROUP BY 1;
 ```
 
-```{sql, connection=pg}
+```{sql}
+#| connection: pg
 WITH 
 first_terms AS (
   SELECT id_bioguide, min(term_start) AS first_term
@@ -293,7 +301,8 @@ cohorts_retained %>%
   kable()
 ```
 
-```{sql, connection=pg}
+```{sql}
+#| connection: pg
 WITH 
 first_terms AS (
   SELECT id_bioguide, min(term_start) AS first_term

@@ -20,24 +20,29 @@ When pushing data to a PostgreSQL database, I use the `timestamp with time zone`
 @tanimura2021sql provides the following example, which is interesting because the west coast of the United States would not be on the PST time zone at that time of year.
 Instead, it would be on PDT.
 
-```{sql, connection=pg}
+```{sql}
+#| connection: pg
 SELECT '2020-09-01 00:00:00 -0' AT TIME ZONE 'pst';
 ```
 
-```{sql, connection=pg}
+```{sql}
+#| connection: pg
 SELECT '2020-09-01 00:00:00 -0' AT TIME ZONE 'pdt';
 ```
+
 I think most people barely know the difference between PST and PDT and even fewer would know the exact dates that one switches from one to the other.
 A better approach is to use a time zone that encodes information about when PDT is used and when PST is used.
 In PostgreSQL, the table `pg_timezone_names` has information that we need.
 
-```{sql, connection=pg}
+```{sql}
+#| connection: pg
 SELECT * 
 FROM pg_timezone_names
 WHERE name ~ '^US/';
 ```
 
-```{sql, connection=pg}
+```{sql}
+#| connection: pg
 SELECT * 
 FROM pg_timezone_names
 WHERE abbrev IN ('PDT', 'PST') 
@@ -45,13 +50,15 @@ ORDER BY name DESC
 LIMIT 5;
 ```
 
-```{sql, connection=pg}
+```{sql}
+#| connection: pg
 SELECT 
     '2020-09-01 00:00:00 -0' AT TIME ZONE 'US/Pacific',
     '2020-09-01 00:00:00 -0' AT TIME ZONE 'PDT';
 ```
 
-```{sql, connection=pg}
+```{sql}
+#| connection: pg
 SELECT     
     '2020-12-01 00:00:00 -0' AT TIME ZONE 'US/Pacific',
     '2020-12-01 00:00:00 -0' AT TIME ZONE 'PST';
@@ -60,7 +67,8 @@ SELECT
 
 As discussed in @tanimura2021sql, PostgreSQL has a rich array of functions for converting dates and times and extracting such information as months and days of the week.
 
-```{sql, connection=pg}
+```{sql}
+#| connection: pg
 SELECT date_trunc('month','2020-10-04 12:33:35'::timestamp);
 ```
 One such function 
@@ -100,7 +108,8 @@ a_time_df %>%
 ```
 ## The Retail Sales Data Set
 
-```{sql, connection=pg}
+```{sql}
+#| connection: pg
 SELECT sales_month, sales
 FROM retail_sales
 WHERE kind_of_business = 'Retail and food services sales, total'
@@ -117,7 +126,8 @@ retail_sales %>%
   geom_line()
 ```
 
-```{sql, connection=pg}
+```{sql}
+#| connection: pg
 SELECT date_part('year',sales_month) as sales_year,
     sum(sales) as sales
 FROM retail_sales
@@ -137,7 +147,8 @@ retail_sales %>%
   geom_line()
 ```
 
-```{sql, connection=pg}
+```{sql}
+#| connection: pg
 SELECT date_part('year',sales_month) as sales_year, 
   kind_of_business, sum(sales) as sales
 FROM retail_sales
@@ -165,7 +176,8 @@ retail_sales %>%
   theme(legend.position = "top")
 ```
 
-```{sql, connection=pg}
+```{sql}
+#| connection: pg
 SELECT sales_month, kind_of_business, sales
 FROM retail_sales
 WHERE kind_of_business IN ('Men''s clothing stores','Women''s clothing stores')
@@ -183,7 +195,8 @@ retail_sales %>%
   theme(legend.position = "top")
 ```
 
-```{sql, connection=pg}
+```{sql}
+#| connection: pg
 SELECT date_part('year',sales_month) as sales_year,
   kind_of_business, sum(sales) as sales
 FROM retail_sales
@@ -208,7 +221,8 @@ retail_sales %>%
   theme(legend.position = "top")
 ```
 
-```{sql, connection=pg}
+```{sql}
+#| connection: pg
 SELECT date_part('year', sales_month) AS sales_year,
   sum(CASE WHEN kind_of_business = 'Women''s clothing stores' 
           then sales 
