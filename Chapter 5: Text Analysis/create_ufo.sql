@@ -1,5 +1,7 @@
-DROP table if exists ufo;
-CREATE table ufo
+SET search_path TO sql_book;
+
+DROP TABLE IF exists ufo;
+CREATE TABLE ufo
 (
 sighting_report text
 ,description text

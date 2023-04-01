@@ -1,10 +1,10 @@
-DROP table if exists public.stop_words;
-CREATE table public.stop_words
-(stop_word varchar
+DROP table if exists sql_book.stop_words;
+CREATE table sql_book.stop_words
+(stop_word text
 );
 
-INSERT into public.stop_words
-values
+INSERT into sql_book.stop_words
+VALUES
 ('a'),
 ('about'),
 ('above'),
