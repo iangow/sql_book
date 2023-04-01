@@ -1,5 +1,7 @@
 # Cohorts
 
+## Cohorts: A Useful Analysis Framework
+
 Chapter 4 examines the fascinating topic of cohorts, where a cohort is a group of observations (often people) who acquire a shared characteristic at (approximately) the same time.
 For example, children entering kindergarten in New Zealand in 2017 or the Harvard MBA Class of 2002.
 
@@ -42,7 +44,7 @@ Now to find the median life expectancy, we could calculate something like this:^
 $$ \left\{j: \arg \min_{i} \left(\prod_{0}^{i} p_i\right) \leq \frac{1}{2} \right\} $$
 So we have a (fairly) well-defined procedure here.
 There are obviously some details to be worked out.
-For example, do we focus on one year (2018 in this case), or collect data over multiple years.
+For example, do we focus on one year (2018 in this case)? Or collect data over multiple years?
 Does it make sense to form cohorts by years?
 Or would grouping into larger cohorts (e.g., 20--25) make more sense?
 Do we identify people by birthdays?
@@ -60,8 +62,11 @@ Are these the equivalent life expectancies calculated using data available aroun
 Or are these the observed lifespans of people born in 1891--1900?
 If the latter, how accurate were the former as estimates of these values?
 
+## The Legislators Data Set
+
+Now that we understand cohorts, let's move onto the *legislators* data set.
+
 ```{r}
-#| include: false
 library(DBI)
 library(tidyverse)
 library(dbplyr)
@@ -70,9 +75,12 @@ library(knitr)
 ```
 
 ```{r}
-#| output: false
 pg <- dbConnect(RPostgres::Postgres(), bigint = "integer")
 dbExecute(pg, "SET search_path TO sql_book")
+```
+
+```{r}
+legislators_terms <- tbl(pg, "legislators_terms")
 ```
 
 ```{sql}
@@ -98,7 +106,7 @@ LIMIT 10;
 ```
 
 ```{r}
-legislators_terms <- tbl(pg, "legislators_terms")
+
 first_terms <- 
   legislators_terms %>%
   group_by(id_bioguide) %>%
@@ -190,17 +198,22 @@ GROUP BY 1;
 ```{r}
 retained_data %>%
   select(period, pct_retained) %>%
+  filter(period <= 4) %>%
   collect() %>%
   arrange(period) %>%
   pivot_wider(names_from = period, 
               names_prefix = "yr",
               values_from = pct_retained) %>%
-  collect()
+  collect() %>%
+  kable()
 ```
+
+## Adjusting Time Series to Increase Retention Accuracy
 
 ```{sql}
 #| connection: pg
-WITH 
+WITH
+
 first_terms AS (
   SELECT id_bioguide, min(term_start) AS first_term
   FROM legislators_terms 
@@ -208,9 +221,9 @@ first_terms AS (
   
 SELECT a.id_bioguide, a.first_term, b.term_start, b.term_end,
   c.date,
-  date_part('year',age(c.date, a.first_term)) AS period
+  date_part('year', age(c.date, a.first_term)) AS period
 FROM first_terms a
-JOIN legislators_terms b ON a.id_bioguide = b.id_bioguide 
+JOIN legislators_terms b USING (id_bioguide)
 LEFT JOIN date_dim c ON c.date BETWEEN b.term_start and b.term_end 
 and c.month_name = 'December' and c.day_of_month = 31;
 ```
@@ -266,24 +279,28 @@ GROUP BY 1;
 
 ```{sql}
 #| connection: pg
-WITH 
+WITH
+
 first_terms AS (
-  SELECT id_bioguide, min(term_start) AS first_term
+  SELECT id_bioguide, min(term_start) as first_term
   FROM legislators_terms 
   GROUP BY 1),
-  
-cohorts AS (
-  SELECT * 
-  FROM first_terms a
-  JOIN legislators_terms b USING (id_bioguide)
-  LEFT JOIN date_dim c ON c.date BETWEEN b.term_start AND b.term_end 
-    AND c.month_name = 'December' AND c.day_of_month = 31)
-  
-SELECT 
-  coalesce(date_part('year', age(date, first_term)), 0) AS period,
-  count(DISTINCT id_bioguide) AS cohort_retained
-FROM cohorts
-GROUP BY 1;
+
+cohorts_retained AS (        
+    SELECT coalesce(date_part('year', age(c.date,a.first_term)),0) AS period,
+    count(distinct a.id_bioguide) as cohort_retained
+    FROM first_terms a
+    JOIN legislators_terms b USING (id_bioguide)
+    LEFT JOIN date_dim c ON c.date BETWEEN b.term_start AND b.term_end 
+      AND c.month_name = 'December' AND c.day_of_month = 31
+    GROUP BY 1)
+    
+SELECT period,
+  first_value(cohort_retained) OVER w AS cohort_size,
+  cohort_retained,
+  cohort_retained * 1.0/first_value(cohort_retained) over w as pct_retained
+FROM cohorts_retained
+WINDOW w AS (ORDER BY period);
 ```
 
 ```{r}
@@ -293,12 +310,23 @@ cohorts_retained <-
   select(period, id_bioguide) %>%
   distinct() %>%
   group_by(period) %>%
-  summarize(cohort_retained = n()) %>%
-  arrange(period)
+  summarize(cohort_retained = n()) 
 
-cohorts_retained %>%
+pct_retained <-
+  cohorts_retained %>%
+  window_order(period) %>%
+  mutate(cohort_size = first(cohort_retained),
+         cohort_retained = as.double(cohort_retained),
+         pct_retained = cohort_retained/cohort_size) 
+
+pct_retained %>%
+  arrange(period) %>%
   collect(n = 10) %>%
   kable()
+
+pct_retained %>%
+  ggplot(aes(x = period, y = pct_retained)) + 
+  geom_line()
 ```
 
 ```{sql}
@@ -326,4 +354,31 @@ first_terms %>%
   select(id_bioguide, first_term, term_start, term_end)  %>%
   collect(n = 10) %>%
   kable()
+```
+
+```{sql}
+#| connection: pg
+SELECT first_century, period
+,first_value(cohort_retained) over (partition by first_century order by period) as cohort_size
+,cohort_retained
+,cohort_retained * 1.0 / 
+ first_value(cohort_retained) over (partition by first_century order by period) as pct_retained
+FROM
+(
+        SELECT date_part('century',a.first_term) as first_century
+        ,coalesce(date_part('year',age(c.date,a.first_term)),0) as period
+        ,count(distinct a.id_bioguide) as cohort_retained
+        FROM
+        (
+                SELECT id_bioguide, min(term_start) as first_term
+                FROM legislators_terms 
+                GROUP BY 1
+        ) a
+        JOIN legislators_terms b on a.id_bioguide = b.id_bioguide 
+        LEFT JOIN date_dim c on c.date between b.term_start and b.term_end 
+        and c.month_name = 'December' and c.day_of_month = 31
+        GROUP BY 1,2
+) aa
+ORDER BY 1,2
+;
 ```
