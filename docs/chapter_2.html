@@ -255,42 +255,43 @@ div.csl-indent {
 <div class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>dates_sql <span class="ot">&lt;-</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>   <span class="st">"SELECT * </span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="st">    FROM generate_series('2000-01-01'::timestamp,'2030-12-31', '1 day')"</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>dates <span class="ot">&lt;-</span> </span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tbl</span>(pg, <span class="fu">sql</span>(dates_sql)) <span class="sc">%&gt;%</span></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">date =</span> generate_series)</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>dates_processed <span class="ot">&lt;-</span></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  dates <span class="sc">%&gt;%</span></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">date_key =</span> <span class="fu">as.integer</span>(<span class="fu">to_char</span>(date, <span class="st">'yyyymmdd'</span>)),</span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>         <span class="at">day_of_month =</span> <span class="fu">as.integer</span>(<span class="fu">date_part</span>(<span class="st">'day'</span>,date)),</span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>         <span class="at">day_of_year =</span> <span class="fu">as.integer</span>(<span class="fu">date_part</span>(<span class="st">'doy'</span>, date)),</span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>         <span class="at">day_of_week =</span> <span class="fu">as.integer</span>(<span class="fu">date_part</span>(<span class="st">'dow'</span>, date)),</span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>         <span class="at">day_name  =</span> <span class="fu">trim</span>(<span class="fu">to_char</span>(date, <span class="st">'Day'</span>)),</span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>         <span class="at">day_short_name =</span> <span class="fu">trim</span>(<span class="fu">to_char</span>(date, <span class="st">'Dy'</span>)),</span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>         <span class="at">week_number =</span> <span class="fu">as.integer</span>(<span class="fu">date_part</span>(<span class="st">'week'</span>, date)),</span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>         <span class="at">week_of_month =</span> <span class="fu">as.integer</span>(<span class="fu">to_char</span>(date,<span class="st">'W'</span>)),</span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>         <span class="at">week =</span> <span class="fu">as.Date</span>(<span class="fu">date_trunc</span>(<span class="st">'week'</span>, date)),</span>
-<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>         <span class="at">month_number =</span> <span class="fu">as.integer</span>(<span class="fu">date_part</span>(<span class="st">'month'</span>,date)),</span>
-<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>         <span class="at">month_name =</span> <span class="fu">trim</span>(<span class="fu">to_char</span>(date, <span class="st">'Month'</span>)),</span>
-<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>         <span class="at">month_short_name =</span> <span class="fu">trim</span>(<span class="fu">to_char</span>(date, <span class="st">'Mon'</span>)),</span>
-<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>         <span class="at">first_day_of_month =</span> <span class="fu">as.Date</span>(<span class="fu">date_trunc</span>(<span class="st">'month'</span>, date)),</span>
-<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>         <span class="at">last_day_of_month =</span> <span class="fu">as.Date</span>(<span class="fu">date_trunc</span>(<span class="st">'month'</span>, date) <span class="sc">+</span></span>
-<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>                                       <span class="fu">sql</span>(<span class="st">"interval '1 month' -</span></span>
-<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a><span class="st">                                            interval '1 day'"</span>)),</span>
-<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>         <span class="at">quarter_number =</span> <span class="fu">as.integer</span>(<span class="fu">date_part</span>(<span class="st">'quarter'</span>, date)),</span>
-<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>         <span class="at">quarter_name =</span> <span class="fu">trim</span>(<span class="st">'Q'</span> <span class="sc">%||%</span> <span class="fu">as.integer</span>(<span class="fu">date_part</span>(<span class="st">'quarter'</span>, date))),</span>
-<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>         <span class="at">first_day_of_quarter =</span> <span class="fu">as.Date</span>(<span class="fu">date_trunc</span>(<span class="st">'quarter'</span>, date)),</span>
-<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>         <span class="at">last_day_of_quarter =</span> <span class="fu">as.Date</span>(<span class="fu">date_trunc</span>(<span class="st">'quarter'</span>, date) <span class="sc">+</span> </span>
-<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>                                         <span class="fu">sql</span>(<span class="st">"interval '3 months' -</span></span>
-<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a><span class="st">                                              interval '1 day'"</span>)),</span>
-<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>         <span class="at">year =</span> <span class="fu">as.integer</span>(<span class="fu">date_part</span>(<span class="st">'year'</span>, date)),</span>
-<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>         <span class="at">decade =</span> <span class="fu">as.integer</span>(<span class="fu">date_part</span>(<span class="st">'decade'</span>, date)) <span class="sc">*</span> <span class="dv">10</span>,</span>
-<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>         <span class="at">century =</span> <span class="fu">as.integer</span>(<span class="fu">date_part</span>(<span class="st">'century'</span>, date)))</span>
-<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a>dates_processed <span class="sc">%&gt;%</span></span>
-<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>(<span class="at">n =</span> <span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="st">    FROM generate_series('2000-01-01'::timestamp,</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="st">                         '2030-12-31', '1 day')"</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>dates <span class="ot">&lt;-</span> </span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tbl</span>(pg, <span class="fu">sql</span>(dates_sql)) <span class="sc">%&gt;%</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">date =</span> generate_series)</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>dates_processed <span class="ot">&lt;-</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  dates <span class="sc">%&gt;%</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">date_key =</span> <span class="fu">as.integer</span>(<span class="fu">to_char</span>(date, <span class="st">'yyyymmdd'</span>)),</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>         <span class="at">day_of_month =</span> <span class="fu">as.integer</span>(<span class="fu">date_part</span>(<span class="st">'day'</span>,date)),</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>         <span class="at">day_of_year =</span> <span class="fu">as.integer</span>(<span class="fu">date_part</span>(<span class="st">'doy'</span>, date)),</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>         <span class="at">day_of_week =</span> <span class="fu">as.integer</span>(<span class="fu">date_part</span>(<span class="st">'dow'</span>, date)),</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>         <span class="at">day_name  =</span> <span class="fu">trim</span>(<span class="fu">to_char</span>(date, <span class="st">'Day'</span>)),</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>         <span class="at">day_short_name =</span> <span class="fu">trim</span>(<span class="fu">to_char</span>(date, <span class="st">'Dy'</span>)),</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>         <span class="at">week_number =</span> <span class="fu">as.integer</span>(<span class="fu">date_part</span>(<span class="st">'week'</span>, date)),</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>         <span class="at">week_of_month =</span> <span class="fu">as.integer</span>(<span class="fu">to_char</span>(date,<span class="st">'W'</span>)),</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>         <span class="at">week =</span> <span class="fu">as.Date</span>(<span class="fu">date_trunc</span>(<span class="st">'week'</span>, date)),</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>         <span class="at">month_number =</span> <span class="fu">as.integer</span>(<span class="fu">date_part</span>(<span class="st">'month'</span>,date)),</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>         <span class="at">month_name =</span> <span class="fu">trim</span>(<span class="fu">to_char</span>(date, <span class="st">'Month'</span>)),</span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>         <span class="at">month_short_name =</span> <span class="fu">trim</span>(<span class="fu">to_char</span>(date, <span class="st">'Mon'</span>)),</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>         <span class="at">first_day_of_month =</span> <span class="fu">as.Date</span>(<span class="fu">date_trunc</span>(<span class="st">'month'</span>, date)),</span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>         <span class="at">last_day_of_month =</span> <span class="fu">as.Date</span>(<span class="fu">date_trunc</span>(<span class="st">'month'</span>, date) <span class="sc">+</span></span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>                                       <span class="fu">sql</span>(<span class="st">"interval '1 month' -</span></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a><span class="st">                                            interval '1 day'"</span>)),</span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>         <span class="at">quarter_number =</span> <span class="fu">as.integer</span>(<span class="fu">date_part</span>(<span class="st">'quarter'</span>, date)),</span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>         <span class="at">quarter_name =</span> <span class="fu">trim</span>(<span class="st">'Q'</span> <span class="sc">%||%</span> <span class="fu">as.integer</span>(<span class="fu">date_part</span>(<span class="st">'quarter'</span>, date))),</span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>         <span class="at">first_day_of_quarter =</span> <span class="fu">as.Date</span>(<span class="fu">date_trunc</span>(<span class="st">'quarter'</span>, date)),</span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>         <span class="at">last_day_of_quarter =</span> <span class="fu">as.Date</span>(<span class="fu">date_trunc</span>(<span class="st">'quarter'</span>, date) <span class="sc">+</span> </span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>                                         <span class="fu">sql</span>(<span class="st">"interval '3 months' -</span></span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a><span class="st">                                              interval '1 day'"</span>)),</span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>         <span class="at">year =</span> <span class="fu">as.integer</span>(<span class="fu">date_part</span>(<span class="st">'year'</span>, date)),</span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>         <span class="at">decade =</span> <span class="fu">as.integer</span>(<span class="fu">date_part</span>(<span class="st">'decade'</span>, date)) <span class="sc">*</span> <span class="dv">10</span>,</span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>         <span class="at">century =</span> <span class="fu">as.integer</span>(<span class="fu">date_part</span>(<span class="st">'century'</span>, date)))</span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>dates_processed <span class="sc">%&gt;%</span></span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>(<span class="at">n =</span> <span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 10 × 22
    date                date_key day_of_month day_of_year day_of_week day_name 
@@ -345,7 +346,8 @@ FROM (
   SELECT "generate_series" AS "date"
   FROM (
 SELECT * 
-    FROM generate_series('2000-01-01'::timestamp,'2030-12-31', '1 day')
+    FROM generate_series('2000-01-01'::timestamp,
+                         '2030-12-31', '1 day')
   ) "q01"
 ) "q02"</code></pre>
 </div>
