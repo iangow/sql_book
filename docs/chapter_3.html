@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.1.189">
+<meta name="generator" content="quarto-1.2.269">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -202,6 +202,11 @@ div.csl-indent {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="./chapter_5.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Text Analysis</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="./references.html" class="sidebar-item-text sidebar-link">References</a>
   </div>
 </li>
@@ -234,6 +239,7 @@ div.csl-indent {
 <div class="quarto-title-meta">
 
     
+  
     
   </div>
   
@@ -256,7 +262,7 @@ div.csl-indent {
 <h2 data-number="3.2" class="anchored" data-anchor-id="time-zone-conversions"><span class="header-section-number">3.2</span> Time Zone Conversions</h2>
 <p><span class="citation" data-cites="tanimura2021sql">Tanimura (<a href="references.html#ref-tanimura2021sql" role="doc-biblioref">2021</a>)</span> points out that often “timestamps in the database are not encoded with the time zone, and you will need to consult with the source or developer to figure out how your data was stored.” When pushing data to a PostgreSQL database, I use the <code>timestamp with time zone</code> type as much as possible.</p>
 <p><span class="citation" data-cites="tanimura2021sql">Tanimura (<a href="references.html#ref-tanimura2021sql" role="doc-biblioref">2021</a>)</span> provides the following example, which is interesting because the west coast of the United States would not be on the PST time zone at that time of year. Instead, it would be on PDT.</p>
-<div class="cell" data-connection="pg">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="st">'2020-09-01 00:00:00'</span> <span class="kw">AT</span> <span class="dt">TIME</span> <span class="dt">ZONE</span> <span class="st">'pst'</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="knitsql-table">
 <table class="table table-sm table-striped">
@@ -274,7 +280,7 @@ div.csl-indent {
 </table>
 </div>
 </div>
-<div class="cell" data-connection="pg">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="st">'2020-09-01 00:00:00'</span> <span class="kw">AT</span> <span class="dt">TIME</span> <span class="dt">ZONE</span> <span class="st">'pdt'</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="knitsql-table">
 <table class="table table-sm table-striped">
@@ -293,7 +299,7 @@ div.csl-indent {
 </div>
 </div>
 <p>I think most people barely know the difference between PST and PDT and even fewer would know the exact dates that one switches from one to the other. A better approach is to use a time zone that encodes information about when PDT is used and when PST is used. In PostgreSQL, the table <code>pg_timezone_names</code> has information that we need.</p>
-<div class="cell" data-connection="pg">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span> </span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> pg_timezone_names</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> name ~ <span class="st">'^US/'</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -373,7 +379,7 @@ div.csl-indent {
 </table>
 </div>
 </div>
-<div class="cell" data-connection="pg">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span> </span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> pg_timezone_names</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> abbrev <span class="kw">IN</span> (<span class="st">'PDT'</span>, <span class="st">'PST'</span>) </span>
@@ -426,7 +432,7 @@ div.csl-indent {
 </div>
 </div>
 <p>The following two queries show that <code>US/Pacific</code> is sometimes <code>PDT</code> and sometimes <code>PST</code>.</p>
-<div class="cell" data-connection="pg">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">'2020-09-01 17:00:01 US/Pacific'</span>:<span class="ch">:timestamptz</span> <span class="kw">AS</span> t1,</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">'2020-09-01 17:00:01 PDT'</span>:<span class="ch">:timestamptz</span>  <span class="kw">AS</span> t2;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -448,7 +454,7 @@ div.csl-indent {
 </table>
 </div>
 </div>
-<div class="cell" data-connection="pg">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">'2020-12-01 16:00:01 US/Pacific'</span>:<span class="ch">:timestamptz</span> <span class="kw">AS</span> t1,</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">'2020-12-01 16:00:01 PST'</span>:<span class="ch">:timestamptz</span>  <span class="kw">AS</span> t2;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -480,7 +486,7 @@ div.csl-indent {
 <span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>two_times</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># Source:   SQL [1 x 2]
-# Database: postgres  [igow@localhost:5432/igow]
+# Database: postgres  [iangow@/tmp:5432/iangow]
   t1                  t2                 
   &lt;dttm&gt;              &lt;dttm&gt;             
 1 2020-12-02 00:00:01 2020-12-02 00:00:01</code></pre>
@@ -520,7 +526,7 @@ div.csl-indent {
 <p>Second, columns of type <code>TIMESTAMP WITH TIME ZONE</code> come into R with the associated time-zone information, which is what we want (especially if we will later put timestamp data back into PostgreSQL).</p>
 <p>Third, we can see that we can choose to <em>display</em> information in a different time zone without changing the underlying data.</p>
 <p>Some care is needed with timestamp data. I think the <code>AT TIME ZONE</code> queries provided in <span class="citation" data-cites="tanimura2021sql">Tanimura (<a href="references.html#ref-tanimura2021sql" role="doc-biblioref">2021</a>)</span> are actually pretty dangerous, as can be seen in the following query. While we supply <code>2020-09-01 00:00:00</code> as UTC and then render it <code>AT TIME ZONE 'PDT'</code>, it turns out that the returned value is interpreted as a <code>TIMESTAMP WITHOUT TIME ZONE</code> and subsequent queries lead to confusing behaviour. In the query below, the second application of <code>AT TIME ZONE</code> interprets the <code>TIMESTAMP WITHOUT TIME ZONE</code> as though it came from the stated time zone and the results seem to have <code>AT TIME ZONE</code> doing the opposite of what it did when given a <code>TIMESTAMP WITH TIME ZONE</code> (as in the initial literal <code>'2020-09-01 00:00:01 -0'</code>).</p>
-<div class="cell" data-connection="pg">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span> q1 <span class="kw">AS</span></span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a> (<span class="kw">SELECT</span> <span class="st">'2020-09-01 00:00:01 -0'</span> <span class="kw">AT</span> <span class="dt">TIME</span> <span class="dt">ZONE</span> <span class="st">'PDT'</span> <span class="kw">AS</span> t1)</span>
 <span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a> </span>
@@ -562,7 +568,7 @@ div.csl-indent {
 </div>
 </div>
 <p>It seems that <code>TIMESTAMP WITHOUT TIME ZONE</code> values should be converted to a time zone as quickly as possible to avoid confusion and that great care is needed with <code>AT TIME ZONE</code> given that it does very different things according to the supplied data type.</p>
-<div class="cell" data-connection="pg">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span> q1 <span class="kw">AS</span></span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a> (<span class="kw">SELECT</span> <span class="st">'2020-09-01 00:00:01 -0'</span>:<span class="ch">:timestamptz</span> <span class="kw">AS</span> t1)</span>
 <span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a> </span>
@@ -606,7 +612,7 @@ div.csl-indent {
 <span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>two_times_notz</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># Source:   SQL [1 x 2]
-# Database: postgres  [igow@localhost:5432/igow]
+# Database: postgres  [iangow@/tmp:5432/iangow]
   t1                     t2                 
   &lt;chr&gt;                  &lt;dttm&gt;             
 1 2020-12-01 00:00:01-00 2020-12-01 00:00:01</code></pre>
@@ -648,7 +654,7 @@ div.csl-indent {
 <section id="date-and-timestamp-format-conversions" class="level2" data-number="3.3">
 <h2 data-number="3.3" class="anchored" data-anchor-id="date-and-timestamp-format-conversions"><span class="header-section-number">3.3</span> Date and Timestamp Format Conversions</h2>
 <p>As discussed in <span class="citation" data-cites="tanimura2021sql">Tanimura (<a href="references.html#ref-tanimura2021sql" role="doc-biblioref">2021</a>)</span>, PostgreSQL has a rich array of functions for converting dates and times and extracting such information as months and days of the week.</p>
-<div class="cell" data-connection="pg">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb37"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> date_trunc(<span class="st">'month'</span>,<span class="st">'2020-10-04 12:33:35 -00'</span>:<span class="ch">:timestamptz</span>);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="knitsql-table">
 <table class="table table-sm table-striped">
@@ -673,7 +679,7 @@ div.csl-indent {
 <span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">a_trunced_time =</span> <span class="fu">date_trunc</span>(<span class="st">'month'</span>, a_time))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># Source:   SQL [1 x 2]
-# Database: postgres  [igow@localhost:5432/igow]
+# Database: postgres  [iangow@/tmp:5432/iangow]
   a_time              a_trunced_time     
   &lt;dttm&gt;              &lt;dttm&gt;             
 1 2020-10-04 12:33:35 2020-10-01 00:00:00</code></pre>
@@ -702,7 +708,7 @@ FROM (SELECT '2020-10-04 12:33:35'::timestamp AS a_time) "q01"</code></pre>
 <span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">a_trunced_time =</span> <span class="fu">date_trunc</span>(<span class="st">'month'</span>, a_time)) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># Source:   SQL [1 x 2]
-# Database: postgres  [igow@localhost:5432/igow]
+# Database: postgres  [iangow@/tmp:5432/iangow]
   a_time              a_trunced_time     
   &lt;dttm&gt;              &lt;dttm&gt;             
 1 2020-10-04 19:33:35 2020-10-01 00:00:00</code></pre>
@@ -738,7 +744,7 @@ FROM (SELECT '2020-10-04 12:33:35 US/Pacific'::timestamp with time zone AS a_tim
 </section>
 <section id="the-retail-sales-data-set" class="level2" data-number="3.4">
 <h2 data-number="3.4" class="anchored" data-anchor-id="the-retail-sales-data-set"><span class="header-section-number">3.4</span> The Retail Sales Data Set</h2>
-<div class="cell" data-connection="pg">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb52"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> sales_month, sales</span>
 <span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> retail_sales</span>
 <span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> kind_of_business <span class="op">=</span> <span class="st">'Retail and food services sales, total'</span></span>
@@ -809,7 +815,7 @@ FROM (SELECT '2020-10-04 12:33:35 US/Pacific'::timestamp with time zone AS a_tim
 <p><img src="chapter_3_files/figure-html/unnamed-chunk-19-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<div class="cell" data-connection="pg">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb54"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> date_part(<span class="st">'year'</span>,sales_month) <span class="kw">as</span> sales_year,</span>
 <span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sum</span>(sales) <span class="kw">as</span> sales</span>
 <span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> retail_sales</span>
@@ -883,7 +889,7 @@ FROM (SELECT '2020-10-04 12:33:35 US/Pacific'::timestamp with time zone AS a_tim
 <p><img src="chapter_3_files/figure-html/unnamed-chunk-21-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<div class="cell" data-connection="pg">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb56"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> date_part(<span class="st">'year'</span>,sales_month) <span class="kw">as</span> sales_year, </span>
 <span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>  kind_of_business, <span class="fu">sum</span>(sales) <span class="kw">as</span> sales</span>
 <span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> retail_sales</span>
@@ -975,7 +981,7 @@ FROM (SELECT '2020-10-04 12:33:35 US/Pacific'::timestamp with time zone AS a_tim
 <p><img src="chapter_3_files/figure-html/unnamed-chunk-23-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<div class="cell" data-connection="pg">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb58"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> sales_month, kind_of_business, sales</span>
 <span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> retail_sales</span>
 <span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> kind_of_business <span class="kw">IN</span> (<span class="st">'Men</span><span class="ch">''</span><span class="st">s clothing stores'</span>,<span class="st">'Women</span><span class="ch">''</span><span class="st">s clothing stores'</span>)</span>
@@ -1058,7 +1064,7 @@ FROM (SELECT '2020-10-04 12:33:35 US/Pacific'::timestamp with time zone AS a_tim
 <p><img src="chapter_3_files/figure-html/unnamed-chunk-25-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<div class="cell" data-connection="pg">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb60"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> date_part(<span class="st">'year'</span>,sales_month) <span class="kw">as</span> sales_year,</span>
 <span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a>  kind_of_business, <span class="fu">sum</span>(sales) <span class="kw">as</span> sales</span>
 <span id="cb60-3"><a href="#cb60-3" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> retail_sales</span>
@@ -1148,7 +1154,7 @@ FROM (SELECT '2020-10-04 12:33:35 US/Pacific'::timestamp with time zone AS a_tim
 <p><img src="chapter_3_files/figure-html/unnamed-chunk-27-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<div class="cell" data-connection="pg">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb62"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> date_part(<span class="st">'year'</span>, sales_month) <span class="kw">AS</span> sales_year,</span>
 <span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sum</span>(<span class="cf">CASE</span> <span class="cf">WHEN</span> kind_of_business <span class="op">=</span> <span class="st">'Women</span><span class="ch">''</span><span class="st">s clothing stores'</span> </span>
 <span id="cb62-3"><a href="#cb62-3" aria-hidden="true" tabindex="-1"></a>          <span class="cf">then</span> sales </span>
@@ -1446,7 +1452,7 @@ FROM (
 <span id="cb75-9"><a href="#cb75-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">pct_from_index =</span> (sales<span class="sc">/</span>index_sales <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">*</span> <span class="dv">100</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># Source:     SQL [?? x 4]
-# Database:   postgres  [igow@localhost:5432/igow]
+# Database:   postgres  [iangow@/tmp:5432/iangow]
 # Ordered by: sales_year
    sales_year sales index_sales pct_from_index
         &lt;dbl&gt; &lt;dbl&gt;       &lt;dbl&gt;          &lt;dbl&gt;
@@ -1460,7 +1466,7 @@ FROM (
  8       1999 29549       31815          -7.12
  9       2000 31447       31815          -1.16
 10       2001 31453       31815          -1.14
-# ℹ more rows</code></pre>
+# … with more rows</code></pre>
 </div>
 </div>
 <div class="cell">
@@ -1558,7 +1564,24 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     button.classList.add('code-copy-button-checked');
     var currentTitle = button.getAttribute("title");
     button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
     setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
       button.setAttribute("title", currentTitle);
       button.classList.remove('code-copy-button-checked');
     }, 1000);
@@ -1594,24 +1617,42 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       return note.innerHTML;
     });
   }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
   var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
   for (var i=0; i<bibliorefs.length; i++) {
     const ref = bibliorefs[i];
-    const cites = ref.parentNode.getAttribute('data-cites').split(' ');
-    tippyHover(ref, function() {
-      var popup = window.document.createElement('div');
-      cites.forEach(function(cite) {
-        var citeDiv = window.document.createElement('div');
-        citeDiv.classList.add('hanging-indent');
-        citeDiv.classList.add('csl-entry');
-        var biblioDiv = window.document.getElementById('ref-' + cite);
-        if (biblioDiv) {
-          citeDiv.innerHTML = biblioDiv.innerHTML;
-        }
-        popup.appendChild(citeDiv);
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
       });
-      return popup.innerHTML;
-    });
+    }
   }
 });
 </script>
