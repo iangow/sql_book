@@ -1,18 +1,21 @@
 # Time Series Analysis
 
-## Date, Datetime, and Time Manipulations
-
 ```{r}
-#| include: false
+#| message: false
 library(DBI)
 library(tidyverse)
 library(dbplyr)
 ```
 
 ```{r}
+#| output: false
 pg <- dbConnect(RPostgres::Postgres(), bigint = "integer")
 dbExecute(pg, "SET search_path TO sql_book")
 ```
+
+## Date, Datetime, and Time Manipulations
+
+## Time Zone Conversions
 
 @tanimura2021sql points out that often "timestamps in the database are not encoded with the time zone, and you will need to consult with the source or developer to figure out how your data was stored."
 When pushing data to a PostgreSQL database, I use the `timestamp with time zone` type as much as possible.
@@ -22,12 +25,12 @@ Instead, it would be on PDT.
 
 ```{sql}
 #| connection: pg
-SELECT '2020-09-01 00:00:00 -0' AT TIME ZONE 'pst';
+SELECT '2020-09-01 00:00:00' AT TIME ZONE 'pst';
 ```
 
 ```{sql}
 #| connection: pg
-SELECT '2020-09-01 00:00:00 -0' AT TIME ZONE 'pdt';
+SELECT '2020-09-01 00:00:00' AT TIME ZONE 'pdt';
 ```
 
 I think most people barely know the difference between PST and PDT and even fewer would know the exact dates that one switches from one to the other.
@@ -50,26 +53,122 @@ ORDER BY name DESC
 LIMIT 5;
 ```
 
-```{sql}
-#| connection: pg
-SELECT 
-    '2020-09-01 00:00:00 -0' AT TIME ZONE 'US/Pacific',
-    '2020-09-01 00:00:00 -0' AT TIME ZONE 'PDT';
-```
+The following two queries show that `US/Pacific` is sometimes `PDT` and sometimes `PST`.
 
 ```{sql}
 #| connection: pg
-SELECT     
-    '2020-12-01 00:00:00 -0' AT TIME ZONE 'US/Pacific',
-    '2020-12-01 00:00:00 -0' AT TIME ZONE 'PST';
+SELECT 
+    '2020-09-01 17:00:01 US/Pacific'::timestamptz AS t1,
+    '2020-09-01 17:00:01 PDT'::timestamptz  AS t2;
 ```
-### Date and Timestamp Format Conversions
+```{sql}
+#| connection: pg
+SELECT 
+    '2020-12-01 16:00:01 US/Pacific'::timestamptz AS t1,
+    '2020-12-01 16:00:01 PST'::timestamptz  AS t2;
+```
+```{r}
+sql <-
+  "SELECT     
+    '2020-12-01 16:00:01 US/Pacific'::timestamptz AS t1,
+    '2020-12-01 16:00:01 PST'::timestamptz AS t2"
+
+two_times <- tbl(pg, sql(sql))
+two_times
+two_times %>%
+  collect()
+
+one_time <-
+  two_times %>%
+  select(t1) %>%
+  pull()
+
+print(one_time, tz = "UTC")
+print(one_time, tz = "US/Pacific")
+Sys.timezone()
+print(one_time, tz = Sys.timezone())
+```
+
+The above examples illustrate a few key ideas.
+
+First, while we supply the literal form `'2020-09-01 17:00:01 US/Pacific'::timestamptz`, it seems that once a variable has been encoded as `TIMESTAMP WITH TIME ZONE`, it behaves as though it is actually being *stored* as a timestamp in the UTC time zone, just with the *displayed* time perhaps being different.
+
+Second, columns of type `TIMESTAMP WITH TIME ZONE` come into R with the associated time-zone information, which is what we want (especially if we will later put timestamp data back into PostgreSQL).
+
+Third, we can see that we can choose to *display* information in a different time zone without changing the underlying data.
+
+Some care is needed with timestamp data.
+I think the `AT TIME ZONE` queries provided in @tanimura2021sql are actually pretty dangerous, as can be seen in the following query.
+While we supply `2020-09-01 00:00:00` as UTC and then render it `AT TIME ZONE 'PDT'`, it turns out that the returned value is interpreted as a `TIMESTAMP WITHOUT TIME ZONE` and subsequent queries lead to confusing behaviour.
+In the query below, the second application of `AT TIME ZONE` interprets the `TIMESTAMP WITHOUT TIME ZONE` as though it came from the stated time zone and the results seem to have `AT TIME ZONE` doing the opposite of what it did when given a `TIMESTAMP WITH TIME ZONE` (as in the initial literal `'2020-09-01 00:00:01 -0'`). 
+
+```{sql}
+#| connection: pg
+WITH q1 AS
+ (SELECT '2020-09-01 00:00:01 -0' AT TIME ZONE 'PDT' AS t1)
+ 
+SELECT t1 AT TIME ZONE 'UTC' AS t2,
+  to_char(t1, 'YYYY-MM-DD HH24:MI:SS TZ'),
+  t1 AT TIME ZONE 'PDT' AS t3,
+  t1 AT TIME ZONE 'Australia/Melbourne' AS t4,
+  pg_typeof(t1)
+FROM q1
+```
+It seems that `TIMESTAMP WITHOUT TIME ZONE` values should be converted to a time zone as quickly as possible to avoid confusion and that great care is needed with `AT TIME ZONE` given that it does very different things according to the supplied data type.
+
+```{sql}
+#| connection: pg
+WITH q1 AS
+ (SELECT '2020-09-01 00:00:01 -0'::timestamptz AS t1)
+ 
+SELECT t1,
+  to_char(t1, 'YYYY-MM-DD HH24:MI:SS TZ'),
+  pg_typeof(t1)
+FROM q1
+```
+Strange behaviour can result from values stored as `TIMESTAMP WITHOUT TIME ZONE`.
+Below we see that `t1` is printed as UTC no matter what, while the behaviour of `t2` seems easier to understand.
+
+```{r}
+sql <-
+  "SELECT     
+    '2020-12-01 00:00:01-00' AS t1,
+    '2020-12-01 00:00:01-00'::timestamptz AS t2"
+
+two_times_notz <- tbl(pg, sql(sql))
+two_times_notz
+```
+
+```{r}
+two_times_notz_r <-
+  collect(two_times_notz)
+
+
+print(two_times_notz_r$t1)
+Sys.timezone()
+print(two_times_notz_r$t1, tz = Sys.timezone())
+
+print(two_times_notz_r$t2)
+Sys.timezone()
+print(two_times_notz_r$t2, tz = Sys.timezone())
+```
+
+
+As pointed out by @tanimura2021sql, one drawback to storing information as UTC is that localtime information may be lost.
+But it seems it would be more prudent to store information as `TIMESTAMP WITH TIME ZONE` and keep local time zone information as a separate column to avoid confusion.
+For example, if the `orders` table is stored as `TIMESTAMP WITHOUT TIME ZONE` based on the local time of the customer, which might be `Australia/Melbourne` and the `shipping` table uses `TIMESTAMP WITH TIME ZONE`, then an analyst of time-to-ship data would be confused by orders apparently being shipped before they are made.
+If `shipping` table uses `TIMESTAMP WITH TIME ZONE` using timestamps in the time zone of the East Bay warehouse (so `US/Pacific`), things would be even worse.
+
+I think that fully fleshing out the issues here would require a separate chapter.
+In fact, nothing in the core part of Chapter 3 of @tanimura2021sql (which focuses on the `retail_sales` table) really uses timestamp information, so we can put these issues aside for now.
+
+## Date and Timestamp Format Conversions
 
 As discussed in @tanimura2021sql, PostgreSQL has a rich array of functions for converting dates and times and extracting such information as months and days of the week.
 
 ```{sql}
 #| connection: pg
-SELECT date_trunc('month','2020-10-04 12:33:35'::timestamp);
+SELECT date_trunc('month','2020-10-04 12:33:35 -00'::timestamptz);
 ```
 One such function 
 
