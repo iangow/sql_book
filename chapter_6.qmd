@@ -1,0 +1,150 @@
+# Chapter 6
+
+```{r}
+#| message: false
+library(DBI)
+library(tidyverse)
+library(dbplyr)
+library(knitr)
+```
+
+```{r}
+#| output: false
+pg <- dbConnect(RPostgres::Postgres(), bigint = "integer")
+dbExecute(pg, "SET search_path TO sql_book")
+```
+
+```{r}
+earthquakes <- tbl(pg, "earthquakes")
+```
+
+```{r}
+earthquakes %>%
+  filter(!is.na(mag)) %>%
+  group_by(mag) %>%
+  summarize(earthquakes = n()) %>%
+  mutate(pct_earthquakes = earthquakes/sum(earthquakes, na.rm = TRUE)) %>%
+  arrange(desc(mag)) %>%
+  collect(n = 5) %>%
+  kable()
+```
+
+```{r}
+earthquakes %>%
+  filter(!is.na(mag)) %>%
+  group_by(mag) %>%
+  summarize(earthquakes = n()) %>%
+  mutate(pct_earthquakes = earthquakes/sum(earthquakes, na.rm = TRUE)) %>%
+  arrange(mag) %>%
+  collect(n = 5) %>%
+  kable()
+```
+
+```{r}
+norcal <-
+  earthquakes %>%
+  filter(!is.na(mag), place == 'Northern California') %>%
+  group_by(place, mag) %>%
+  summarize(count = n(), .groups = "drop") 
+
+norcal %>% 
+  arrange(place, desc(mag)) %>% 
+  collect(n = 3) %>%
+  kable()
+
+norcal %>% 
+  arrange(place, mag) %>% 
+  collect(n = 3) %>%
+  kable()
+```
+
+```{r}
+earthquakes %>%
+  filter(!is.na(mag), place == 'Northern California') %>%
+  group_by(place) %>%
+  window_order(mag) %>%
+  mutate(percentile = percent_rank()) %>%
+  group_by(place, mag, percentile) %>%
+  summarize(count = n(), .groups = "drop") %>%
+  arrange(place, desc(mag)) %>%
+  collect(n = 6) %>%
+  kable()
+```
+```{r}
+earthquakes %>%
+  filter(!is.na(mag), place == 'Central Alaska') %>%
+  select(place, mag) %>%
+  mutate(percentile = ntile(100, order_by = "mag")) %>%
+  arrange(place, desc(mag)) %>%
+  collect(n = 5) %>%
+  kable()
+```
+
+```{r}
+earthquakes %>%
+  filter(!is.na(mag), place == 'Central Alaska') %>%
+  select(place, mag) %>%
+  group_by(place) %>%
+  window_order(mag) %>%
+  mutate(percentile = round(percent_rank() * 100, 0)) %>%
+  arrange(place, desc(mag)) %>%
+  show_query()
+```
+Interestingly enough, there is no SQL translation of `ntile()` offered by `dbplyr`, even though this is a function provided by `dplyr` and presumably inspired by the SQL function.
+And there does not seem to be an easy workaround using `dplyr` verbs and functions for which there are SQL translations (such as `cut()` and `quantile()`).
+But we can achieve the right result using an SQL snippet as we do below.
+
+```{r}
+cen_ak_quartiles <-
+  earthquakes %>%
+  filter(!is.na(mag), place == 'Central Alaska') %>%
+  select(place, mag) %>%
+  group_by(place) %>%
+  mutate(ntile = ntile(4, order_by = "mag"))
+
+cen_ak_quartiles %>%
+  group_by(place, ntile) %>%
+  summarize(maximum = max(mag, na.rm = TRUE),
+            minimum = min(mag, na.rm = TRUE),
+            .groups = "drop") %>%
+  arrange(place, desc(ntile)) %>%
+  kable()
+```
+
+```{r}
+earthquakes %>%
+  filter(!is.na(mag), place == 'Central Alaska') %>%
+  select(place, mag) %>%
+  group_by(place) %>%
+  summarize(pct_25 = quantile(mag, probs = 0.25, na.rm = TRUE),
+            pct_50 = quantile(mag, probs = 0.50, na.rm = TRUE),
+            pct_75 = quantile(mag, probs = 0.75, na.rm = TRUE)) %>%
+  kable()
+```
+
+```{r}
+earthquakes %>%
+  filter(!is.na(mag), place == 'Central Alaska') %>%
+  summarize(pct_25_mag = quantile(mag, probs = 0.25, na.rm = TRUE),
+            pct_25_depth = quantile(depth, probs = 0.25, na.rm = TRUE)) %>%
+  kable()
+```
+
+```{r}
+earthquakes %>%
+  filter(!is.na(mag), 
+         place %in% c('Central Alaska', 'Southern Alaska')) %>%
+  group_by(place) %>%
+  summarize(pct_25_mag = quantile(mag, probs = 0.25, na.rm = TRUE),
+            pct_25_depth = quantile(depth, probs = 0.25, na.rm = TRUE)) %>%
+  kable()
+```
+
+```{r}
+earthquakes %>%
+  summarize(sd_mag = sd(mag, na.rm = TRUE),
+            stddev_samp_mag = stddev_samp(mag),
+            stddev_pop_mag = stddev_pop(mag)) %>%
+  mutate(diff_samp = sd_mag - stddev_samp_mag,
+         diff_pop = sd_mag - stddev_pop_mag)
+```
