@@ -1,5 +1,25 @@
 # Text Analysis
 
+## Why Text Analysis with SQL
+
+I would actually reframe this question as "why store text data in a database?" and offer different reasons from those offered in @tanimura2021sql.
+To structure my answer I will use a representative textual analysis problem (really set of problems) I've managed in the past.
+
+Public companies routinely communicate with investors or their representatives through conference calls.
+Most public companies hold conference calls when they announce their earnings results for a quarter or year.
+The typical earnings conference call starts with a presentation of results by management, typically the CEO or CEO, followed by the "Q&A" portion of the call during which call participants can ask questions of management
+Apart from representatives of the company, the typical participant in a conference call is an equity analyst.
+Equity analysts typically cover a relatively small numbers of companies, typically in a single industry, and provide insights and investment recommendations and related to their covered companies and industries.
+
+Analyst recommendations usually come from valuation analyses that draw on projections of future financial performance.
+An analyst's valuation model is usually constructed using a spreadsheet and to some extent an analyst's questions on a conference call will seek information that can be used for model inputs.
+
+Transcripts of conference calls are collected by a number of data providers, who presumably supply them to various users, including investors and academic researchers.
+I have used transcripts of conference calls in my own research.
+The data provider in my case provided a continuous stream of transcripts in XML files.
+Each call is contained in its own XML file with a file name that indicates the unique identifier of the call.
+Some elements of the call are contained in structured XML, but the bulk of the data in a call are in a single unstructured XML field.
+
 ```{r}
 #| message: false
 library(DBI)
