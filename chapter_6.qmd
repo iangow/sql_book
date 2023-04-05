@@ -1,4 +1,4 @@
-# Chapter 6
+# Anomaly Detection
 
 ```{r}
 #| message: false
@@ -23,7 +23,8 @@ earthquakes %>%
   filter(!is.na(mag)) %>%
   group_by(mag) %>%
   summarize(earthquakes = n()) %>%
-  mutate(pct_earthquakes = earthquakes/sum(earthquakes, na.rm = TRUE)) %>%
+  mutate(pct_earthquakes = earthquakes/sum(earthquakes,
+                                           na.rm = TRUE)) %>%
   arrange(desc(mag)) %>%
   collect(n = 5) %>%
   kable()
@@ -34,7 +35,8 @@ earthquakes %>%
   filter(!is.na(mag)) %>%
   group_by(mag) %>%
   summarize(earthquakes = n()) %>%
-  mutate(pct_earthquakes = earthquakes/sum(earthquakes, na.rm = TRUE)) %>%
+  mutate(pct_earthquakes = earthquakes/sum(earthquakes, 
+                                           na.rm = TRUE)) %>%
   arrange(mag) %>%
   collect(n = 5) %>%
   kable()
@@ -146,5 +148,133 @@ earthquakes %>%
             stddev_samp_mag = stddev_samp(mag),
             stddev_pop_mag = stddev_pop(mag)) %>%
   mutate(diff_samp = sd_mag - stddev_samp_mag,
-         diff_pop = sd_mag - stddev_pop_mag)
+         diff_pop = sd_mag - stddev_pop_mag) %>%
+  collect() %>%
+  kable()
 ```
+
+Below Cathy uses `INNER JOIN` with `ON 1 = 1`.
+
+```{sql}
+#| eval: false
+SELECT * 
+FROM earthquakes a
+INNER JOIN b ON 1 = 1
+```
+
+Instead, I use `CROSS JOIN` (this is `cross_join` in `dplyr`).
+
+```{sql}
+#| eval: false
+SELECT * 
+FROM earthquakes a
+CROSS JOIN b
+```
+
+The output in the book differs from one gets from running the code, 
+so I add `!(mag %in% c(-9, -9.99))` to get closer to the book's output.
+
+Note that in constructing `mag_stats`, I follow the book in using `avg(mag)` and `stddev_pop(mag)`.
+In practice, I would probably lean more to using R-compatible `mean(mag, na.rm = TRUE)` and `sd(mag, na.rm = TRUE)`, respectively.
+This makes little differ in practice---the only difference is that `sd` is translated into `stddev_samp` instead of `stddev_pop`, which is barely different in this case---but I believe it is helpful to be consistent where possible.
+Often I find myself moving the data processing from PosrtgreSQL to R or vice versa and this is much easier if the `dbplyr` code is consistent with the `dplyr` equivalent.
+
+```{r}
+mag_stats <-
+  earthquakes %>%
+  filter(!is.na(mag)) %>%
+  summarize(avg_mag = avg(mag),
+            std_dev = stddev_pop(mag))
+
+z_scores <-
+  earthquakes %>%
+  filter(!is.na(mag), !(mag %in% c(-9, -9.99))) %>%
+  select(place, mag) %>%
+  cross_join(mag_stats) %>%
+  mutate(z_score = (mag - avg_mag) / std_dev) 
+
+z_scores %>%
+  arrange(desc(mag)) %>%
+  collect(n = 3) %>%
+  kable()
+
+z_scores %>%
+  arrange(mag) %>%
+  collect(n = 3) %>%
+  kable()
+```
+
+## Graphing to find anomalies visually
+
+```{r}
+earthquakes %>%
+  filter(!is.na(mag)) %>%
+  ggplot(aes(x = mag)) +
+  geom_histogram(breaks = seq(-10, 10, 0.1))
+```
+
+```{r}
+earthquakes %>%
+  filter(!is.na(mag),
+         between(mag, 7.2, 9.5)) %>%
+  ggplot(aes(x = mag)) +
+  geom_histogram(binwidth = 0.1)
+```
+
+```{r}
+earthquakes %>%
+  filter(!is.na(mag),
+         between(mag, 7.2, 9.5)) %>%
+  ggplot(aes(x = mag)) +
+  geom_bar() +
+  scale_x_binned(breaks = seq(7.2, 9.5, 0.1))
+```
+
+```{r}
+earthquakes %>%
+  filter(!is.na(mag), !is.na(depth)) %>%
+  distinct(mag, depth) %>%
+  ggplot(aes(x = mag, y = depth)) +
+  geom_point(size = 0.1, colour = "blue")
+```
+
+```{r}
+earthquakes %>%
+  filter(!is.na(mag), !is.na(depth)) %>%
+  filter(between(mag, 4, 7), depth <= 50) %>%
+  ggplot(aes(x = mag, y = depth)) +
+  geom_count(color = "blue")
+```
+
+```{r}
+japan_quakes <-
+  earthquakes %>%
+  filter(!is.na(mag), !is.na(depth)) %>%
+  filter(place %~% "Japan") 
+
+japan_quakes %>%
+  ggplot(aes(y = mag)) +
+  geom_boxplot(width = 0.5)
+```
+
+```{r}
+japan_quakes %>%
+  summarize(ntile_25 = quantile(mag, probs = 0.25, na.rm = TRUE),
+            median = quantile(mag, probs = 0.50, na.rm = TRUE),
+            ntile_75 = quantile(mag, probs = 0.75, na.rm = TRUE)) %>%
+  mutate(iqr = (ntile_75 - ntile_25) * 1.5,
+         lower_whisker = ntile_25 - (ntile_75 - ntile_25) * 1.5,
+         upper_whisker = ntile_75 + (ntile_75 - ntile_25) * 1.5) %>%
+  kable()
+```
+
+```{r}
+japan_quakes %>%
+  select(mag, time) %>%
+  collect() %>%
+  mutate(year = as.factor(year(time))) %>%
+  ggplot(aes(y = mag, x = year, group = year)) +
+  geom_boxplot()
+```
+
+## Forms of Anomalies
