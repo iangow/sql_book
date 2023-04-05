@@ -95,9 +95,9 @@ earthquakes %>%
   arrange(place, desc(mag)) %>%
   show_query()
 ```
-Interestingly enough, there is no SQL translation of `ntile()` offered by `dbplyr`, even though this is a function provided by `dplyr` and presumably inspired by the SQL function.
-And there does not seem to be an easy workaround using `dplyr` verbs and functions for which there are SQL translations (such as `cut()` and `quantile()`).
-But we can achieve the right result using an SQL snippet as we do below.
+The `ntile()` offered by `dbplyr` works a little differently from other window functions.
+Rather than preceding the `mutate` with a `window_order()`, we need to specify an `order_by` argument.^[The reason for this is not clear and I have filed a feature request to make the handling of `ntile()` similar to that of other window functions.]
+
 
 ```{r}
 cen_ak_quartiles <-
