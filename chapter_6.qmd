@@ -98,7 +98,6 @@ earthquakes %>%
 The `ntile()` offered by `dbplyr` works a little differently from other window functions.
 Rather than preceding the `mutate` with a `window_order()`, we need to specify an `order_by` argument.^[The reason for this is not clear and I have filed a feature request to make the handling of `ntile()` similar to that of other window functions.]
 
-
 ```{r}
 cen_ak_quartiles <-
   earthquakes %>%
@@ -504,4 +503,29 @@ earthquakes_wins %>%
   arrange(mag) %>%
   collect(n = 3) %>%
   kable()
+```
+
+### Rescaling
+
+In the book, it says `WHERE depth >= 0.05`, but I need to use `WHERE depth > 0.05` to match the results there.
+
+```{r}
+quake_depths <-
+  earthquakes %>%
+  filter(depth > 0.05) %>%
+  mutate(depth = sql("round(depth, 1)")) %>%
+  select(depth)
+
+quake_depths %>%
+  count(depth)
+
+quake_depths %>%
+  ggplot(aes(x = depth)) +
+  geom_histogram(binwidth = 0.1)
+```
+
+```{r}
+quake_depths %>%
+  ggplot(aes(x = log(depth, base = 10))) +
+  geom_histogram(binwidth = 0.1)
 ```
