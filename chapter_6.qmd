@@ -259,12 +259,12 @@ japan_quakes %>%
 
 ```{r}
 japan_quakes %>%
-  summarize(ntile_25 = quantile(mag, probs = 0.25, na.rm = TRUE),
-            median = quantile(mag, probs = 0.50, na.rm = TRUE),
-            ntile_75 = quantile(mag, probs = 0.75, na.rm = TRUE)) %>%
-  mutate(iqr = (ntile_75 - ntile_25) * 1.5,
-         lower_whisker = ntile_25 - (ntile_75 - ntile_25) * 1.5,
-         upper_whisker = ntile_75 + (ntile_75 - ntile_25) * 1.5) %>%
+  summarize(p25 = quantile(mag, probs = 0.25, na.rm = TRUE),
+            p50 = quantile(mag, probs = 0.50, na.rm = TRUE),
+            p75 = quantile(mag, probs = 0.75, na.rm = TRUE)) %>%
+  mutate(iqr = (p75 - p25) * 1.5,
+         lower_whisker = p25 - (p75 - p25) * 1.5,
+         upper_whisker = p75 + (p75 - p25) * 1.5) %>%
   kable()
 ```
 
@@ -278,3 +278,55 @@ japan_quakes %>%
 ```
 
 ## Forms of Anomalies
+
+### Anomalous Values
+
+```{r}
+earthquakes %>%
+  filter(mag >= 1.08) %>%
+  group_by(mag) %>%
+  summarize(count = n()) %>%
+  arrange(mag) %>%
+  collect(n = 5) %>%
+  kable()
+```
+
+```{r}
+earthquakes %>%
+  filter(depth > 600) %>%
+  group_by(net) %>%
+  summarize(count = n()) %>%
+  arrange(net) %>%
+  collect(n = 5) %>%
+  kable()
+```
+```{r}
+earthquakes %>%
+  filter(depth > 600) %>%
+  group_by(place) %>%
+  summarize(count = n()) %>%
+  arrange(place) %>%
+  collect(n = 5) %>%
+  kable()
+```
+
+```{r}
+earthquakes %>%
+  filter(depth > 600) %>%
+  mutate(place_name = case_when(place %~% ' of ' ~ split_part(place, ' of ', 2L),
+                                TRUE ~ place)) %>%
+  group_by(place_name) %>%
+  summarize(count = n()) %>%
+  arrange(desc(count)) %>%
+  collect(n = 3) %>%
+  kable()
+```
+
+```{r}
+earthquakes %>%
+  summarize(distinct_types = n_distinct(type),
+            distinct_lower = n_distinct(lower(type))) %>%
+  kable()
+```
+
+### Anomalous Counts or Frequencies
