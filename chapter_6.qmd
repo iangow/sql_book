@@ -6,11 +6,14 @@ library(DBI)
 library(tidyverse)
 library(dbplyr)
 library(knitr)
+library(forcats)
 ```
 
 ```{r}
 #| output: false
-pg <- dbConnect(RPostgres::Postgres(), bigint = "integer")
+pg <- dbConnect(RPostgres::Postgres(), 
+                bigint = "integer",
+                check_interrupts = TRUE)
 dbExecute(pg, "SET search_path TO sql_book")
 ```
 
@@ -330,3 +333,175 @@ earthquakes %>%
 ```
 
 ### Anomalous Counts or Frequencies
+
+Why use `date_trunc('year',time)::date as earthquake_year`?
+
+```{sql}
+#| connection = pg
+SELECT EXTRACT(year FROM time) AS earthquake_year, 
+  COUNT(*) AS earthquakes
+FROM earthquakes
+GROUP BY 1
+ORDER BY 1;
+```
+```{r}
+earthquakes %>%
+  mutate(earthquake_year = as.character(year(time))) %>%
+  group_by(earthquake_year) %>%
+  summarize(earthquakes = n()) %>%
+  ggplot(aes(x = earthquake_year, y = earthquakes)) +
+  geom_bar(stat = "identity")
+```
+
+^[Without the `select(earthquake_year)`, the following plot would take 4 seconds to produce---versus 0.4 seconds needed here. 
+This suggests that `ggplot` is triggering a `collect()` on fields that it does not need to make the plot.]
+
+```{r}
+#| eval: false
+earthquakes %>%
+  mutate(earthquake_year = as.character(year(time))) %>%
+  select(earthquake_year) %>%
+  ggplot(aes(x = earthquake_year)) +
+  geom_bar()
+```
+```{r}
+earthquakes %>%
+  mutate(earthquake_month = floor_date(time, "month")) %>%
+  group_by(earthquake_month) %>%
+  summarize(earthquakes = n(), .groups = "drop") %>%
+  ggplot(aes(x = earthquake_month, y = earthquakes)) +
+  geom_line()
+```
+
+From the book, "it turns out that the increase in earthquakes starting in 2017 can be at least partially explained by the status field. The status indicates whether the event has been reviewed by a human ('reviewed') or was directly posted by a system without review ('automatic')."
+This can be seen in the following plot.^[Unlike the plot in the book, I leave observations with "manual" status in the plot, as they are in the SQL query.]
+
+```{r}
+earthquakes %>%
+  mutate(earthquake_month = floor_date(time, "month")) %>%
+  group_by(earthquake_month, status) %>%
+  summarize(earthquakes = n(), .groups = "drop") %>%
+  ggplot(aes(x = earthquake_month, y = earthquakes, color = status)) +
+  geom_line()
+```
+
+
+```{r}
+earthquakes %>%
+  filter(mag >= 6) %>%
+  group_by(place) %>%
+  summarize(earthquakes = n(), .groups = "drop") %>%
+  arrange(desc(earthquakes)) %>%
+  collect(n = 3) %>%
+  kable()
+```
+
+For the next query, it seems easy enough to just put the result in a plot.
+
+```{r}
+earthquakes %>%
+  filter(mag >= 6) %>%
+  mutate(place = if_else(place %~% ' of ',
+                         split_part(place, ' of ', 2L), 
+                         place)) %>%
+  count(place, name = "earthquakes") %>%
+  arrange(desc(earthquakes)) %>%
+  collect(n = 10) %>%
+  ggplot(aes(y = fct_inorder(place), 
+             x = earthquakes)) +
+  geom_bar(stat = "identity")
+```  
+### Anomalies from the Absence of Data
+
+## Handling Anomalies
+
+### Investigation
+
+### Removal
+
+```{r}
+earthquakes %>%
+  filter(!mag %in% c(-9,-9.99)) %>%
+  select(time, mag, type) %>%
+  collect(n = 10) %>%
+  kable()
+```
+
+```{r}
+earthquakes %>%
+  summarize(avg_mag = avg(mag),
+            avg_mag_adjusted = avg(if_else(mag > -9, mag, NA))) %>%
+  kable()
+```
+
+```{r}
+earthquakes %>%
+  filter(place == 'Yellowstone National Park, Wyoming') %>%
+  summarize(avg_mag = avg(mag),
+            avg_mag_adjusted = avg(if_else(mag > -9, mag, NA))) %>%
+  kable()
+```
+
+### Replacement with Alternate Values
+
+```{r}
+earthquakes %>%
+  mutate(event_type = if_else(type == 'earthquake', type, 'Other')) %>%
+  count(event_type) %>%
+  kable()
+```
+
+```{r}
+extremes <-
+  earthquakes %>%
+  summarize(p95 = quantile(mag, probs = 0.95, na.rm = TRUE),
+            p05 = quantile(mag, probs = 0.05, na.rm = TRUE))
+
+extremes %>% kable()
+```
+
+Note that this SQL from the book^[I simplify the SQL from the book assuming that the table already includes a `CROSS JOIN` with the SQL equivalent of `extremes` and I use shorter variable names for the extremes.]
+
+```{sql}
+#| eval: false
+CASE 
+  WHEN mag > p95 THEN p95
+  WHEN mag < p05 THEN p05
+  ELSE mag
+END AS mag_winsorized
+```
+
+can be replaced with a single line:
+
+```{sql}
+#| eval: false
+LEAST(GREATEST(mag, p05), p95) AS mag_winsorized
+```
+
+The R equivalents of `LEAST` and `GREATEST` are `pmin` and `pmax`, respectively.
+And `dbplyr` will translate `pmin` and `pmax` for us, so we can get winsorized data as follows.
+
+```{r}
+#| warning: false
+earthquakes_wins <-
+  earthquakes %>%
+  filter(!is.na(mag)) %>%
+  cross_join(extremes) %>%
+  mutate(mag_winsorized = pmin(pmax(mag, p05), p95)) %>%
+  select(time, place, mag, mag_winsorized) 
+
+earthquakes_wins %>%
+  arrange(desc(mag)) %>%
+  collect(n = 3) %>%
+  kable()
+
+earthquakes_wins %>%
+  filter(mag == mag_winsorized) %>%
+  collect(n = 3) %>%
+  kable()
+
+earthquakes_wins %>%
+  arrange(mag) %>%
+  collect(n = 3) %>%
+  kable()
+```
