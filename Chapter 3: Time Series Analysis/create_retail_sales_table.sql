@@ -1,6 +1,6 @@
 -- create the table
-DROP table if exists retail_sales;
-CREATE table retail_sales
+DROP table if exists sql_book.retail_sales;
+CREATE table sql_book.retail_sales
 (
 sales_month date
 ,naics_code varchar
@@ -11,7 +11,7 @@ sales_month date
 ;
 
 -- populate the table with data from the csv file. Download the file locally before completing this step
-COPY retail_sales 
+COPY sql_book.retail_sales 
 FROM '/Users/igow/git/sql_book/Chapter 3: Time Series Analysis/us_retail_sales.csv' -- change to the location you saved the csv file
 DELIMITER ','
 CSV HEADER

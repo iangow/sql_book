@@ -1,5 +1,5 @@
-DROP table if exists legislators_terms;
-CREATE table legislators_terms
+DROP table if exists sql_book.legislators_terms;
+CREATE table sql_book.legislators_terms
 (
 id_bioguide varchar
 ,term_number int 
@@ -24,7 +24,7 @@ id_bioguide varchar
 )
 ;
 
-COPY legislators_terms
+COPY sql_book.legislators_terms
 FROM '/Users/igow/git/sql_book/Chapter 4: Cohorts/legislators_terms.csv' -- change to the location you saved the csv file
 DELIMITER ','
 CSV HEADER

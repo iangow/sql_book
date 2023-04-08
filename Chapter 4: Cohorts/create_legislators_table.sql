@@ -1,6 +1,6 @@
-DROP table if exists legislators;
+DROP table if exists sql_book.legislators;
 
-CREATE table legislators
+CREATE table sql_book.legislators
 (
 full_name varchar--name_official_full
 ,first_name varchar --name_first
@@ -34,7 +34,7 @@ full_name varchar--name_official_full
 )
 ;
 
-COPY legislators
+COPY sql_book.legislators
 FROM '/Users/igow/git/sql_book/Chapter 4: Cohorts/legislators.csv' -- change to the location you saved the csv file
 DELIMITER ','
 CSV HEADER

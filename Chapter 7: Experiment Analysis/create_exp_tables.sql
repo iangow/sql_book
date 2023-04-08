@@ -1,5 +1,5 @@
-DROP table if exists game_users;
-CREATE table game_users
+DROP table if exists sql_book.game_users;
+CREATE table sql_book.game_users
 (
 user_id int
 ,created date
@@ -7,10 +7,10 @@ user_id int
 )
 ;
 
-COPY game_users FROM '/Users/igow/git/sql_book/Chapter 7: Experiment Analysis/game_users.csv' DELIMITER ',' CSV HEADER;
+COPY sql_book.game_users FROM '/Users/igow/git/sql_book/Chapter 7: Experiment Analysis/game_users.csv' DELIMITER ',' CSV HEADER;
 
-DROP table if exists game_actions;
-CREATE table game_actions
+DROP table if exists sql_book.game_actions;
+CREATE table sql_book.game_actions
 (
 user_id int
 ,action text
@@ -18,10 +18,10 @@ user_id int
 ) 
 ;
 
-COPY game_actions FROM '/Users/igow/git/sql_book/Chapter 7: Experiment Analysis/game_actions.csv' DELIMITER ',' CSV HEADER;
+COPY sql_book.game_actions FROM '/Users/igow/git/sql_book/Chapter 7: Experiment Analysis/game_actions.csv' DELIMITER ',' CSV HEADER;
 
-DROP table if exists game_purchases;
-CREATE table game_purchases
+DROP table if exists sql_book.game_purchases;
+CREATE table sql_book.game_purchases
 (
 user_id int
 ,purch_date date
@@ -29,10 +29,10 @@ user_id int
 )
 ;
 
-COPY game_purchases FROM '/Users/igow/git/sql_book/Chapter 7: Experiment Analysis/game_purchases.csv' DELIMITER ',' CSV HEADER;
+COPY sql_book.game_purchases FROM '/Users/igow/git/sql_book/Chapter 7: Experiment Analysis/game_purchases.csv' DELIMITER ',' CSV HEADER;
 
-DROP table if exists exp_assignment;
-CREATE table exp_assignment
+DROP table if exists sql_book.exp_assignment;
+CREATE table sql_book.exp_assignment
 (
 exp_name text
 ,user_id int
@@ -41,4 +41,4 @@ exp_name text
 )
 ;
 
-COPY exp_assignment FROM '/Users/igow/git/sql_book/Chapter 7: Experiment Analysis/exp_assignment.csv' DELIMITER ',' CSV HEADER;
+COPY sql_book.exp_assignment FROM '/Users/igow/git/sql_book/Chapter 7: Experiment Analysis/exp_assignment.csv' DELIMITER ',' CSV HEADER;
