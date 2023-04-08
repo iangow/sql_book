@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.2.269">
+<meta name="generator" content="quarto-1.2.335">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -208,6 +208,11 @@ div.csl-indent {
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./chapter_6.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Anomaly Detection</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./chapter_7.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Experiment Analysis</span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -491,7 +496,7 @@ div.csl-indent {
 <span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>two_times</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># Source:   SQL [1 x 2]
-# Database: postgres  [iangow@/tmp:5432/iangow]
+# Database: postgres  [igow@/tmp:5432/igow]
   t1                  t2                 
   &lt;dttm&gt;              &lt;dttm&gt;             
 1 2020-12-02 00:00:01 2020-12-02 00:00:01</code></pre>
@@ -617,7 +622,7 @@ div.csl-indent {
 <span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>two_times_notz</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># Source:   SQL [1 x 2]
-# Database: postgres  [iangow@/tmp:5432/iangow]
+# Database: postgres  [igow@/tmp:5432/igow]
   t1                     t2                 
   &lt;chr&gt;                  &lt;dttm&gt;             
 1 2020-12-01 00:00:01-00 2020-12-01 00:00:01</code></pre>
@@ -684,7 +689,7 @@ div.csl-indent {
 <span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">a_trunced_time =</span> <span class="fu">date_trunc</span>(<span class="st">'month'</span>, a_time))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># Source:   SQL [1 x 2]
-# Database: postgres  [iangow@/tmp:5432/iangow]
+# Database: postgres  [igow@/tmp:5432/igow]
   a_time              a_trunced_time     
   &lt;dttm&gt;              &lt;dttm&gt;             
 1 2020-10-04 12:33:35 2020-10-01 00:00:00</code></pre>
@@ -713,7 +718,7 @@ FROM (SELECT '2020-10-04 12:33:35'::timestamp AS a_time) "q01"</code></pre>
 <span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">a_trunced_time =</span> <span class="fu">date_trunc</span>(<span class="st">'month'</span>, a_time)) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># Source:   SQL [1 x 2]
-# Database: postgres  [iangow@/tmp:5432/iangow]
+# Database: postgres  [igow@/tmp:5432/igow]
   a_time              a_trunced_time     
   &lt;dttm&gt;              &lt;dttm&gt;             
 1 2020-10-04 19:33:35 2020-10-01 00:00:00</code></pre>
@@ -1457,7 +1462,7 @@ FROM (
 <span id="cb75-9"><a href="#cb75-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">pct_from_index =</span> (sales<span class="sc">/</span>index_sales <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">*</span> <span class="dv">100</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># Source:     SQL [?? x 4]
-# Database:   postgres  [iangow@/tmp:5432/iangow]
+# Database:   postgres  [igow@/tmp:5432/igow]
 # Ordered by: sales_year
    sales_year sales index_sales pct_from_index
         &lt;dbl&gt; &lt;dbl&gt;       &lt;dbl&gt;          &lt;dbl&gt;
@@ -1471,7 +1476,7 @@ FROM (
  8       1999 29549       31815          -7.12
  9       2000 31447       31815          -1.16
 10       2001 31453       31815          -1.14
-# … with more rows</code></pre>
+# ℹ more rows</code></pre>
 </div>
 </div>
 <div class="cell">

@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.2.269">
+<meta name="generator" content="quarto-1.2.335">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -212,6 +212,11 @@ div.csl-indent {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="./chapter_7.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Experiment Analysis</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="./references.html" class="sidebar-item-text sidebar-link">References</a>
   </div>
 </li>
@@ -305,25 +310,24 @@ div.csl-indent {
 <span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>(<span class="at">n =</span> <span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 10 × 22
-   date                date_key day_of…¹ day_o…² day_o…³ day_n…⁴ day_s…⁵ week_…⁶
-   &lt;dttm&gt;                 &lt;int&gt;    &lt;int&gt;   &lt;int&gt;   &lt;int&gt; &lt;chr&gt;   &lt;chr&gt;     &lt;int&gt;
- 1 2000-01-01 00:00:00 20000101        1       1       6 Saturd… Sat          52
- 2 2000-01-02 00:00:00 20000102        2       2       0 Sunday  Sun          52
- 3 2000-01-03 00:00:00 20000103        3       3       1 Monday  Mon           1
- 4 2000-01-04 00:00:00 20000104        4       4       2 Tuesday Tue           1
- 5 2000-01-05 00:00:00 20000105        5       5       3 Wednes… Wed           1
- 6 2000-01-06 00:00:00 20000106        6       6       4 Thursd… Thu           1
- 7 2000-01-07 00:00:00 20000107        7       7       5 Friday  Fri           1
- 8 2000-01-08 00:00:00 20000108        8       8       6 Saturd… Sat           1
- 9 2000-01-09 00:00:00 20000109        9       9       0 Sunday  Sun           1
-10 2000-01-10 00:00:00 20000110       10      10       1 Monday  Mon           2
-# … with 14 more variables: week_of_month &lt;int&gt;, week &lt;date&gt;,
-#   month_number &lt;int&gt;, month_name &lt;chr&gt;, month_short_name &lt;chr&gt;,
-#   first_day_of_month &lt;date&gt;, last_day_of_month &lt;date&gt;, quarter_number &lt;int&gt;,
-#   quarter_name &lt;chr&gt;, first_day_of_quarter &lt;date&gt;,
-#   last_day_of_quarter &lt;date&gt;, year &lt;int&gt;, decade &lt;dbl&gt;, century &lt;int&gt;, and
-#   abbreviated variable names ¹​day_of_month, ²​day_of_year, ³​day_of_week,
-#   ⁴​day_name, ⁵​day_short_name, ⁶​week_number</code></pre>
+   date                date_key day_of_month day_of_year day_of_week day_name 
+   &lt;dttm&gt;                 &lt;int&gt;        &lt;int&gt;       &lt;int&gt;       &lt;int&gt; &lt;chr&gt;    
+ 1 2000-01-01 00:00:00 20000101            1           1           6 Saturday 
+ 2 2000-01-02 00:00:00 20000102            2           2           0 Sunday   
+ 3 2000-01-03 00:00:00 20000103            3           3           1 Monday   
+ 4 2000-01-04 00:00:00 20000104            4           4           2 Tuesday  
+ 5 2000-01-05 00:00:00 20000105            5           5           3 Wednesday
+ 6 2000-01-06 00:00:00 20000106            6           6           4 Thursday 
+ 7 2000-01-07 00:00:00 20000107            7           7           5 Friday   
+ 8 2000-01-08 00:00:00 20000108            8           8           6 Saturday 
+ 9 2000-01-09 00:00:00 20000109            9           9           0 Sunday   
+10 2000-01-10 00:00:00 20000110           10          10           1 Monday   
+# ℹ 16 more variables: day_short_name &lt;chr&gt;, week_number &lt;int&gt;,
+#   week_of_month &lt;int&gt;, week &lt;date&gt;, month_number &lt;int&gt;, month_name &lt;chr&gt;,
+#   month_short_name &lt;chr&gt;, first_day_of_month &lt;date&gt;,
+#   last_day_of_month &lt;date&gt;, quarter_number &lt;int&gt;, quarter_name &lt;chr&gt;,
+#   first_day_of_quarter &lt;date&gt;, last_day_of_quarter &lt;date&gt;, year &lt;int&gt;,
+#   decade &lt;dbl&gt;, century &lt;int&gt;</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>dates_processed <span class="sc">%&gt;%</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">show_query</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
