@@ -1,0 +1,97 @@
+# Experiment Analysis
+
+## Strengths and Limits of Experiment Analysis with SQL
+
+I would reframe this discussion.
+We might be using a database because the results of an experiment are stored there.
+
+An alternative approach might have the results of an experiment are extracted and exported to a CSV or Excel file and attached to an email and sent to you for analysis.^[Ew!]
+But extracted from where?
+If the data are in a database, it would be better to cut out the middleman and just get the data directly.
+
+The limitations of SQL essentially vanish when we access the data using `dbplyr`.
+R can do any statistical calculation we can think of, so we have no need of an online statistical calculator (though such calculators can help us frame our analyses and check our results).
+
+
+Cathy does say that "many databases allow developers to extend SQL functionality with *user-defined functions* (UDFs) ... but they are beyond the scope of this book."
+For PostgreSQL there is [PL/Python](https://www.postgresql.org/docs/current/plpython.html) and [PL/R](https://github.com/postgres-plr/plr), which allow creation of functions in Python and R, respectively.
+When I first started to use PostgreSQL, these extensions seemed pretty exciting and, because I was maintaining my own databases, I could use them.
+But over time, I found maintaining UDFs to be more effort than could be justified and I no longer use them.
+Instead, if I need to do analysis in Python or R, I will extract data from the database, do the analysis, then write data back to the database.
+While this likely partly reflects the kinds of analysis I do, I think that UDFs are likely to be off limits to most users because of the additional complexity of turning code into UDFs and because many users would lack sufficient database privileges to create these.
+
+## The Data Set
+
+As discussed in @tanimura2021sql, there are four tables used in this chapter.
+Here we set up references to each of these tables.
+
+```{r}
+#| message: false
+library(DBI)
+library(tidyverse)
+library(dbplyr)
+library(knitr)
+library(flextable)
+library(janitor)
+```
+
+```{r}
+#| output: false
+pg <- dbConnect(RPostgres::Postgres(), 
+                bigint = "integer",
+                check_interrupts = TRUE)
+dbExecute(pg, "SET search_path TO sql_book")
+```
+
+```{r}
+game_users <- tbl(pg, "game_users")
+game_actions <- tbl(pg, "game_actions")
+game_purchases <- tbl(pg, "game_purchases")
+exp_assignment <- tbl(pg, "exp_assignment")
+```
+
+## Types of Experiments
+
+I would reword the first paragraph here to the following for clarity (edits in *italics*):
+
+> There is a wide range of experiments,
+> If you can change something that a user, customer, constituent, or other entity experiences, you can in theory test *the effect* of that change *on some outcome*.
+
+```{r}
+cont_tbl <-
+  exp_assignment %>%
+  left_join(game_actions, by = "user_id") %>%
+  group_by(variant, user_id) %>%
+  summarize(completed = 
+              coalesce(any(action == "onboarding complete", na.rm = TRUE),
+                       FALSE),
+            .groups = "drop") %>%
+  count(variant, completed) %>%
+  mutate(completed = if_else(completed, "Yes", "No")) %>%
+  pivot_wider(names_from = completed, values_from = n) %>%
+  collect()
+```
+
+```{r}
+cont_tbl %>%
+  adorn_totals(c("row", "col")) %>%
+  mutate(`% Complete` = prettyNum(Yes/Total * 100, digits = 4)) %>%
+  flextable() %>%
+  add_header_row(values=c("", "Completed onboarding", ""),
+                 colwidths = c(1, 2, 2))
+```
+Now we can do the Chi-squared test.
+We need to turn `variant` into the row names of the contingency table so that we only a $ 2 \times 2$ table as out data frame and we use `column_to_rownames()` to this effect.
+We then pipe the result into the base R function `chisq.test()`.
+I specified `correct = FALSE` so that my result matched what I got from the [online calculator](https://www.socscistatistics.com/tests/chisquare2/) I found.
+I think display the Chi-squared statistic and the $p$-value.
+
+```{r}
+res <- 
+  cont_tbl %>%
+  column_to_rownames(var = "variant") %>%
+  chisq.test(correct = FALSE)
+
+res$statistic
+res$p.value
+```
