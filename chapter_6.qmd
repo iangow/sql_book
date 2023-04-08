@@ -26,8 +26,8 @@ earthquakes %>%
   filter(!is.na(mag)) %>%
   group_by(mag) %>%
   summarize(earthquakes = n()) %>%
-  mutate(pct_earthquakes = earthquakes/sum(earthquakes,
-                                           na.rm = TRUE)) %>%
+  mutate(pct_earthquakes = 1.0 * earthquakes / 
+           sum(earthquakes, na.rm = TRUE)) %>%
   arrange(desc(mag)) %>%
   collect(n = 5) %>%
   kable()
@@ -252,7 +252,7 @@ earthquakes %>%
 japan_quakes <-
   earthquakes %>%
   filter(!is.na(mag), !is.na(depth)) %>%
-  filter(place %~% "Japan") 
+  filter(grepl("Japan", place)) 
 
 japan_quakes %>%
   ggplot(aes(y = mag)) +
@@ -315,7 +315,8 @@ earthquakes %>%
 ```{r}
 earthquakes %>%
   filter(depth > 600) %>%
-  mutate(place_name = case_when(place %~% ' of ' ~ split_part(place, ' of ', 2L),
+  mutate(place_name = case_when(grepl(' of ', place) ~
+                                  split_part(place, ' of ', 2L),
                                 TRUE ~ place)) %>%
   group_by(place_name) %>%
   summarize(count = n()) %>%
@@ -400,7 +401,7 @@ For the next query, it seems easy enough to just put the result in a plot.
 ```{r}
 earthquakes %>%
   filter(mag >= 6) %>%
-  mutate(place = if_else(place %~% ' of ',
+  mutate(place = if_else(grepl(' of ', place),
                          split_part(place, ' of ', 2L), 
                          place)) %>%
   count(place, name = "earthquakes") %>%
