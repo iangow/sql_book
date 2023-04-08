@@ -198,3 +198,31 @@ exp_assignment %>%
 ```
 
 ### Time Boxing
+
+```{r}
+amounts_boxed <- 
+  exp_assignment %>%
+  filter(exp_name == 'Onboarding') %>%
+  mutate(exp_end = exp_date + days(7)) %>%
+  left_join(game_purchases, 
+            by = join_by(user_id, exp_end >= purch_date)) %>%
+  group_by(variant, user_id) %>%
+  summarize(amount = sum(coalesce(amount, 0), na.rm = TRUE),
+            .groups = "drop")
+
+
+t_test_stats_boxed <-
+  amounts_boxed %>%
+  group_by(variant) %>%
+  summarize(n = n(),
+            mean = mean(amount, na.rm = TRUE),
+            sd = sd(amount, na.rm = TRUE)) %>%
+  collect()
+
+t_test_stats_boxed %>%
+  kable(digits = 3)
+```
+
+```{r}
+t_test(t_test_stats_boxed)
+```
