@@ -14,7 +14,7 @@ R can do any statistical calculation we can think of, so we have no need of an o
 
 
 Cathy does say that "many databases allow developers to extend SQL functionality with *user-defined functions* (UDFs) ... but they are beyond the scope of this book."
-For PostgreSQL there is [PL/Python](https://www.postgresql.org/docs/current/plpython.html) and [PL/R](https://github.com/postgres-plr/plr), which allow creation of functions in Python and R, respectively.
+For PostgreSQL there are [PL/Python](https://www.postgresql.org/docs/current/plpython.html) and [PL/R](https://github.com/postgres-plr/plr), which allow creation of functions in Python and R, respectively.
 When I first started to use PostgreSQL, these extensions seemed pretty exciting and, because I was maintaining my own databases, I could use them.
 But over time, I found maintaining UDFs to be more effort than could be justified and I no longer use them.
 Instead, if I need to do analysis in Python or R, I will extract data from the database, do the analysis, then write data back to the database.
@@ -106,4 +106,95 @@ res$statistic
 res$p.value
 ```
 
-### Experiments wtih Continuous Outcomes: The t-Test
+### Experiments with Continuous Outcomes: The t-Test
+
+```{r}
+amounts <- 
+  exp_assignment %>%
+  filter(exp_name == 'Onboarding') %>%
+  left_join(game_purchases, by = "user_id") %>%
+  group_by(variant, user_id) %>%
+  summarize(amount = sum(coalesce(amount, 0), na.rm = TRUE),
+            .groups = "drop")
+
+t_test_stats <-
+  amounts %>%
+  group_by(variant) %>%
+  summarize(n = n(),
+            mean = mean(amount, na.rm = TRUE),
+            sd = sd(amount, na.rm = TRUE)) %>%
+  collect()
+
+t_test_stats %>%
+  kable(digits = 3)
+```
+
+We can make a small function that we can pass a data frame to as `df`.
+The calculations assume that `df` contains two rows (one for each group) and columns named `mean`, `sd`, and `n` for the mean, standard deviation, and number of observations, respectively, in each group.
+
+```{r}
+t_test <- function(df) {
+  mean_diff = abs(df$mean[1] - df$mean[2])
+  se_diff <- sqrt(sum(df$sd^2 / df$n))
+  t_stat <- mean_diff / se_diff
+  p <- pt(t_stat, df = sum(df$n))
+  p_val <- 2 * min(p, 1 - p)
+  return(list("statistic" = t_stat, "p-value" = p_val))
+}
+
+t_test(t_test_stats)
+```
+These values line up with those obtained from the [online calculator](https://www.omnicalculator.com/statistics/t-test) I found.
+
+An alternative approach would be to `collect()` the underlying data and do the $t$-test in R.
+
+```{r}
+t_test_data <-
+  amounts %>%
+  select(variant, amount) %>%
+  collect()
+
+t.test(formula = amount ~ variant, data = t_test_data)
+```
+
+```{r}
+t_test_stats_2 <-
+  amounts %>%
+  inner_join(game_actions, by = "user_id") %>%
+  filter(action == "onboarding complete") %>%
+  group_by(variant) %>%
+  summarize(n = n(),
+            mean = mean(amount, na.rm = TRUE),
+            sd = sd(amount, na.rm = TRUE)) %>%
+  collect()
+
+t_test_stats_2 %>%
+  kable(digits = 3)
+```
+
+```{r}
+t_test(t_test_stats_2)
+```
+
+## Challenges with Experiments and Options for Rescuing Flawed Experiments
+
+### Variant Assignment
+
+### Outliers
+
+```{r}
+exp_assignment %>%
+  left_join(game_purchases, by = "user_id", keep = TRUE,
+            suffix = c("", ".y")) %>%
+  inner_join(game_actions, by = "user_id") %>%
+  filter(action == "onboarding complete",
+         exp_name == 'Onboarding') %>%
+  group_by(variant) %>%
+  summarize(total_cohorted = n_distinct(user_id),
+            purchasers = n_distinct(user_id.y),
+            .groups = "drop") %>%
+  mutate(pct_purchased = purchasers * 100.0 / total_cohorted) %>%
+  kable(digits = 2)
+```
+
+### Time Boxing
