@@ -55,7 +55,15 @@ exp_assignment <- tbl(pg, "exp_assignment")
 I would reword the first paragraph here to the following for clarity (edits in *italics*):
 
 > There is a wide range of experiments,
-> If you can change something that a user, customer, constituent, or other entity experiences, you can in theory test *the effect* of that change *on some outcome*.
+> If you can change something that a user, customer, constituent, or other entity experiences, you can in theory test *the effect of* that change *on some outcome*.
+
+### Experiments wtih Binary Outcomes: The Chi-Squared Test
+
+To better match the approach of the book, I essentially create the contingency table in the database.
+An alternative approach would have been to `collect()` after `summarize()` and then do the statistical analysis in R.
+In fact, many of the functions in R are better set-up for this approach.
+However, this means bring more data into R and doing more calculation in R.
+If the experiment is very large or you would rather the database server do more of the work, then the approach below may be preferred.
 
 ```{r}
 cont_tbl <-
@@ -72,6 +80,8 @@ cont_tbl <-
   collect()
 ```
 
+Using the packages `janitor` and `flextable`, I mimic the nicely formatted output shown in the book:
+
 ```{r}
 cont_tbl %>%
   adorn_totals(c("row", "col")) %>%
@@ -80,11 +90,11 @@ cont_tbl %>%
   add_header_row(values=c("", "Completed onboarding", ""),
                  colwidths = c(1, 2, 2))
 ```
-Now we can do the Chi-squared test.
-We need to turn `variant` into the row names of the contingency table so that we only a $ 2 \times 2$ table as out data frame and we use `column_to_rownames()` to this effect.
-We then pipe the result into the base R function `chisq.test()`.
-I specified `correct = FALSE` so that my result matched what I got from the [online calculator](https://www.socscistatistics.com/tests/chisquare2/) I found.
-I think display the Chi-squared statistic and the $p$-value.
+Now I can do the Chi-squared test.
+I need to turn `variant` into the row names of the contingency table so that we want a simple $2 \times 2$ numeric table as the input to our statistical test and I use `column_to_rownames()` to this end.
+I then pipe the result into the base R function `chisq.test()`.
+I specified `correct = FALSE` so that my result matched what I got from the [online calculator](https://www.socscistatistics.com/tests/chisquare/default.aspx) I found.
+I then display the Chi-squared statistic and the $p$-value.
 
 ```{r}
 res <- 
@@ -95,3 +105,5 @@ res <-
 res$statistic
 res$p.value
 ```
+
+### Experiments wtih Continuous Outcomes: The t-Test
