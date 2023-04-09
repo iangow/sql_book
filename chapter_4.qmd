@@ -67,6 +67,7 @@ If the latter, how accurate were the former as estimates of these values?
 Now that we understand cohorts, let's move onto the *legislators* data set.
 
 ```{r}
+#| warning: false
 library(DBI)
 library(tidyverse)
 library(dbplyr)
@@ -75,38 +76,16 @@ library(knitr)
 ```
 
 ```{r}
-pg <- dbConnect(RPostgres::Postgres(), bigint = "integer")
-dbExecute(pg, "SET search_path TO sql_book")
+pg <- dbConnect(duckdb::duckdb(), 
+                dbdir = "sql_book.duckdb", 
+                read_only = TRUE)
 ```
 
 ```{r}
 legislators_terms <- tbl(pg, "legislators_terms")
 ```
 
-```{sql}
-#| connection: pg
-SELECT id_bioguide ,min(term_start) AS first_term
-FROM legislators_terms 
-GROUP BY 1
-LIMIT 10;
-```
-
-```{sql}
-#| connection: pg
-WITH first_terms AS (
-      SELECT id_bioguide, min(term_start) AS first_term
-      FROM legislators_terms 
-      GROUP BY 1) 
-SELECT date_part('year', age(b.term_start, a.first_term)) AS period,
-    count(distinct a.id_bioguide) as cohort_retained
-FROM first_terms a
-JOIN legislators_terms b on a.id_bioguide = b.id_bioguide 
-GROUP BY 1
-LIMIT 10;
-```
-
 ```{r}
-
 first_terms <- 
   legislators_terms %>%
   group_by(id_bioguide) %>%
@@ -123,29 +102,8 @@ cohorts %>%
   collect(n = 10)
 ```
 
-```{sql}
-#| connection: pg
-WITH 
-first_terms AS (
-  SELECT id_bioguide, min(term_start) AS first_term
-  FROM legislators_terms 
-  GROUP BY 1),
-
-cohorts AS (
-  SELECT date_part('year', age(b.term_start, a.first_term)) AS period,
-      count(distinct a.id_bioguide) as cohort_retained
-  FROM first_terms a
-  JOIN legislators_terms b on a.id_bioguide = b.id_bioguide 
-  GROUP BY 1)
-  
-SELECT period,
-  first_value(cohort_retained) OVER (ORDER BY period) AS cohort_size,
-  cohort_retained,
-  cohort_retained * 1.0 / first_value(cohort_retained) OVER (ORDER BY period) AS pct_retained
-FROM cohorts;
-```
-
 ```{r}
+#| lobel: retained_data
 retained_data <-
   cohorts %>%
   window_order(period) %>%
@@ -161,38 +119,6 @@ retained_data %>%
 retained_data %>%
   ggplot(aes(x = period, y = pct_retained)) +
   geom_line()
-```
-
-```{sql}
-#| connection: pg
-WITH 
-first_terms AS (
-  SELECT id_bioguide, min(term_start) AS first_term
-  FROM legislators_terms 
-  GROUP BY 1),
-
-cohorts AS (
-  SELECT date_part('year', age(b.term_start, a.first_term)) AS period,
-      count(distinct a.id_bioguide) as cohort_retained
-  FROM first_terms a
-  JOIN legislators_terms b on a.id_bioguide = b.id_bioguide 
-  GROUP BY 1),
-  
-retained_data AS (
-  SELECT period,
-    first_value(cohort_retained) OVER (ORDER BY period) AS cohort_size,
-    cohort_retained,
-    cohort_retained * 1.0 / first_value(cohort_retained) OVER (ORDER BY period) AS pct_retained
-  FROM cohorts)
-
-SELECT cohort_size,
-  max(case when period = 0 then pct_retained end) as yr0,
-  max(case when period = 1 then pct_retained end) as yr1,
-  max(case when period = 2 then pct_retained end) as yr2,
-  max(case when period = 3 then pct_retained end) as yr3,
-  max(case when period = 4 then pct_retained end) as yr4
-FROM retained_data
-GROUP BY 1;
 ```
 
 ```{r}
@@ -212,27 +138,19 @@ retained_data %>%
 
 ```{sql}
 #| connection: pg
-WITH
-
-first_terms AS (
-  SELECT id_bioguide, min(term_start) AS first_term
-  FROM legislators_terms 
-  GROUP BY 1)
-  
-SELECT a.id_bioguide, a.first_term, b.term_start, b.term_end,
-  c.date,
-  date_part('year', age(c.date, a.first_term)) AS period
-FROM first_terms a
-JOIN legislators_terms b USING (id_bioguide)
-LEFT JOIN date_dim c ON c.date BETWEEN b.term_start and b.term_end 
-and c.month_name = 'December' and c.day_of_month = 31;
+SELECT generate_series AS date 
+FROM generate_series(timestamp '1770-12-31',
+                     timestamp '2030-12-31',
+                     INTERVAL 1 year);
 ```
 
 ```{r}
-year_ends <-
-  tbl(pg, sql("
-    SELECT generate_series::date AS date
-    FROM generate_series('1770-12-31', '2030-12-31', interval '1 year')"))
+#| label: cohorts
+year_ends <- 
+  tibble(date = seq(as.Date("1770-12-31"), 
+                    as.Date("2030-12-31"), 
+                    by = "year")) %>%
+  copy_inline(pg, .)
 
 cohorts <-
   first_terms %>%
@@ -245,62 +163,6 @@ cohorts <-
 cohorts %>%
   collect(n = 10) %>%
   kable()
-```
-```{r}
-#| eval: false
-year_ends <- 
-  tibble(date = seq(as.Date("1770-12-31"), 
-                    as.Date("2030-12-31"), 
-                    by = "year")) %>%
-  copy_inline(pg, .)
-```
-
-```{sql}
-#| connection: pg
-WITH 
-first_terms AS (
-  SELECT id_bioguide, min(term_start) AS first_term
-  FROM legislators_terms 
-  GROUP BY 1),
-  
-year_ends AS (
-  SELECT generate_series::date as date
-  FROM generate_series('1770-12-31', '2030-12-31', interval '1 year')
-)
-  
-SELECT 
-  coalesce(date_part('year', age(c.date, a.first_term)), 0) AS period,
-  count(DISTINCT a.id_bioguide) AS cohort_retained
-FROM first_terms a
-JOIN legislators_terms b ON a.id_bioguide = b.id_bioguide 
-LEFT JOIN year_ends c ON c.date BETWEEN b.term_start AND b.term_end 
-GROUP BY 1;
-```
-
-```{sql}
-#| connection: pg
-WITH
-
-first_terms AS (
-  SELECT id_bioguide, min(term_start) as first_term
-  FROM legislators_terms 
-  GROUP BY 1),
-
-cohorts_retained AS (        
-    SELECT coalesce(date_part('year', age(c.date,a.first_term)),0) AS period,
-    count(distinct a.id_bioguide) as cohort_retained
-    FROM first_terms a
-    JOIN legislators_terms b USING (id_bioguide)
-    LEFT JOIN date_dim c ON c.date BETWEEN b.term_start AND b.term_end 
-      AND c.month_name = 'December' AND c.day_of_month = 31
-    GROUP BY 1)
-    
-SELECT period,
-  first_value(cohort_retained) OVER w AS cohort_size,
-  cohort_retained,
-  cohort_retained * 1.0/first_value(cohort_retained) over w as pct_retained
-FROM cohorts_retained
-WINDOW w AS (ORDER BY period);
 ```
 
 ```{r}
@@ -329,22 +191,6 @@ pct_retained %>%
   geom_line()
 ```
 
-```{sql}
-#| connection: pg
-WITH 
-first_terms AS (
-  SELECT id_bioguide, min(term_start) AS first_term
-  FROM legislators_terms 
-  GROUP BY 1)
-  
-SELECT id_bioguide, a.first_term, b.term_start,
-  CASE WHEN b.term_type = 'rep' THEN b.term_start + interval '2 years'
-       WHEN b.term_type = 'sen' THEN b.term_start + interval '6 years'
-  END AS term_end
-FROM first_terms a
-JOIN legislators_terms b USING (id_bioguide);
-```
-
 ```{r}
 first_terms %>%
   inner_join(legislators_terms, by = join_by(id_bioguide)) %>%
@@ -356,29 +202,7 @@ first_terms %>%
   kable()
 ```
 
-```{sql}
-#| connection: pg
-SELECT first_century, period
-,first_value(cohort_retained) over (partition by first_century order by period) as cohort_size
-,cohort_retained
-,cohort_retained * 1.0 / 
- first_value(cohort_retained) over (partition by first_century order by period) as pct_retained
-FROM
-(
-        SELECT date_part('century',a.first_term) as first_century
-        ,coalesce(date_part('year',age(c.date,a.first_term)),0) as period
-        ,count(distinct a.id_bioguide) as cohort_retained
-        FROM
-        (
-                SELECT id_bioguide, min(term_start) as first_term
-                FROM legislators_terms 
-                GROUP BY 1
-        ) a
-        JOIN legislators_terms b on a.id_bioguide = b.id_bioguide 
-        LEFT JOIN date_dim c on c.date between b.term_start and b.term_end 
-        and c.month_name = 'December' and c.day_of_month = 31
-        GROUP BY 1,2
-) aa
-ORDER BY 1,2
-;
+```{r}
+#| include: false
+dbDisconnect(pg, shutdown = TRUE)
 ```

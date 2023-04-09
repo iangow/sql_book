@@ -19,6 +19,7 @@ pg_to_duckdb <- function(table) {
   dbDisconnect(pg)
 }
 
+pg_to_duckdb("date_dim")
 pg_to_duckdb("game_users")
 pg_to_duckdb("game_actions")
 pg_to_duckdb( "game_purchases")
