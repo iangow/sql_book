@@ -19,3 +19,34 @@ Another benefit of using R is that we can do more with R.
 In contrast, here I will include code to produce the data as well as code to make plots (where applicable).
 
 My view is that the material here might be useful to someone who is using @tanimura2021sql and wants to see how the ideas there can be implemented using R, while at the same time being useful to someone who knows (or is looking to learn) R and is looking for realistic data sets to work on.
+
+## SQL and me
+
+*Computer Information Systems I* was a required subject in my undergraduate degree program.^[Bachelor of Commerce/Bachelor of Laws at the University of New South Wales.]
+While I do not recall many of the details of the subject, I do recall a lecturer whose English was difficult to understand (I am not sure how many lectures I attended, as I thought at the time that lectures are a very inefficient way to learn ... as I still do) and a group project.
+
+The group project required the construction of an SQL database for a hypothetical business.
+My group comprised three people---myself, a good friend, and someone who was working full-time and studying a degree specializing in information systems.
+I was a self-supporting full-time student, so I could not afford the software we used to build the database (my memory tells me it was about $60, but I know enough not to trust memories), but my friend had a copy.
+I recall that some parts of the project were completed over the phone (this was before the internet), perhaps not the best way to write SQL.
+In the end, I guess we got the project done and submitted.^[I vaguely recall getting a lower grade than my friend for the group assignment, which was inexplicable since there was no indication who did what. I survived.]
+
+In any case, after that subject I continued on with the rest of my degree, but I don't think I used SQL or any data analysis tools except for Excel for the remainder of my Bachelor of Commerce (the Bachelor of Laws was free of quantitative analysis as far as I recall).
+
+When I graduated I joined a "strategy consulting" firm.
+My first project involved trying to explain the factors affecting branch profitability for a regional firm offering banking and insurance products.
+I don't remember all the details, but there were many data analyses and some involved making requests for SQL queries to be run to supply the data that I used.
+
+My second significant project involved analyses of product and customer profitability.
+Again the details are hazy, but I recall that analyses required joining multiple tables involving data on mapping of products to cost centres, products to orders, orders to customers, and so on.
+I would guess that I used Microsoft Access on a laptop that was underpowered (for its time).^[I recall that partners had the higher-powered laptops---necessary for writing Lotus Notes and reading Powerpoint slides---while analysts like me had older laptops.
+It didn't make sense to me at the time, and still doesn't.]
+
+A later project had a reputation that preceded it.
+Several people had joined this project before deciding to leave the firm.
+My recollection is that a partner had been hired from another firm with the understanding that he would lead an "insurance benchmarking study".
+This 
+
+
+A later project involved preparing 
+
