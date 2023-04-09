@@ -234,7 +234,40 @@ div.csl-indent {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#missing-data" id="toc-missing-data" class="nav-link active" data-scroll-target="#missing-data"><span class="toc-section-number">2.1</span>  Missing data</a></li>
+  <li><a href="#types-of-data" id="toc-types-of-data" class="nav-link active" data-scroll-target="#types-of-data"><span class="toc-section-number">2.1</span>  Types of Data</a>
+  <ul class="collapse">
+  <li><a href="#database-data-types" id="toc-database-data-types" class="nav-link" data-scroll-target="#database-data-types"><span class="toc-section-number">2.1.1</span>  Database Data Types</a></li>
+  <li><a href="#structured-versus-unstructured" id="toc-structured-versus-unstructured" class="nav-link" data-scroll-target="#structured-versus-unstructured"><span class="toc-section-number">2.1.2</span>  Structured versus Unstructured</a></li>
+  <li><a href="#quantitative-versus-qualitative-data" id="toc-quantitative-versus-qualitative-data" class="nav-link" data-scroll-target="#quantitative-versus-qualitative-data"><span class="toc-section-number">2.1.3</span>  Quantitative versus Qualitative Data</a></li>
+  <li><a href="#first--second--and-third-party-data" id="toc-first--second--and-third-party-data" class="nav-link" data-scroll-target="#first--second--and-third-party-data"><span class="toc-section-number">2.1.4</span>  First-, Second-, and Third-Party Data</a></li>
+  <li><a href="#sparse-data" id="toc-sparse-data" class="nav-link" data-scroll-target="#sparse-data"><span class="toc-section-number">2.1.5</span>  Sparse Data</a></li>
+  </ul></li>
+  <li><a href="#sql-query-structure" id="toc-sql-query-structure" class="nav-link" data-scroll-target="#sql-query-structure"><span class="toc-section-number">2.2</span>  SQL Query Structure</a></li>
+  <li><a href="#profiling-distributions" id="toc-profiling-distributions" class="nav-link" data-scroll-target="#profiling-distributions"><span class="toc-section-number">2.3</span>  Profiling: Distributions</a>
+  <ul class="collapse">
+  <li><a href="#histograms-and-frequencies" id="toc-histograms-and-frequencies" class="nav-link" data-scroll-target="#histograms-and-frequencies"><span class="toc-section-number">2.3.1</span>  Histograms and Frequencies</a></li>
+  <li><a href="#binning" id="toc-binning" class="nav-link" data-scroll-target="#binning"><span class="toc-section-number">2.3.2</span>  Binning</a></li>
+  <li><a href="#n-tiles" id="toc-n-tiles" class="nav-link" data-scroll-target="#n-tiles"><span class="toc-section-number">2.3.3</span>  n-Tiles</a></li>
+  </ul></li>
+  <li><a href="#profiling-data-quality" id="toc-profiling-data-quality" class="nav-link" data-scroll-target="#profiling-data-quality"><span class="toc-section-number">2.4</span>  Profiling: Data Quality</a>
+  <ul class="collapse">
+  <li><a href="#detecting-duplicates" id="toc-detecting-duplicates" class="nav-link" data-scroll-target="#detecting-duplicates"><span class="toc-section-number">2.4.1</span>  Detecting Duplicates</a></li>
+  <li><a href="#deduplication-with-group-by-and-distinct" id="toc-deduplication-with-group-by-and-distinct" class="nav-link" data-scroll-target="#deduplication-with-group-by-and-distinct"><span class="toc-section-number">2.4.2</span>  Deduplication with GROUP BY and DISTINCT</a></li>
+  </ul></li>
+  <li><a href="#preparing-data-cleaning" id="toc-preparing-data-cleaning" class="nav-link" data-scroll-target="#preparing-data-cleaning"><span class="toc-section-number">2.5</span>  Preparing: Data Cleaning</a>
+  <ul class="collapse">
+  <li><a href="#cleaning-data-with-case-transformations" id="toc-cleaning-data-with-case-transformations" class="nav-link" data-scroll-target="#cleaning-data-with-case-transformations"><span class="toc-section-number">2.5.1</span>  Cleaning Data with CASE Transformations</a></li>
+  <li><a href="#type-conversions-and-casting" id="toc-type-conversions-and-casting" class="nav-link" data-scroll-target="#type-conversions-and-casting"><span class="toc-section-number">2.5.2</span>  Type Conversions and Casting</a></li>
+  <li><a href="#dealing-with-nulls-coalesce-nullif-nvl-functions" id="toc-dealing-with-nulls-coalesce-nullif-nvl-functions" class="nav-link" data-scroll-target="#dealing-with-nulls-coalesce-nullif-nvl-functions"><span class="toc-section-number">2.5.3</span>  Dealing with Nulls: coalesce, nullif, nvl Functions</a></li>
+  <li><a href="#missing-data" id="toc-missing-data" class="nav-link" data-scroll-target="#missing-data"><span class="toc-section-number">2.5.4</span>  Missing data</a></li>
+  </ul></li>
+  <li><a href="#preparing-shaping-data" id="toc-preparing-shaping-data" class="nav-link" data-scroll-target="#preparing-shaping-data"><span class="toc-section-number">2.6</span>  Preparing: Shaping Data</a>
+  <ul class="collapse">
+  <li><a href="#for-which-output-bi-visualization-statistics-ml" id="toc-for-which-output-bi-visualization-statistics-ml" class="nav-link" data-scroll-target="#for-which-output-bi-visualization-statistics-ml"><span class="toc-section-number">2.6.1</span>  For Which Output: BI, Visualization, Statistics, ML</a></li>
+  <li><a href="#pivoting-with-case-statements" id="toc-pivoting-with-case-statements" class="nav-link" data-scroll-target="#pivoting-with-case-statements"><span class="toc-section-number">2.6.2</span>  Pivoting with CASE Statements</a></li>
+  <li><a href="#unpivoting-with-union-statements" id="toc-unpivoting-with-union-statements" class="nav-link" data-scroll-target="#unpivoting-with-union-statements"><span class="toc-section-number">2.6.3</span>  Unpivoting with UNION Statements</a></li>
+  <li><a href="#pivot-and-unpivot-functions" id="toc-pivot-and-unpivot-functions" class="nav-link" data-scroll-target="#pivot-and-unpivot-functions"><span class="toc-section-number">2.6.4</span>  pivot and unpivot Functions</a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
@@ -260,11 +293,70 @@ div.csl-indent {
 
 <p>Chapter 2 of <span class="citation" data-cites="tanimura2021sql">Tanimura (<a href="references.html#ref-tanimura2021sql" role="doc-biblioref">2021</a>)</span> provides a good foundation discussion of issues related to preparing data for analysis. While the discussion is couched in terms of SQL, in reality the issues are not specific to SQL or databases. For this reason, I recommend that you read the chapter.</p>
 <p>While Chapter 2 of <span class="citation" data-cites="tanimura2021sql">Tanimura (<a href="references.html#ref-tanimura2021sql" role="doc-biblioref">2021</a>)</span> contains many code snippets, few of these seem to be intended for users to run (in part because they assume a database set-up that users would not have). For this reason, I do not attempt to provide <code>dplyr</code> equivalents to the code there except for a couple of exceptions that I discuss below.</p>
-<section id="missing-data" class="level2" data-number="2.1">
-<h2 data-number="2.1" class="anchored" data-anchor-id="missing-data"><span class="header-section-number">2.1</span> Missing data</h2>
+<p>In my view, some of the material in Chapter 2 of <span class="citation" data-cites="tanimura2021sql">Tanimura (<a href="references.html#ref-tanimura2021sql" role="doc-biblioref">2021</a>)</span> would be better placed later in the book where there is more context for some of the issues discussed. Chapter 2 of <span class="citation" data-cites="tanimura2021sql">Tanimura (<a href="references.html#ref-tanimura2021sql" role="doc-biblioref">2021</a>)</span> contains some example code, but no data, so the reader can merely read. As such, there isn’t much for me to parallel here. Nonetheless, I recommend you go read Chapter 2 before coming back here.</p>
+<section id="types-of-data" class="level2" data-number="2.1">
+<h2 data-number="2.1" class="anchored" data-anchor-id="types-of-data"><span class="header-section-number">2.1</span> Types of Data</h2>
+<section id="database-data-types" class="level3" data-number="2.1.1">
+<h3 data-number="2.1.1" class="anchored" data-anchor-id="database-data-types"><span class="header-section-number">2.1.1</span> Database Data Types</h3>
+<p>R has all the types listed in Chapter 2. PostgreSQL has a richer set of data types than base R has.<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
+<p>In general, data retains the equivalent type when transferred from R to PostgreSQL or vice versa. Sometimes data makes round trips (e.g., data is pulled from PostgreSQL to R for computations and then sent back to R) and it is important to check that data types are retained in the process (e.g., that timestamps don’t shift to a different time zone).</p>
+</section>
+<section id="structured-versus-unstructured" class="level3" data-number="2.1.2">
+<h3 data-number="2.1.2" class="anchored" data-anchor-id="structured-versus-unstructured"><span class="header-section-number">2.1.2</span> Structured versus Unstructured</h3>
+</section>
+<section id="quantitative-versus-qualitative-data" class="level3" data-number="2.1.3">
+<h3 data-number="2.1.3" class="anchored" data-anchor-id="quantitative-versus-qualitative-data"><span class="header-section-number">2.1.3</span> Quantitative versus Qualitative Data</h3>
+</section>
+<section id="first--second--and-third-party-data" class="level3" data-number="2.1.4">
+<h3 data-number="2.1.4" class="anchored" data-anchor-id="first--second--and-third-party-data"><span class="header-section-number">2.1.4</span> First-, Second-, and Third-Party Data</h3>
+</section>
+<section id="sparse-data" class="level3" data-number="2.1.5">
+<h3 data-number="2.1.5" class="anchored" data-anchor-id="sparse-data"><span class="header-section-number">2.1.5</span> Sparse Data</h3>
+</section>
+</section>
+<section id="sql-query-structure" class="level2" data-number="2.2">
+<h2 data-number="2.2" class="anchored" data-anchor-id="sql-query-structure"><span class="header-section-number">2.2</span> SQL Query Structure</h2>
+</section>
+<section id="profiling-distributions" class="level2" data-number="2.3">
+<h2 data-number="2.3" class="anchored" data-anchor-id="profiling-distributions"><span class="header-section-number">2.3</span> Profiling: Distributions</h2>
+<section id="histograms-and-frequencies" class="level3" data-number="2.3.1">
+<h3 data-number="2.3.1" class="anchored" data-anchor-id="histograms-and-frequencies"><span class="header-section-number">2.3.1</span> Histograms and Frequencies</h3>
+</section>
+<section id="binning" class="level3" data-number="2.3.2">
+<h3 data-number="2.3.2" class="anchored" data-anchor-id="binning"><span class="header-section-number">2.3.2</span> Binning</h3>
+</section>
+<section id="n-tiles" class="level3" data-number="2.3.3">
+<h3 data-number="2.3.3" class="anchored" data-anchor-id="n-tiles"><span class="header-section-number">2.3.3</span> n-Tiles</h3>
+</section>
+</section>
+<section id="profiling-data-quality" class="level2" data-number="2.4">
+<h2 data-number="2.4" class="anchored" data-anchor-id="profiling-data-quality"><span class="header-section-number">2.4</span> Profiling: Data Quality</h2>
+<section id="detecting-duplicates" class="level3" data-number="2.4.1">
+<h3 data-number="2.4.1" class="anchored" data-anchor-id="detecting-duplicates"><span class="header-section-number">2.4.1</span> Detecting Duplicates</h3>
+</section>
+<section id="deduplication-with-group-by-and-distinct" class="level3" data-number="2.4.2">
+<h3 data-number="2.4.2" class="anchored" data-anchor-id="deduplication-with-group-by-and-distinct"><span class="header-section-number">2.4.2</span> Deduplication with GROUP BY and DISTINCT</h3>
+</section>
+</section>
+<section id="preparing-data-cleaning" class="level2" data-number="2.5">
+<h2 data-number="2.5" class="anchored" data-anchor-id="preparing-data-cleaning"><span class="header-section-number">2.5</span> Preparing: Data Cleaning</h2>
+<section id="cleaning-data-with-case-transformations" class="level3" data-number="2.5.1">
+<h3 data-number="2.5.1" class="anchored" data-anchor-id="cleaning-data-with-case-transformations"><span class="header-section-number">2.5.1</span> Cleaning Data with CASE Transformations</h3>
+</section>
+<section id="type-conversions-and-casting" class="level3" data-number="2.5.2">
+<h3 data-number="2.5.2" class="anchored" data-anchor-id="type-conversions-and-casting"><span class="header-section-number">2.5.2</span> Type Conversions and Casting</h3>
+</section>
+<section id="dealing-with-nulls-coalesce-nullif-nvl-functions" class="level3" data-number="2.5.3">
+<h3 data-number="2.5.3" class="anchored" data-anchor-id="dealing-with-nulls-coalesce-nullif-nvl-functions"><span class="header-section-number">2.5.3</span> Dealing with Nulls: coalesce, nullif, nvl Functions</h3>
+</section>
+<section id="missing-data" class="level3" data-number="2.5.4">
+<h3 data-number="2.5.4" class="anchored" data-anchor-id="missing-data"><span class="header-section-number">2.5.4</span> Missing data</h3>
+<p>The SQL in the book generally uses the form <code>x::date</code> rather than the more standard SQL <code>CAST(x AS DATE)</code>. In <code>dbplyr</code>, we would use <code>as.Date(x)</code> and <code>dbplyr</code> would translate as <code>CAST(x AS DATE)</code>. The following code and output demonstrates how <code>dbplyr</code> translated from <code>dplyr</code> to SQL.</p>
+<p>The table stored in <code>dates_processed</code> below is equivalent to that created and stored in the database as <code>date_dim</code> in the code supplied with book. This <code>date_dim</code> table is only used in #sec-time-series of the book and we will not even use it there (for reasons to be explained).</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(DBI)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(DBI)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>pg <span class="ot">&lt;-</span> <span class="fu">dbConnect</span>(RPostgres<span class="sc">::</span><span class="fu">Postgres</span>(), </span>
@@ -290,27 +382,25 @@ div.csl-indent {
 <span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>         <span class="at">day_name  =</span> <span class="fu">trim</span>(<span class="fu">to_char</span>(date, <span class="st">'Day'</span>)),</span>
 <span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>         <span class="at">day_short_name =</span> <span class="fu">trim</span>(<span class="fu">to_char</span>(date, <span class="st">'Dy'</span>)),</span>
 <span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>         <span class="at">week_number =</span> <span class="fu">as.integer</span>(<span class="fu">date_part</span>(<span class="st">'week'</span>, date)),</span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>         <span class="at">week_of_month =</span> <span class="fu">as.integer</span>(<span class="fu">to_char</span>(date,<span class="st">'W'</span>)),</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>         <span class="at">week_of_month =</span> <span class="fu">as.integer</span>(<span class="fu">to_char</span>(date, <span class="st">'W'</span>)),</span>
 <span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>         <span class="at">week =</span> <span class="fu">as.Date</span>(<span class="fu">date_trunc</span>(<span class="st">'week'</span>, date)),</span>
 <span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>         <span class="at">month_number =</span> <span class="fu">as.integer</span>(<span class="fu">date_part</span>(<span class="st">'month'</span>,date)),</span>
 <span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>         <span class="at">month_name =</span> <span class="fu">trim</span>(<span class="fu">to_char</span>(date, <span class="st">'Month'</span>)),</span>
 <span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>         <span class="at">month_short_name =</span> <span class="fu">trim</span>(<span class="fu">to_char</span>(date, <span class="st">'Mon'</span>)),</span>
 <span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>         <span class="at">first_day_of_month =</span> <span class="fu">as.Date</span>(<span class="fu">date_trunc</span>(<span class="st">'month'</span>, date)),</span>
 <span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>         <span class="at">last_day_of_month =</span> <span class="fu">as.Date</span>(<span class="fu">date_trunc</span>(<span class="st">'month'</span>, date) <span class="sc">+</span></span>
-<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>                                       <span class="fu">sql</span>(<span class="st">"interval '1 month' -</span></span>
-<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a><span class="st">                                            interval '1 day'"</span>)),</span>
-<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>         <span class="at">quarter_number =</span> <span class="fu">as.integer</span>(<span class="fu">date_part</span>(<span class="st">'quarter'</span>, date)),</span>
-<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>         <span class="at">quarter_name =</span> <span class="fu">trim</span>(<span class="st">'Q'</span> <span class="sc">%||%</span> <span class="fu">as.integer</span>(<span class="fu">date_part</span>(<span class="st">'quarter'</span>, date))),</span>
-<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>         <span class="at">first_day_of_quarter =</span> <span class="fu">as.Date</span>(<span class="fu">date_trunc</span>(<span class="st">'quarter'</span>, date)),</span>
-<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>         <span class="at">last_day_of_quarter =</span> <span class="fu">as.Date</span>(<span class="fu">date_trunc</span>(<span class="st">'quarter'</span>, date) <span class="sc">+</span> </span>
-<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>                                         <span class="fu">sql</span>(<span class="st">"interval '3 months' -</span></span>
-<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a><span class="st">                                              interval '1 day'"</span>)),</span>
-<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>         <span class="at">year =</span> <span class="fu">as.integer</span>(<span class="fu">date_part</span>(<span class="st">'year'</span>, date)),</span>
-<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>         <span class="at">decade =</span> <span class="fu">as.integer</span>(<span class="fu">date_part</span>(<span class="st">'decade'</span>, date)) <span class="sc">*</span> <span class="dv">10</span>,</span>
-<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>         <span class="at">century =</span> <span class="fu">as.integer</span>(<span class="fu">date_part</span>(<span class="st">'century'</span>, date)))</span>
-<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>dates_processed <span class="sc">%&gt;%</span></span>
-<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>(<span class="at">n =</span> <span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>                                       <span class="fu">months</span>(<span class="dv">1</span>) <span class="sc">-</span> <span class="fu">days</span>(<span class="dv">1</span>)),</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>         <span class="at">quarter_number =</span> <span class="fu">as.integer</span>(<span class="fu">date_part</span>(<span class="st">'quarter'</span>, date)),</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>         <span class="at">quarter_name =</span> <span class="fu">trim</span>(<span class="st">'Q'</span> <span class="sc">%||%</span> <span class="fu">as.integer</span>(<span class="fu">date_part</span>(<span class="st">'quarter'</span>, date))),</span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>         <span class="at">first_day_of_quarter =</span> <span class="fu">as.Date</span>(<span class="fu">date_trunc</span>(<span class="st">'quarter'</span>, date)),</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>         <span class="at">last_day_of_quarter =</span> <span class="fu">as.Date</span>(<span class="fu">date_trunc</span>(<span class="st">'quarter'</span>, date) <span class="sc">+</span> </span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>                                         <span class="fu">months</span>(<span class="dv">3</span>) <span class="sc">-</span> <span class="fu">days</span>(<span class="dv">1</span>)),</span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>         <span class="at">year =</span> <span class="fu">as.integer</span>(<span class="fu">year</span>(date)),</span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>         <span class="at">decade =</span> <span class="fu">as.integer</span>(<span class="fu">date_part</span>(<span class="st">'decade'</span>, date)) <span class="sc">*</span> <span class="dv">10</span>,</span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>         <span class="at">century =</span> <span class="fu">as.integer</span>(<span class="fu">date_part</span>(<span class="st">'century'</span>, date)))</span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>dates_processed <span class="sc">%&gt;%</span></span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>(<span class="at">n =</span> <span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 10 × 22
    date                date_key day_of_month day_of_year day_of_week day_name 
@@ -351,14 +441,12 @@ SELECT
   trim(to_char("date", 'Month')) AS "month_name",
   trim(to_char("date", 'Mon')) AS "month_short_name",
   CAST(date_trunc('month', "date") AS DATE) AS "first_day_of_month",
-  CAST(date_trunc('month', "date") + interval '1 month' -
-                                            interval '1 day' AS DATE) AS "last_day_of_month",
+  CAST((date_trunc('month', "date") + CAST('1 months' AS INTERVAL)) - CAST('1 days' AS INTERVAL) AS DATE) AS "last_day_of_month",
   CAST(date_part('quarter', "date") AS INTEGER) AS "quarter_number",
   trim('Q' || CAST(date_part('quarter', "date") AS INTEGER)) AS "quarter_name",
   CAST(date_trunc('quarter', "date") AS DATE) AS "first_day_of_quarter",
-  CAST(date_trunc('quarter', "date") + interval '3 months' -
-                                              interval '1 day' AS DATE) AS "last_day_of_quarter",
-  CAST(date_part('year', "date") AS INTEGER) AS "year",
+  CAST((date_trunc('quarter', "date") + CAST('3 months' AS INTERVAL)) - CAST('1 days' AS INTERVAL) AS DATE) AS "last_day_of_quarter",
+  CAST(EXTRACT(year FROM "date") AS INTEGER) AS "year",
   CAST(date_part('decade', "date") AS INTEGER) * 10.0 AS "decade",
   CAST(date_part('century', "date") AS INTEGER) AS "century"
 FROM (
@@ -371,6 +459,20 @@ SELECT *
 ) "q02"</code></pre>
 </div>
 </div>
+</section>
+</section>
+<section id="preparing-shaping-data" class="level2" data-number="2.6">
+<h2 data-number="2.6" class="anchored" data-anchor-id="preparing-shaping-data"><span class="header-section-number">2.6</span> Preparing: Shaping Data</h2>
+<section id="for-which-output-bi-visualization-statistics-ml" class="level3" data-number="2.6.1">
+<h3 data-number="2.6.1" class="anchored" data-anchor-id="for-which-output-bi-visualization-statistics-ml"><span class="header-section-number">2.6.1</span> For Which Output: BI, Visualization, Statistics, ML</h3>
+</section>
+<section id="pivoting-with-case-statements" class="level3" data-number="2.6.2">
+<h3 data-number="2.6.2" class="anchored" data-anchor-id="pivoting-with-case-statements"><span class="header-section-number">2.6.2</span> Pivoting with CASE Statements</h3>
+</section>
+<section id="unpivoting-with-union-statements" class="level3" data-number="2.6.3">
+<h3 data-number="2.6.3" class="anchored" data-anchor-id="unpivoting-with-union-statements"><span class="header-section-number">2.6.3</span> Unpivoting with UNION Statements</h3>
+<p>A user of <code>dplyr</code> has access to the functions <code>pivot_wider</code> and <code>pivot_longer</code>, which make it much easier to “pivot” and “unpivot” tables than using <code>CASE</code> statements, which could become long and tedious.</p>
+<p>To illustrate the <code>dplyr</code> way of doing things, I will create <code>ctry_pops</code> to match the data discussed in Chapter 2. First, I create the data set using the <code>tribble()</code> function from <code>dplyr</code>.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>ctry_pops <span class="ot">&lt;-</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tribble</span>(</span>
@@ -378,42 +480,119 @@ SELECT *
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Canada"</span>, <span class="dv">24593</span>, <span class="dv">27791</span>, <span class="dv">31100</span>, <span class="dv">34207</span>,</span>
 <span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Mexico"</span>, <span class="dv">68347</span>, <span class="dv">84634</span>, <span class="dv">99775</span>, <span class="dv">114061</span>,</span>
 <span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">"United States"</span>, <span class="dv">227225</span>, <span class="dv">249623</span>, <span class="dv">282162</span>, <span class="dv">309326</span></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>ctry_pops <span class="sc">%&gt;%</span></span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="sc">-</span>country, </span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>               <span class="at">names_to =</span> <span class="st">"year"</span>,</span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>               <span class="at">names_prefix =</span> <span class="st">"year_"</span>,</span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>               <span class="at">values_ptypes =</span> <span class="fu">integer</span>(),</span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>               <span class="at">values_to =</span> <span class="st">"population"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Second, I pivot the local data frame using <code>pivot_longer</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>ctry_pops_long <span class="ot">&lt;-</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  ctry_pops <span class="sc">%&gt;%</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="sc">-</span>country, </span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">names_to =</span> <span class="st">"year"</span>,</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>               <span class="at">names_prefix =</span> <span class="st">"year_"</span>,</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>               <span class="at">values_ptypes =</span> <span class="fu">integer</span>(),</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>               <span class="at">values_to =</span> <span class="st">"population"</span>) </span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>ctry_pops_long <span class="sc">%&gt;%</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped">
+<thead>
+<tr class="header">
+<th style="text-align: left;">country</th>
+<th style="text-align: left;">year</th>
+<th style="text-align: right;">population</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Canada</td>
+<td style="text-align: left;">1980</td>
+<td style="text-align: right;">24593</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Canada</td>
+<td style="text-align: left;">1990</td>
+<td style="text-align: right;">27791</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Canada</td>
+<td style="text-align: left;">2000</td>
+<td style="text-align: right;">31100</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Canada</td>
+<td style="text-align: left;">2010</td>
+<td style="text-align: right;">34207</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Mexico</td>
+<td style="text-align: left;">1980</td>
+<td style="text-align: right;">68347</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Mexico</td>
+<td style="text-align: left;">1990</td>
+<td style="text-align: right;">84634</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Mexico</td>
+<td style="text-align: left;">2000</td>
+<td style="text-align: right;">99775</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Mexico</td>
+<td style="text-align: left;">2010</td>
+<td style="text-align: right;">114061</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">United States</td>
+<td style="text-align: left;">1980</td>
+<td style="text-align: right;">227225</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">United States</td>
+<td style="text-align: left;">1990</td>
+<td style="text-align: right;">249623</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">United States</td>
+<td style="text-align: left;">2000</td>
+<td style="text-align: right;">282162</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">United States</td>
+<td style="text-align: left;">2010</td>
+<td style="text-align: right;">309326</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Next, I copy the data to PostgreSQL, so that it’s a (temporary) table inside the database.<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>ctry_pops_db <span class="ot">&lt;-</span> <span class="fu">copy_to</span>(pg, ctry_pops)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>ctry_pops_db</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 12 × 3
-   country       year  population
-   &lt;chr&gt;         &lt;chr&gt;      &lt;int&gt;
- 1 Canada        1980       24593
- 2 Canada        1990       27791
- 3 Canada        2000       31100
- 4 Canada        2010       34207
- 5 Mexico        1980       68347
- 6 Mexico        1990       84634
- 7 Mexico        2000       99775
- 8 Mexico        2010      114061
- 9 United States 1980      227225
-10 United States 1990      249623
-11 United States 2000      282162
-12 United States 2010      309326</code></pre>
+<pre><code># Source:   table&lt;ctry_pops&gt; [3 x 5]
+# Database: postgres  [iangow@/tmp:5432/iangow]
+  country       year_1980 year_1990 year_2000 year_2010
+  &lt;chr&gt;             &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+1 Canada            24593     27791     31100     34207
+2 Mexico            68347     84634     99775    114061
+3 United States    227225    249623    282162    309326</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>ctry_pops_db <span class="ot">&lt;-</span> <span class="fu">copy_to</span>(pg, ctry_pops)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>ctry_pops_db_long <span class="ot">&lt;-</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  ctry_pops_db <span class="sc">%&gt;%</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="sc">-</span>country, </span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">names_to =</span> <span class="st">"year"</span>,</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>               <span class="at">names_prefix =</span> <span class="st">"year_"</span>,</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>               <span class="at">values_to =</span> <span class="st">"population"</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<p>From the output below, we can see that <code>dbplyr</code> has taken care of the tedious business of constructing several statements for us.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>ctry_pops_db <span class="sc">%&gt;%</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="sc">-</span>country, </span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>               <span class="at">names_to =</span> <span class="st">"year"</span>,</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">names_prefix =</span> <span class="st">"year_"</span>,</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>               <span class="at">values_to =</span> <span class="st">"population"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">show_query</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>ctry_pops_db_long <span class="sc">%&gt;%</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">show_query</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>&lt;SQL&gt;
 (
@@ -441,6 +620,132 @@ UNION ALL
 )</code></pre>
 </div>
 </div>
+<p>And from the following, we can see that the result is the same as it was when using <code>dplyr</code> on a local data frame.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>ctry_pops_db_long <span class="sc">%&gt;%</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped">
+<thead>
+<tr class="header">
+<th style="text-align: left;">country</th>
+<th style="text-align: left;">year</th>
+<th style="text-align: right;">population</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Canada</td>
+<td style="text-align: left;">1980</td>
+<td style="text-align: right;">24593</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Mexico</td>
+<td style="text-align: left;">1980</td>
+<td style="text-align: right;">68347</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">United States</td>
+<td style="text-align: left;">1980</td>
+<td style="text-align: right;">227225</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Canada</td>
+<td style="text-align: left;">1990</td>
+<td style="text-align: right;">27791</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Mexico</td>
+<td style="text-align: left;">1990</td>
+<td style="text-align: right;">84634</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">United States</td>
+<td style="text-align: left;">1990</td>
+<td style="text-align: right;">249623</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Canada</td>
+<td style="text-align: left;">2000</td>
+<td style="text-align: right;">31100</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Mexico</td>
+<td style="text-align: left;">2000</td>
+<td style="text-align: right;">99775</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">United States</td>
+<td style="text-align: left;">2000</td>
+<td style="text-align: right;">282162</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Canada</td>
+<td style="text-align: left;">2010</td>
+<td style="text-align: right;">34207</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Mexico</td>
+<td style="text-align: left;">2010</td>
+<td style="text-align: right;">114061</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">United States</td>
+<td style="text-align: left;">2010</td>
+<td style="text-align: right;">309326</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>And we can reverse the <code>pivot_longer()</code> using <code>pivot_wider()</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>ctry_pops_db_long <span class="sc">%&gt;%</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">compute</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> year, </span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>              <span class="at">values_from =</span> population, </span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>              <span class="at">names_prefix =</span> <span class="st">"year_"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped">
+<thead>
+<tr class="header">
+<th style="text-align: left;">country</th>
+<th style="text-align: right;">year_2010</th>
+<th style="text-align: right;">year_1990</th>
+<th style="text-align: right;">year_2000</th>
+<th style="text-align: right;">year_1980</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Mexico</td>
+<td style="text-align: right;">114061</td>
+<td style="text-align: right;">84634</td>
+<td style="text-align: right;">99775</td>
+<td style="text-align: right;">68347</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Canada</td>
+<td style="text-align: right;">34207</td>
+<td style="text-align: right;">27791</td>
+<td style="text-align: right;">31100</td>
+<td style="text-align: right;">24593</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">United States</td>
+<td style="text-align: right;">309326</td>
+<td style="text-align: right;">249623</td>
+<td style="text-align: right;">282162</td>
+<td style="text-align: right;">227225</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="pivot-and-unpivot-functions" class="level3" data-number="2.6.4">
+<h3 data-number="2.6.4" class="anchored" data-anchor-id="pivot-and-unpivot-functions"><span class="header-section-number">2.6.4</span> pivot and unpivot Functions</h3>
 
 
 <div id="refs" class="references csl-bib-body hanging-indent" role="doc-bibliography" style="display: none">
@@ -448,6 +753,14 @@ UNION ALL
 Tanimura, C. 2021. <em>SQL for Data Analysis</em>. O’Reilly Media. <a href="https://books.google.com.au/books?id=ojhCEAAAQBAJ">https://books.google.com.au/books?id=ojhCEAAAQBAJ</a>.
 </div>
 </div>
+</section>
+</section>
+<section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes">
+<hr>
+<ol>
+<li id="fn1"><p>Some packages offer additional data types, so it is difficult to be definitive where R has fewer types once packages are included.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p>“Temporary” here means that it will disappear once we close our connection to the database.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
 </section>
 
 </main> <!-- /main -->
