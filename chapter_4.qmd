@@ -96,10 +96,12 @@ cohorts <-
   inner_join(first_terms, by = "id_bioguide") %>%
   mutate(period = date_part('year', age(term_start, first_term))) %>%
   group_by(period) %>%
-  summarize(cohort_retained = sql("count(distinct id_bioguide)")) 
+  summarize(cohort_retained = n_distinct(id_bioguide)) 
 
 cohorts %>%
-  collect(n = 10)
+  arrange(period) %>%
+  collect(n = 10) %>%
+  kable()
 ```
 
 ```{r}
@@ -112,7 +114,8 @@ retained_data <-
   select(period, cohort_size, cohort_retained, pct_retained) 
 
 retained_data %>%
-  collect(n = 10)
+  collect(n = 10) %>%
+  kable(digits = 3)
 ```
 
 ```{r}
@@ -135,14 +138,6 @@ retained_data %>%
 ```
 
 ## Adjusting Time Series to Increase Retention Accuracy
-
-```{sql}
-#| connection: pg
-SELECT generate_series AS date 
-FROM generate_series(timestamp '1770-12-31',
-                     timestamp '2030-12-31',
-                     INTERVAL 1 year);
-```
 
 ```{r}
 #| label: cohorts
