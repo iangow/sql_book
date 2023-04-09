@@ -45,8 +45,25 @@ It didn't make sense to me at the time, and still doesn't.]
 A later project had a reputation that preceded it.
 Several people had joined this project before deciding to leave the firm.
 My recollection is that a partner had been hired from another firm with the understanding that he would lead an "insurance benchmarking study".
-This 
+The assigned junior person on the project would be waiting until the very busy partner had managed to extract complete surveys from various insurance firms.
+Faced with this prospect, I tried to engineer my way off this project by creating a Visual Basic program that would take completed surveys and, with assistance of a Microsoft Access database, create a Powerpoint slide automatically.
+My program worked OK, but I ended up needing to resign to get off the project myself.
 
+A later freelance consulting project had me working with the financial planning team of a major Australian bank.
+Their existing planning process involved sending out numerous Excel spreadsheet templates to various units (branches, project managers) and then carefully stitching back the completed spreadsheets into a single large spreadsheet.
+This process would take weeks because the returned spreadsheets had been quite mangled.
+I helped the team reengineer the process to use a Microsoft Access database fed by locked templates.
+The resulting process took hours instead of weeks.
 
-A later project involved preparing 
+Making the fateful---and much regretted---decision to leave business for a "career" in business academia, my exposure to SQL has not gone down.
+For the first several years after entering the PhD program at Stanford, `PROC SQL` in SAS was a mainstay of my analysis pipeline.
+In 2011, I decided to migrate to an alternative database, as I found SAS restrictive.
+After trying a number of alternatives (SQLite and MySQL), I settled on PostgreSQL as the backend of my data analysis workflow.
 
+Initially, I was writing a lot of SQL and using other programs (e.g., Stata and R) to analyse data.
+When `dplyr` and `dbplyr` emerged, I immediately found this to be very intuitive and facile for analysis.
+Nowadays, I rarely write SQL directly and rely on `dbplyr` to do that for me.
+Of course, it's still very helpful to know SQL well and I suspect I still "think in SQL" even though I type in `dbplyr` commands.
+Today, I essentially never use "data files"; all my data go through a PostgreSQL database.
+
+The point of boring any reader with the autobiographical details above is to illustrate that one can go a lot of places in data analysis and not get very far from SQL.
