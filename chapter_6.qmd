@@ -14,6 +14,10 @@ library(forcats)
 pg <- dbConnect(RPostgres::Postgres(), 
                 bigint = "integer",
                 check_interrupts = TRUE)
+```
+
+```{r}
+#| include: false
 dbExecute(pg, "SET search_path TO sql_book")
 ```
 
