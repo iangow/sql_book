@@ -1,4 +1,4 @@
-# Time Series Analysis
+# Time Series Analysis {#sec-time-series}
 
 ```{r}
 #| message: false

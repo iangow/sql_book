@@ -7,12 +7,56 @@ For this reason, I recommend that you read the chapter.
 While Chapter 2 of @tanimura2021sql contains many code snippets, few of these seem to be intended for users to run (in part because they assume a database set-up that users would not have).
 For this reason, I do not attempt to provide `dplyr` equivalents to the code there except for a couple of exceptions that I discuss below.
 
-## Missing data
+## Types of Data
+
+### Database Data Types
+
+### Structured versus Unstructured
+
+### Quantitative versus Qualitative Data
+
+### First-, Second-, and Third-Party Data
+
+### Sparse Data
+
+## SQL Query Structure
+
+## Profiling: Distributions
+
+### Histograms and Frequencies
+
+### Binning
+
+### n-Tiles
+
+## Profiling: Data Quality
+
+### Detecting Duplicates
+
+### Deduplication with GROUP BY and DISTINCT
+
+## Preparing: Data Cleaning
+
+### Cleaning Data with CASE Transformations
+
+### Type Conversions and Casting
+
+### Dealing with Nulls: coalesce, nullif, nvl Functions
+
+### Missing data
+
+The SQL in the book generally uses the form `x::date` rather than the more standard SQL `CAST(x AS DATE)`.
+In `dbplyr`, we would use `as.Date(x)` and `dbplyr` would translate as `CAST(x AS DATE)`.
+The following code and output demonstrates how `dbplyr` translated from `dplyr` to SQL.
+
+The table stored in `dates_processed` below is equivalent to that created and stored in the database as `date_dim` in the code supplied with book.
+This `date_dim` table is only used in #sec-time-series of the book and we will not even use it there (for reasons to be explained).
 
 ```{r}
 #| message: false
 library(tidyverse)
 library(DBI)
+library(knitr)
 ```
 
 ```{r}
@@ -46,22 +90,20 @@ dates_processed <-
          day_name  = trim(to_char(date, 'Day')),
          day_short_name = trim(to_char(date, 'Dy')),
          week_number = as.integer(date_part('week', date)),
-         week_of_month = as.integer(to_char(date,'W')),
+         week_of_month = as.integer(to_char(date, 'W')),
          week = as.Date(date_trunc('week', date)),
          month_number = as.integer(date_part('month',date)),
          month_name = trim(to_char(date, 'Month')),
          month_short_name = trim(to_char(date, 'Mon')),
          first_day_of_month = as.Date(date_trunc('month', date)),
          last_day_of_month = as.Date(date_trunc('month', date) +
-                                       sql("interval '1 month' -
-                                            interval '1 day'")),
+                                       months(1) - days(1)),
          quarter_number = as.integer(date_part('quarter', date)),
          quarter_name = trim('Q' %||% as.integer(date_part('quarter', date))),
          first_day_of_quarter = as.Date(date_trunc('quarter', date)),
          last_day_of_quarter = as.Date(date_trunc('quarter', date) + 
-                                         sql("interval '3 months' -
-                                              interval '1 day'")),
-         year = as.integer(date_part('year', date)),
+                                         months(3) - days(1)),
+         year = as.integer(year(date)),
          decade = as.integer(date_part('decade', date)) * 10,
          century = as.integer(date_part('century', date)))
 
@@ -72,6 +114,18 @@ dates_processed %>%
   show_query()
 ```
 
+## Preparing: Shaping Data
+
+### For Which Output: BI, Visualization, Statistics, ML
+
+### Pivoting with CASE Statements
+
+### Unpivoting with UNION Statements
+
+A user of `dplyr` has access to the functions `pivot_wider` and `pivot_longer`, which make it much easier to "pivot" and "unpivot" tables than using `CASE` statements, which could become long and tedious.
+
+To illustrate the `dplyr` way of doing things, I will create `ctry_pops` to match the data discussed in Chapter 2.
+First, I create the data set using the `tribble()` function from `dplyr`.
 
 ```{r}
 ctry_pops <-
@@ -81,25 +135,41 @@ ctry_pops <-
   "Mexico", 68347, 84634, 99775, 114061,
   "United States", 227225, 249623, 282162, 309326
 )
+```
 
+Second, I pivot the local data frame using `pivot_longer`.
+
+```{r}
 ctry_pops %>%
   pivot_longer(cols = -country, 
                names_to = "year",
                names_prefix = "year_",
                values_ptypes = integer(),
-               values_to = "population")
+               values_to = "population") %>%
+  kable()
 ```
 
-```{r}
+Next, I copy the data to PostgreSQL, so that it's a (temporary) table inside the database.^["Temporary" here means that it will disappear once we close our connection to the database.]
 
+```{r}
 ctry_pops_db <- copy_to(pg, ctry_pops)
+ctry_pops_db
 ```
 
 ```{r}
-ctry_pops_db %>%
+ctry_pops_db_long <-
+  ctry_pops_db %>%
   pivot_longer(cols = -country, 
                names_to = "year",
                names_prefix = "year_",
-               values_to = "population") %>%
+               values_to = "population") 
+
+ctry_pops_db_long %>%
   show_query()
+
+ctry_pops_db_long %>%
+  kable()
 ```
+
+### pivot and unpivot Functions
+

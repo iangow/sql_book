@@ -1,1 +1,24 @@
 # Analysis with SQL
+
+## What is Data Analysis?
+
+## Why SQL?
+
+### What is SQL?
+
+### Benefits of SQL
+
+### SQL versus R or Python
+
+### SQL as Part of the Data Analysis Workflow
+
+## Database Types and How to Work with Them
+
+### Row-Store Databases
+
+### Column-Store Databases
+
+### Other Types of Data Infrastructure
+
+## Conclusion
+
