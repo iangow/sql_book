@@ -1,0 +1,329 @@
+# Creating Complex Data Sets for Analysis
+
+## When to Use SQL for Complex Data Sets
+
+### Advantages of Using SQL
+
+### When to Build into ETL Instead
+
+### When to Put Logic in Other Tools
+
+```{r}
+#| message: false
+library(DBI)
+library(tidyverse)
+library(dbplyr)
+library(knitr)
+```
+
+```{r}
+pg <- dbConnect(RPostgres::Postgres(), 
+                bigint = "integer",
+                check_interrupts = TRUE)
+```
+
+
+```{r}
+#| include: false
+dbExecute(pg, "SET search_path TO sql_book")
+```
+
+## Code Organization
+
+```{r}
+earthquakes <- tbl(pg, "earthquakes")
+legislators_terms <- tbl(pg, "legislators_terms")
+videogame_sales <- tbl(pg, "videogame_sales")
+```
+
+```{r}
+earthquakes %>%
+  filter(date_part('year', time) >= 2019,
+         between(mag, 0, 1)) %>%
+  mutate(place = case_when(grepl('CA', place) ~ 'California',
+                           grepl('AK', place) ~ 'Alaska',
+                           TRUE ~ trim(split_part(place, ',', 2L)))) %>%
+  count(place, type, mag) %>%
+  arrange(desc(n)) %>%
+  collect(n = 10) %>%
+  kable()
+```
+
+### Commenting
+
+### Capitalization, Indentation, Parentheses, and Other Formatting Tricks
+
+### Storing Code
+
+## Organizing Computations
+
+### Understanding Order of SQL Clause Evaluation
+
+In general, I think the order of evaluation is more intuitive when writing SQL using `dbplyr`.
+It is perhaps more confusing to someone who has written a lot of SQL without thinking about the order things are evaluated (e.g., `WHERE` comes early in evaluation, but relatively late in the SQL).
+
+In `dplyr` the meaning of `filter()` is usually clear by where it is placed.
+Some times it is translated into `WHERE` and some times it is `HAVING`.
+In the example below, a `WHERE`-like filter would be placed just after `legislators_terms` (much as it is evaluated by the SQL query engine), while in this case we have `filter` being translated into `HAVING` because it is using the result of `GROUP BY` query.
+One hardly need give this much thought.
+
+```{r}
+terms_by_states <-
+  legislators_terms %>%
+  group_by(state) %>%
+  summarize(terms = n()) %>%
+  filter(terms >= 1000) %>%
+  arrange(desc(terms))
+
+terms_by_states %>%
+  show_query()
+
+terms_by_states %>%
+  collect(n = 10) %>%
+  kable()
+```
+
+The way `dplyr` code is written makes it easy to look at the output each step in the series of pipes.
+In the query below, we can easily highlight the code up to the end of any pipe and evaluate it to see if it is doing what we want and expect it be doing.
+In this specific case, I find the `dplyr` code to be more intuitive than the SQL provided in the book, which uses an `a
+
+
+
+```{r}
+legislators_terms %>%
+  group_by(state) %>%
+  summarize(terms = n(), .groups = "drop") %>%
+  mutate(avg_terms = mean(terms, na.rm = TRUE)) %>%
+  collect(n = 10) %>%
+  kable(digits = 2)
+```
+
+```{r}
+legislators_terms %>%
+  group_by(state) %>%
+  summarize(terms = n(), .groups = "drop") %>%
+  window_order(desc(terms)) %>%
+  mutate(rank = row_number()) %>%
+  arrange(rank) %>%
+  collect(n = 10) %>%
+  kable()
+```
+
+### Subqueries
+
+In writing `dbplyr` code, it is more natural to think in terms of CTEs, even though the code you write will generally be translated into SQL using subqueries.
+
+The query in the book written with `LATERAL` seems much more confusing to me than the following.
+(Also, adding `EXPLAIN` to each query suggests that `LATERAL` is more complicated for PostgreSQL.)
+I rewrote the `LATERAL` query using CTEs and got the following, which seems closer to the second SQL query included in the book.
+
+```{sql}
+#| connection: pg
+WITH 
+
+current_legislators AS (
+  SELECT distinct id_bioguide, party
+  FROM legislators_terms
+  WHERE term_end > '2020-06-01'),
+  
+party_changers AS (
+  SELECT b.id_bioguide, min(term_start) as first_term
+  FROM legislators_terms b
+  INNER JOIN current_legislators AS a
+  ON b.id_bioguide = a.id_bioguide AND b.party <> a.party
+  GROUP BY 1)
+
+SELECT date_part('year', first_term) as first_year, party,
+  count(id_bioguide) as legislators
+FROM current_legislators
+INNER JOIN party_changers
+USING (id_bioguide)
+GROUP BY 1, 2;
+```
+
+Translating the CTE version into `dbplyr` is a piece of cake.
+
+```{r}
+current_legislators <-
+  legislators_terms %>%
+  filter(term_end > '2020-06-01') %>%
+  distinct(id_bioguide, party)
+
+party_changers <-
+  legislators_terms %>%
+  inner_join(current_legislators, 
+             join_by(id_bioguide)) %>%
+  filter(party.x != party.y) %>%
+  group_by(id_bioguide) %>%
+  summarize(first_term = min(term_start, na.rm = TRUE), .groups = "drop")
+
+current_legislators %>%
+  inner_join(party_changers, by = "id_bioguide") %>%
+  mutate(first_year = date_part('year', first_term)) %>%
+  group_by(first_year, party) %>%
+  summarize(legislators = n(), .groups = "drop") %>%
+  collect() %>%
+  kable()
+```
+
+### Temporary Tables
+
+Creating temporary tables with `dbplyr` is easy: simply append `compute()` at the end of the table definition.
+Generally, `dbplyr` will take care of details that likely do not matter much, such as choosing a name for the table (we don't care because we can refer to the table below as `current_legislators` regardless of the name chosen for it).
+
+```{r}
+current_legislators %>%
+  show_query()
+
+current_legislators <-
+  legislators_terms %>%
+  filter(term_end > '2020-06-01') %>%
+  distinct(id_bioguide, party) %>%
+  compute()
+
+current_legislators %>%
+  show_query()
+```
+
+Creating temporary tables can lead to significant performance gains in some situations, as the query optimizer has a simpler object to work with.
+Note that `dbplyr` allows the creating of an index with temporary tables, which can improve performance even further.
+
+Not that some database administrators do not allow users to create temporary tables.
+In such cases, you can often use `collect()` followed by `copy_inline()` effectively. (This is also useful when you have data outside the database---so `collect()` is not relevant---but want to merge it with data in the database.^[See [here](https://iangow.github.io/far_book/beaver68.html?q=copy_inline#replication-for-the-full-sample) for examples.])
+
+### Common Table Expressions
+
+We have been using them throughout the book already.
+For the sake of completeness, I rewrite the query given in the book here.
+
+```{r}
+first_term <- 
+  legislators_terms %>%
+  group_by(id_bioguide) %>%
+  summarize(first_term = min(term_start, na.rm = TRUE),
+            .groups = "drop")
+    
+first_term %>%
+  inner_join(legislators_terms, by = "id_bioguide") %>%
+  mutate(periods = date_part('year', age(term_start, first_term))) %>%
+  group_by(periods) %>%
+  summarize(cohort_retained = n_distinct(id_bioguide)) %>%
+  collect(n = 3) %>%
+  kable()
+```
+
+### grouping sets
+
+I don't think there *is* a "pure" `dbplyr` way of doing these.
+However, not all is lost for the dedicated `dbplyr` user, as the following examples demonstrate.
+
+```{r}
+global_sales <-
+  tbl(pg, sql("
+    SELECT platform, genre, publisher,
+      sum(global_sales) as global_sales
+    FROM videogame_sales
+    GROUP BY grouping sets (platform, genre, publisher)"))
+
+global_sales %>%
+  arrange(desc(global_sales)) %>%
+  collect(n = 10) %>%
+  kable()
+```
+
+```{r}
+global_sales_cube <-
+  tbl(pg, sql("
+    SELECT coalesce(platform, 'All') as platform,
+      coalesce(genre,'All') AS genre,
+      coalesce(publisher,'All') AS publisher,
+      sum(global_sales) AS global_sales
+    FROM videogame_sales
+    GROUP BY cube (platform, genre, publisher)"))
+
+global_sales_cube %>%
+  arrange(platform, genre, publisher) %>%
+  collect(n = 10) %>%
+  kable()
+```
+
+## Managing Data Set Size and Privacy Concerns
+
+### Sampling with %, mod
+
+One can also use `random()` to similar effect.
+
+### Reducing Dimensionality
+
+```{r}
+legislators_terms %>%
+  mutate(state_group = 
+           case_when(state %in% c('CA', 'TX', 'FL', 'NY', 'PA') ~ state, 
+                     TRUE ~ 'Other')) %>%
+  group_by(state_group) %>%
+  summarize(terms = n()) %>%
+  arrange(desc(terms)) %>%
+  collect(n = 6) %>%
+  kable()
+```
+
+```{r}
+top_states <-
+  legislators_terms %>%
+  group_by(state) %>%
+  summarize(n_reps = n_distinct(id_bioguide), .groups = "drop") %>%
+  window_order(desc(n_reps)) %>%
+  mutate(rank = row_number())
+
+legislators_terms %>%
+  inner_join(top_states, by = "state") %>%
+  mutate(state_group = case_when(rank <= 5 ~ state,
+                                 TRUE ~ 'Other')) %>%
+  group_by(state_group) %>%
+  summarize(terms = n_distinct(id_bioguide)) %>%
+  arrange(desc(terms)) %>%
+  collect(n = 6) %>%
+  kable()
+```
+
+Note that the `CASE WHEN` in the SQL in the book can be significantly simplified.
+
+```{sql}
+#| connection: pg
+WITH num_terms AS (
+  SELECT id_bioguide, count(term_id) as terms
+    FROM legislators_terms
+    GROUP BY 1)
+    
+SELECT terms >= 2 AS two_terms_flag,
+  count(*) as legislators
+FROM num_terms
+GROUP BY 1;
+```
+```{r}
+num_terms <- 
+  legislators_terms %>%
+  group_by(id_bioguide) %>%
+  summarize(terms = n(), .groups = "drop")
+
+num_terms %>%
+  mutate(two_terms_flag = terms >= 2) %>%
+  count(two_terms_flag) %>%
+  collect() %>%
+  kable()
+```
+
+Now we can reuse the `num_terms` lazy table we created above.
+
+```{r}
+num_terms %>%
+  mutate(terms_level = case_when(terms >= 10 ~ '10+',
+                                 terms >= 2 ~ '2 - 9',
+                                 TRUE ~ '1')) %>%
+  count(terms_level) %>%
+  collect() %>%
+  kable()
+```
+### PII and Data Privacy
+
+## Conclusion

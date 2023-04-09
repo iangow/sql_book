@@ -1,5 +1,5 @@
-DROP table if exists videogame_sales;
-CREATE table videogame_sales
+DROP table if exists sql_book.videogame_sales;
+CREATE table sql_book.videogame_sales
 (
 rank int
 ,name text
@@ -16,4 +16,4 @@ rank int
 ;
 
 -- change localpath to the location of the saved file
-COPY videogame_sales FROM '/Users/igow/git/sql_book/Chapter 8: Creating Complex Data Sets/videogame_sales.csv' DELIMITER ',' CSV HEADER;
+COPY sql_book.videogame_sales FROM '/Users/igow/git/sql_book/Chapter 8: Creating Complex Data Sets/videogame_sales.csv' DELIMITER ',' CSV HEADER;
