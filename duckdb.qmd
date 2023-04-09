@@ -1,0 +1,12 @@
+# Text Analysis
+
+```{r}
+pg <- dbConnect(duckdb::duckdb(), 
+                dbdir = "sql_book.duckdb", 
+                read_only = TRUE)
+```
+
+```{r}
+#| include: false
+dbDisconnect(pg, shutdown = TRUE)
+```

@@ -28,9 +28,9 @@ library(dbplyr)
 ```
 
 ```{r}
-#| output: false
-pg <- dbConnect(RPostgres::Postgres(), bigint = "integer")
-dbExecute(pg, "SET search_path TO sql_book")
+pg <- dbConnect(duckdb::duckdb(), 
+                dbdir = "sql_book.duckdb", 
+                read_only = TRUE)
 ```
 
 ```{r}
@@ -41,6 +41,14 @@ ufo %>%
   mutate(length = length(sighting_report)) %>%
   ggplot(aes(x = length)) +
   geom_histogram(binwidth = 1)
+```
+
+```{r}
+initcap <- function(x) {
+  if_else(nchar(x) > 0,
+          paste0(toupper(substr(x, 1, 1)),
+                 tolower(substr(x, 2, nchar(x)))), x)
+}
 ```
 
 ```{r}
@@ -61,29 +69,38 @@ regex2 <- paste0("^(.*?)",
 
 ufo_extracted <- 
   ufo %>%
-  mutate(matches = regexp_matches(sighting_report, regex)) %>%
-  mutate(occurred_plus = matches[[1]],
-         reported = matches[[2]],
-         posted = matches[[3]],
-         location = matches[[4]],
-         shape = matches[[5]],
-         duration = matches[[6]]) %>%
+  mutate(occurred_plus = regexp_extract(sighting_report, regex, 1L),
+         reported = regexp_extract(sighting_report, regex, 2L),
+         posted = regexp_extract(sighting_report, regex, 3L),
+         location = regexp_extract(sighting_report, regex, 4L),
+         shape = regexp_extract(sighting_report, regex, 5L),
+         duration = regexp_extract(sighting_report, regex, 6L)) %>%
   select(id, occurred_plus:duration) %>%
-  mutate(occurred_plus = regexp_matches(occurred_plus, regex2)) %>%
-  mutate(occurred_raw = occurred_plus[[1]],
-         entered = occurred_plus[[2]]) %>%
+  mutate(occurred_raw = regexp_extract(occurred_plus, regex2, 1L),
+         entered = regexp_extract(occurred_plus, regex2, 1L)) %>%
   select(-occurred_plus) %>%
   mutate(location_clean = regexp_replace(location, 
                                          "(outside of|close to)", "near")) %>%
-  mutate(occurred = case_when(occurred_raw == '' ~ NA,
-                              length(occurred_raw) < 8 ~ NA,
-                              TRUE ~ as.POSIXct(occurred_raw)),
-         reported = case_when(reported == '' ~ NA,
-                              length(reported) < 8 ~ NA,
-                              TRUE ~ as.POSIXct(reported)),
-         posted = if_else(posted == '', NA, as.Date(posted)),
-         shape = initcap(shape)) %>%
-  collect()
+  mutate(reported = 
+           case_when(reported == '' ~ NA,
+                     nchar(reported) < 8 ~ NA,
+                     regexp_matches(reported, "[AP]M") ~
+                       strptime(reported, "%m/%d/%Y %I:%M:%S %p"),
+                     TRUE ~ strptime(reported, "%m/%d/%Y %H:%M:%S")),
+         occurred = 
+           case_when(occurred_raw == '' ~ NA,
+                     nchar(occurred_raw) < 8 ~ NA,
+                     regexp_matches(occurred_raw, "^[0-9]+/[0-9]+/[0-9]{4}$") ~
+                       strptime(occurred_raw, "%m/%d/%Y"),
+                     regexp_matches(occurred_raw, "[AP]M") ~
+                       strptime(occurred_raw, "%m/%d/%Y %I:%M:%S %p"),
+                     regexp_matches(occurred_raw, "[0-9]{2}:[0-9]{2}:[0-9]{2}") ~
+                       strptime(occurred_raw, "%m/%d/%Y %H:%M:%S"),
+                     TRUE ~ strptime(occurred_raw, "%m/%d/%Y %H:%M")),
+         posted = if_else(posted == '', NA, 
+                          as.Date(strptime(posted, "%m/%d/%Y")))) %>%
+  collect() %>%
+  mutate(shape = initcap(shape)) 
 ```
 
 ```{r}
@@ -125,3 +142,7 @@ ufo_extracted %>%
   geom_bar(stat = "identity")
 ```
 
+```{r}
+#| include: false
+dbDisconnect(pg, shutdown = TRUE)
+```

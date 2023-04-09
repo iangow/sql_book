@@ -36,11 +36,9 @@ library(janitor)
 ```
 
 ```{r}
-#| output: false
-pg <- dbConnect(RPostgres::Postgres(), 
-                bigint = "integer",
-                check_interrupts = TRUE)
-dbExecute(pg, "SET search_path TO sql_book")
+pg <- dbConnect(duckdb::duckdb(), 
+                dbdir = "sql_book.duckdb", 
+                read_only = TRUE)
 ```
 
 ```{r}
@@ -225,4 +223,9 @@ t_test_stats_boxed %>%
 
 ```{r}
 t_test(t_test_stats_boxed)
+```
+
+```{r}
+#| include: false
+dbDisconnect(pg, shutdown = TRUE)
 ```
