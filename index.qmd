@@ -17,8 +17,25 @@ While we include a brief primer on SQL for `dplyr` users [here](https://iangow.g
 Another benefit of using R is that we can do more with R.
 @tanimura2021sql includes many plots of data produced using SQL, but the code to make the plots is not included.
 In contrast, here I will include code to produce the data as well as code to make plots (where applicable).
+In @sec-experiments, we will see that using R avoids the need to go off to an "online calculator" to calculate $p$-values and the like.
 
 My view is that the material here might be useful to someone who is using @tanimura2021sql and wants to see how the ideas there can be implemented using R, while at the same time being useful to someone who knows (or is looking to learn) R and is looking for realistic data sets to work on.
+
+## The structure of this book
+
+First of all, I should note that this "book" is not a standalone book.
+To make sense of what I have here, you really need to get a copy of @tanimura2021sql  itself.
+This book is more of a companion guide to someone who is more familiar with R than SQL, or coming from SQL and looking to learn R in the most effective way possible, or simply looking for a way to get more out of @tanimura2021sql.
+
+With that out of the way, the book evolves in its relation with @tanimura2021sql.
+In Chapters 1 and 2, there is not much to say here, in part because there's not a lot of SQL code to translate (the main feature of this book).
+For these two chapters, I mostly limit myself to some general observations on PostgreSQL, R, and `dplyr`/`dbplyr`.
+
+In Chapters 3 and 4, I focus on the task of translating SQL to `dbplyr` equivalents.
+As a convenience, I include SQL *and* equivalent R code for each code example provided in @tanimura2021sql.
+In some cases, I tweak the SQL found in @tanimura2021sql to better conform to my tastes or to make the translation exercise easier (e.g., I tend to use CTEs much more than  @tanimura2021sql does).
+
+From Chapter 5 onwards, I generally omit SQL and just present the `dplyr` equivalents of the SQL provided in @tanimura2021sql.
 
 ## SQL and me
 
