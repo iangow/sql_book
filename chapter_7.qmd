@@ -226,3 +226,93 @@ t_test_stats_boxed %>%
 ```{r}
 t_test(t_test_stats_boxed)
 ```
+
+### Pre-Post Analysis
+
+```{sql}
+#| connection: pg
+SELECT 
+  CASE WHEN a.created BETWEEN '2020-01-13' AND '2020-01-26' THEN 'pre'
+     when a.created BETWEEN '2020-01-27' AND '2020-02-09' THEN 'post'
+     end as variant,
+  count(distinct a.user_id) AS cohorted,
+  count(distinct b.user_id) AS opted_in,
+  count(distinct b.user_id) * 1.0 / count(DISTINCT a.user_id) AS pct_optin,
+  count(distinct a.created) as days
+FROM game_users a
+LEFT JOIN game_actions b on a.user_id = b.user_id 
+  AND b.action = 'email_optin'
+WHERE a.created BETWEEN '2020-01-13' AND '2020-02-09'
+GROUP BY 1
+;
+```
+
+```{r}
+opt_in_df <-
+  game_users %>%
+  filter(between(created, '2020-01-13', '2020-02-09')) %>%
+  left_join(game_actions %>% 
+              filter(action == 'email_optin'), by = "user_id",
+            keep = TRUE,
+            suffix = c("", ".y")) %>%
+  mutate(variant = if_else(created <= '2020-01-26', 'pre', 'post')) %>%
+  group_by(variant) %>%
+  summarize(cohorted = n_distinct(user_id),
+            opted_in = n_distinct(user_id.y),
+            days = n_distinct(created),
+            .groups = "drop") %>%
+  mutate(not_opted_in = cohorted - opted_in) %>%
+  collect()
+```
+
+```{r}
+opt_in_df %>%
+  select(variant, days, opted_in, not_opted_in, cohorted) %>%
+  adorn_totals(c("row")) %>%
+  mutate(`% opted in` = prettyNum(100.0 * opted_in/cohorted, digits = 4)) %>%
+  rename(Yes = opted_in, No = not_opted_in, Total = cohorted) %>%
+  flextable() %>%
+  add_header_row(values=c("", "Opted in", ""),
+                 colwidths = c(2, 2, 2))
+```
+
+```{r}
+res <- 
+  opt_in_df %>% 
+  select(-cohorted, -days) %>%
+  column_to_rownames(var = "variant") %>%
+  chisq.test(correct = FALSE)
+
+res$statistic
+res$p.value
+```
+
+### Natural experiment analysis
+
+```{r}
+by_country <- 
+  game_users %>%
+  filter(country %in% c('United States', 'Canada')) %>%
+  left_join(game_purchases, by = "user_id",
+            keep = TRUE,
+            suffix = c("", ".y")) %>%
+  group_by(country) %>%
+  summarize(cohorted = n_distinct(user_id),
+            opted_in = n_distinct(user_id.y),
+            .groups = "drop") %>%
+  mutate(pct_purchased = 1.0 * opted_in/cohorted) %>%
+  collect()
+
+by_country %>% kable()
+```
+
+```{r}
+res <- 
+  by_country %>% 
+  select(-pct_purchased) %>%
+  column_to_rownames(var = "country") %>%
+  chisq.test(correct = FALSE)
+
+res$statistic
+res$p.value
+```
