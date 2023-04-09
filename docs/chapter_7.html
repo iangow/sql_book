@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.2.335">
+<meta name="generator" content="quarto-1.2.269">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -112,7 +112,7 @@ div.csl-indent {
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
-<link href="./references.html" rel="next">
+<link href="./chapter_8.html" rel="next">
 <link href="./chapter_6.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
@@ -220,6 +220,11 @@ div.csl-indent {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="./chapter_8.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Creating Complex Data Sets for Analysis</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="./references.html" class="sidebar-item-text sidebar-link">References</a>
   </div>
 </li>
@@ -244,6 +249,8 @@ div.csl-indent {
   <li><a href="#variant-assignment" id="toc-variant-assignment" class="nav-link" data-scroll-target="#variant-assignment"><span class="toc-section-number">7.4.1</span>  Variant Assignment</a></li>
   <li><a href="#outliers" id="toc-outliers" class="nav-link" data-scroll-target="#outliers"><span class="toc-section-number">7.4.2</span>  Outliers</a></li>
   <li><a href="#time-boxing" id="toc-time-boxing" class="nav-link" data-scroll-target="#time-boxing"><span class="toc-section-number">7.4.3</span>  Time Boxing</a></li>
+  <li><a href="#pre-post-analysis" id="toc-pre-post-analysis" class="nav-link" data-scroll-target="#pre-post-analysis"><span class="toc-section-number">7.4.4</span>  Pre-Post Analysis</a></li>
+  <li><a href="#natural-experiment-analysis" id="toc-natural-experiment-analysis" class="nav-link" data-scroll-target="#natural-experiment-analysis"><span class="toc-section-number">7.4.5</span>  Natural experiment analysis</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -332,7 +339,7 @@ div.csl-indent {
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>                 <span class="at">colwidths =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">2</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 
-<div class="tabwid"><style>.cl-2719a17a{}.cl-27166474{font-family:'Helvetica';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-2717c440{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-2717c441{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-2717cd6e{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-2717cd78{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-2717cd79{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-2717cd7a{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-2717cd82{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-2717cd83{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table data-quarto-disable-processing="true" class="cl-2719a17a"><thead><tr style="overflow-wrap:break-word;"><th class="cl-2717cd6e"><p class="cl-2717c440"><span class="cl-27166474"></span></p></th><th colspan="2" class="cl-2717cd78"><p class="cl-2717c441"><span class="cl-27166474">Completed onboarding</span></p></th><th colspan="2" class="cl-2717cd78"><p class="cl-2717c441"><span class="cl-27166474"></span></p></th></tr><tr style="overflow-wrap:break-word;"><th class="cl-2717cd6e"><p class="cl-2717c440"><span class="cl-27166474">variant</span></p></th><th class="cl-2717cd78"><p class="cl-2717c441"><span class="cl-27166474">No</span></p></th><th class="cl-2717cd78"><p class="cl-2717c441"><span class="cl-27166474">Yes</span></p></th><th class="cl-2717cd78"><p class="cl-2717c441"><span class="cl-27166474">Total</span></p></th><th class="cl-2717cd6e"><p class="cl-2717c440"><span class="cl-27166474">% Complete</span></p></th></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-2717cd79"><p class="cl-2717c440"><span class="cl-27166474">control</span></p></td><td class="cl-2717cd7a"><p class="cl-2717c441"><span class="cl-27166474">13,629</span></p></td><td class="cl-2717cd7a"><p class="cl-2717c441"><span class="cl-27166474">36,268</span></p></td><td class="cl-2717cd7a"><p class="cl-2717c441"><span class="cl-27166474">49,897</span></p></td><td class="cl-2717cd79"><p class="cl-2717c440"><span class="cl-27166474">72.69</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-2717cd79"><p class="cl-2717c440"><span class="cl-27166474">variant 1</span></p></td><td class="cl-2717cd7a"><p class="cl-2717c441"><span class="cl-27166474">11,995</span></p></td><td class="cl-2717cd7a"><p class="cl-2717c441"><span class="cl-27166474">38,280</span></p></td><td class="cl-2717cd7a"><p class="cl-2717c441"><span class="cl-27166474">50,275</span></p></td><td class="cl-2717cd79"><p class="cl-2717c440"><span class="cl-27166474">76.14</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-2717cd82"><p class="cl-2717c440"><span class="cl-27166474">Total</span></p></td><td class="cl-2717cd83"><p class="cl-2717c441"><span class="cl-27166474">25,624</span></p></td><td class="cl-2717cd83"><p class="cl-2717c441"><span class="cl-27166474">74,548</span></p></td><td class="cl-2717cd83"><p class="cl-2717c441"><span class="cl-27166474">100,172</span></p></td><td class="cl-2717cd82"><p class="cl-2717c440"><span class="cl-27166474">74.42</span></p></td></tr></tbody></table></div>
+<div class="tabwid"><style>.cl-35cf4d82{}.cl-35cbb244{font-family:'Helvetica';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-35cd250c{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-35cd2516{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-35cd2e62{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-35cd2e63{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-35cd2e6c{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-35cd2e6d{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-35cd2e76{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-35cd2e77{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table data-quarto-disable-processing="true" class="cl-35cf4d82"><thead><tr style="overflow-wrap:break-word;"><th class="cl-35cd2e62"><p class="cl-35cd250c"><span class="cl-35cbb244"></span></p></th><th colspan="2" class="cl-35cd2e63"><p class="cl-35cd2516"><span class="cl-35cbb244">Completed onboarding</span></p></th><th colspan="2" class="cl-35cd2e63"><p class="cl-35cd2516"><span class="cl-35cbb244"></span></p></th></tr><tr style="overflow-wrap:break-word;"><th class="cl-35cd2e62"><p class="cl-35cd250c"><span class="cl-35cbb244">variant</span></p></th><th class="cl-35cd2e63"><p class="cl-35cd2516"><span class="cl-35cbb244">No</span></p></th><th class="cl-35cd2e63"><p class="cl-35cd2516"><span class="cl-35cbb244">Yes</span></p></th><th class="cl-35cd2e63"><p class="cl-35cd2516"><span class="cl-35cbb244">Total</span></p></th><th class="cl-35cd2e62"><p class="cl-35cd250c"><span class="cl-35cbb244">% Complete</span></p></th></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-35cd2e6c"><p class="cl-35cd250c"><span class="cl-35cbb244">control</span></p></td><td class="cl-35cd2e6d"><p class="cl-35cd2516"><span class="cl-35cbb244">13,629</span></p></td><td class="cl-35cd2e6d"><p class="cl-35cd2516"><span class="cl-35cbb244">36,268</span></p></td><td class="cl-35cd2e6d"><p class="cl-35cd2516"><span class="cl-35cbb244">49,897</span></p></td><td class="cl-35cd2e6c"><p class="cl-35cd250c"><span class="cl-35cbb244">72.69</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-35cd2e6c"><p class="cl-35cd250c"><span class="cl-35cbb244">variant 1</span></p></td><td class="cl-35cd2e6d"><p class="cl-35cd2516"><span class="cl-35cbb244">11,995</span></p></td><td class="cl-35cd2e6d"><p class="cl-35cd2516"><span class="cl-35cbb244">38,280</span></p></td><td class="cl-35cd2e6d"><p class="cl-35cd2516"><span class="cl-35cbb244">50,275</span></p></td><td class="cl-35cd2e6c"><p class="cl-35cd250c"><span class="cl-35cbb244">76.14</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-35cd2e76"><p class="cl-35cd250c"><span class="cl-35cbb244">Total</span></p></td><td class="cl-35cd2e77"><p class="cl-35cd2516"><span class="cl-35cbb244">25,624</span></p></td><td class="cl-35cd2e77"><p class="cl-35cd2516"><span class="cl-35cbb244">74,548</span></p></td><td class="cl-35cd2e77"><p class="cl-35cd2516"><span class="cl-35cbb244">100,172</span></p></td><td class="cl-35cd2e76"><p class="cl-35cd250c"><span class="cl-35cbb244">74.42</span></p></td></tr></tbody></table></div>
 </div>
 </div>
 <p>Now I can do the Chi-squared test. I need to turn <code>variant</code> into the row names of the contingency table so that we want a simple <span class="math inline">\(2 \times 2\)</span> numeric table as the input to our statistical test and I use <code>column_to_rownames()</code> to this end. I then pipe the result into the base R function <code>chisq.test()</code>. I specified <code>correct = FALSE</code> so that my result matched what I got from the <a href="https://www.socscistatistics.com/tests/chisquare/default.aspx">online calculator</a> I found. I then display the Chi-squared statistic and the <span class="math inline">\(p\)</span>-value.</p>
@@ -546,6 +553,224 @@ $`p-value`
 </section>
 <section id="time-boxing" class="level3" data-number="7.4.3">
 <h3 data-number="7.4.3" class="anchored" data-anchor-id="time-boxing"><span class="header-section-number">7.4.3</span> Time Boxing</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>amounts_boxed <span class="ot">&lt;-</span> </span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  exp_assignment <span class="sc">%&gt;%</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(exp_name <span class="sc">==</span> <span class="st">'Onboarding'</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">exp_end =</span> exp_date <span class="sc">+</span> <span class="fu">days</span>(<span class="dv">7</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(game_purchases, </span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>            <span class="at">by =</span> <span class="fu">join_by</span>(user_id, exp_end <span class="sc">&gt;=</span> purch_date)) <span class="sc">%&gt;%</span></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(variant, user_id) <span class="sc">%&gt;%</span></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">amount =</span> <span class="fu">sum</span>(<span class="fu">coalesce</span>(amount, <span class="dv">0</span>), <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>            <span class="at">.groups =</span> <span class="st">"drop"</span>)</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>t_test_stats_boxed <span class="ot">&lt;-</span></span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>  amounts_boxed <span class="sc">%&gt;%</span></span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(variant) <span class="sc">%&gt;%</span></span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">n =</span> <span class="fu">n</span>(),</span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>            <span class="at">mean =</span> <span class="fu">mean</span>(amount, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>            <span class="at">sd =</span> <span class="fu">sd</span>(amount, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>()</span>
+<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-20"><a href="#cb19-20" aria-hidden="true" tabindex="-1"></a>t_test_stats_boxed <span class="sc">%&gt;%</span></span>
+<span id="cb19-21"><a href="#cb19-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped">
+<thead>
+<tr class="header">
+<th style="text-align: left;">variant</th>
+<th style="text-align: right;">n</th>
+<th style="text-align: right;">mean</th>
+<th style="text-align: right;">sd</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">variant 1</td>
+<td style="text-align: right;">50275</td>
+<td style="text-align: right;">1.352</td>
+<td style="text-align: right;">5.613</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">control</td>
+<td style="text-align: right;">49897</td>
+<td style="text-align: right;">1.369</td>
+<td style="text-align: right;">5.766</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">t_test</span>(t_test_stats_boxed)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>$statistic
+[1] 0.4920715
+
+$`p-value`
+[1] 0.6226699</code></pre>
+</div>
+</div>
+</section>
+<section id="pre-post-analysis" class="level3" data-number="7.4.4">
+<h3 data-number="7.4.4" class="anchored" data-anchor-id="pre-post-analysis"><span class="header-section-number">7.4.4</span> Pre-Post Analysis</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">CASE</span> <span class="cf">WHEN</span> a.created <span class="kw">BETWEEN</span> <span class="st">'2020-01-13'</span> <span class="kw">AND</span> <span class="st">'2020-01-26'</span> <span class="cf">THEN</span> <span class="st">'pre'</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>     <span class="cf">when</span> a.created <span class="kw">BETWEEN</span> <span class="st">'2020-01-27'</span> <span class="kw">AND</span> <span class="st">'2020-02-09'</span> <span class="cf">THEN</span> <span class="st">'post'</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>     <span class="cf">end</span> <span class="kw">as</span> variant,</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(<span class="kw">distinct</span> a.user_id) <span class="kw">AS</span> cohorted,</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(<span class="kw">distinct</span> b.user_id) <span class="kw">AS</span> opted_in,</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(<span class="kw">distinct</span> b.user_id) <span class="op">*</span> <span class="fl">1.0</span> <span class="op">/</span> <span class="fu">count</span>(<span class="kw">DISTINCT</span> a.user_id) <span class="kw">AS</span> pct_optin,</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(<span class="kw">distinct</span> a.created) <span class="kw">as</span> days</span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> game_users a</span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a><span class="kw">LEFT</span> <span class="kw">JOIN</span> game_actions b <span class="kw">on</span> a.user_id <span class="op">=</span> b.user_id </span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>  <span class="kw">AND</span> b.action <span class="op">=</span> <span class="st">'email_optin'</span></span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> a.created <span class="kw">BETWEEN</span> <span class="st">'2020-01-13'</span> <span class="kw">AND</span> <span class="st">'2020-02-09'</span></span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> <span class="dv">1</span></span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="knitsql-table">
+<table class="table table-sm table-striped">
+<caption>2 records</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">variant</th>
+<th style="text-align: right;">cohorted</th>
+<th style="text-align: right;">opted_in</th>
+<th style="text-align: right;">pct_optin</th>
+<th style="text-align: right;">days</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">post</td>
+<td style="text-align: right;">27617</td>
+<td style="text-align: right;">11220</td>
+<td style="text-align: right;">0.4062715</td>
+<td style="text-align: right;">14</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">pre</td>
+<td style="text-align: right;">24662</td>
+<td style="text-align: right;">14489</td>
+<td style="text-align: right;">0.5875030</td>
+<td style="text-align: right;">14</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>opt_in_df <span class="ot">&lt;-</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  game_users <span class="sc">%&gt;%</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">between</span>(created, <span class="st">'2020-01-13'</span>, <span class="st">'2020-02-09'</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(game_actions <span class="sc">%&gt;%</span> </span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>              <span class="fu">filter</span>(action <span class="sc">==</span> <span class="st">'email_optin'</span>), <span class="at">by =</span> <span class="st">"user_id"</span>,</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>            <span class="at">keep =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>            <span class="at">suffix =</span> <span class="fu">c</span>(<span class="st">""</span>, <span class="st">".y"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">variant =</span> <span class="fu">if_else</span>(created <span class="sc">&lt;=</span> <span class="st">'2020-01-26'</span>, <span class="st">'pre'</span>, <span class="st">'post'</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(variant) <span class="sc">%&gt;%</span></span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">cohorted =</span> <span class="fu">n_distinct</span>(user_id),</span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>            <span class="at">opted_in =</span> <span class="fu">n_distinct</span>(user_id.y),</span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>            <span class="at">days =</span> <span class="fu">n_distinct</span>(created),</span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>            <span class="at">.groups =</span> <span class="st">"drop"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">not_opted_in =</span> cohorted <span class="sc">-</span> opted_in) <span class="sc">%&gt;%</span></span>
+<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>opt_in_df <span class="sc">%&gt;%</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(variant, days, opted_in, not_opted_in, cohorted) <span class="sc">%&gt;%</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">adorn_totals</span>(<span class="fu">c</span>(<span class="st">"row"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="st">`</span><span class="at">% opted in</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">prettyNum</span>(<span class="fl">100.0</span> <span class="sc">*</span> opted_in<span class="sc">/</span>cohorted, <span class="at">digits =</span> <span class="dv">4</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">Yes =</span> opted_in, <span class="at">No =</span> not_opted_in, <span class="at">Total =</span> cohorted) <span class="sc">%&gt;%</span></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">flextable</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_header_row</span>(<span class="at">values=</span><span class="fu">c</span>(<span class="st">""</span>, <span class="st">"Opted in"</span>, <span class="st">""</span>),</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>                 <span class="at">colwidths =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">2</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<div class="tabwid"><style>.cl-3672fef0{}.cl-366fe828{font-family:'Helvetica';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-36712de6{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-36712de7{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-367135de{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-367135e8{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-367135e9{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-367135ea{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-367135eb{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-367135f2{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table data-quarto-disable-processing="true" class="cl-3672fef0"><thead><tr style="overflow-wrap:break-word;"><th colspan="2" class="cl-367135de"><p class="cl-36712de6"><span class="cl-366fe828"></span></p></th><th colspan="2" class="cl-367135e8"><p class="cl-36712de7"><span class="cl-366fe828">Opted in</span></p></th><th colspan="2" class="cl-367135e8"><p class="cl-36712de7"><span class="cl-366fe828"></span></p></th></tr><tr style="overflow-wrap:break-word;"><th class="cl-367135de"><p class="cl-36712de6"><span class="cl-366fe828">variant</span></p></th><th class="cl-367135e8"><p class="cl-36712de7"><span class="cl-366fe828">days</span></p></th><th class="cl-367135e8"><p class="cl-36712de7"><span class="cl-366fe828">Yes</span></p></th><th class="cl-367135e8"><p class="cl-36712de7"><span class="cl-366fe828">No</span></p></th><th class="cl-367135e8"><p class="cl-36712de7"><span class="cl-366fe828">Total</span></p></th><th class="cl-367135de"><p class="cl-36712de6"><span class="cl-366fe828">% opted in</span></p></th></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-367135e9"><p class="cl-36712de6"><span class="cl-366fe828">post</span></p></td><td class="cl-367135ea"><p class="cl-36712de7"><span class="cl-366fe828">14</span></p></td><td class="cl-367135ea"><p class="cl-36712de7"><span class="cl-366fe828">11,220</span></p></td><td class="cl-367135ea"><p class="cl-36712de7"><span class="cl-366fe828">16,397</span></p></td><td class="cl-367135ea"><p class="cl-36712de7"><span class="cl-366fe828">27,617</span></p></td><td class="cl-367135e9"><p class="cl-36712de6"><span class="cl-366fe828">40.63</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-367135e9"><p class="cl-36712de6"><span class="cl-366fe828">pre</span></p></td><td class="cl-367135ea"><p class="cl-36712de7"><span class="cl-366fe828">14</span></p></td><td class="cl-367135ea"><p class="cl-36712de7"><span class="cl-366fe828">14,489</span></p></td><td class="cl-367135ea"><p class="cl-36712de7"><span class="cl-366fe828">10,173</span></p></td><td class="cl-367135ea"><p class="cl-36712de7"><span class="cl-366fe828">24,662</span></p></td><td class="cl-367135e9"><p class="cl-36712de6"><span class="cl-366fe828">58.75</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-367135eb"><p class="cl-36712de6"><span class="cl-366fe828">Total</span></p></td><td class="cl-367135f2"><p class="cl-36712de7"><span class="cl-366fe828">28</span></p></td><td class="cl-367135f2"><p class="cl-36712de7"><span class="cl-366fe828">25,709</span></p></td><td class="cl-367135f2"><p class="cl-36712de7"><span class="cl-366fe828">26,570</span></p></td><td class="cl-367135f2"><p class="cl-36712de7"><span class="cl-366fe828">52,279</span></p></td><td class="cl-367135eb"><p class="cl-36712de6"><span class="cl-366fe828">49.18</span></p></td></tr></tbody></table></div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> </span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  opt_in_df <span class="sc">%&gt;%</span> </span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>cohorted, <span class="sc">-</span>days) <span class="sc">%&gt;%</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">column_to_rownames</span>(<span class="at">var =</span> <span class="st">"variant"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">chisq.test</span>(<span class="at">correct =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>res<span class="sc">$</span>statistic</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>X-squared 
+ 1712.075 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>res<span class="sc">$</span>p.value</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0</code></pre>
+</div>
+</div>
+</section>
+<section id="natural-experiment-analysis" class="level3" data-number="7.4.5">
+<h3 data-number="7.4.5" class="anchored" data-anchor-id="natural-experiment-analysis"><span class="header-section-number">7.4.5</span> Natural experiment analysis</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>by_country <span class="ot">&lt;-</span> </span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  game_users <span class="sc">%&gt;%</span></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(country <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">'United States'</span>, <span class="st">'Canada'</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(game_purchases, <span class="at">by =</span> <span class="st">"user_id"</span>,</span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>            <span class="at">keep =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>            <span class="at">suffix =</span> <span class="fu">c</span>(<span class="st">""</span>, <span class="st">".y"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(country) <span class="sc">%&gt;%</span></span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">cohorted =</span> <span class="fu">n_distinct</span>(user_id),</span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>            <span class="at">opted_in =</span> <span class="fu">n_distinct</span>(user_id.y),</span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>            <span class="at">.groups =</span> <span class="st">"drop"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct_purchased =</span> <span class="fl">1.0</span> <span class="sc">*</span> opted_in<span class="sc">/</span>cohorted) <span class="sc">%&gt;%</span></span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>()</span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a>by_country <span class="sc">%&gt;%</span> <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped">
+<thead>
+<tr class="header">
+<th style="text-align: left;">country</th>
+<th style="text-align: right;">cohorted</th>
+<th style="text-align: right;">opted_in</th>
+<th style="text-align: right;">pct_purchased</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Canada</td>
+<td style="text-align: right;">20179</td>
+<td style="text-align: right;">5011</td>
+<td style="text-align: right;">0.2483275</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">United States</td>
+<td style="text-align: right;">45012</td>
+<td style="text-align: right;">4958</td>
+<td style="text-align: right;">0.1101484</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> </span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>  by_country <span class="sc">%&gt;%</span> </span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>pct_purchased) <span class="sc">%&gt;%</span></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">column_to_rownames</span>(<span class="at">var =</span> <span class="st">"country"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">chisq.test</span>(<span class="at">correct =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>res<span class="sc">$</span>statistic</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>X-squared 
+ 1447.273 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>res<span class="sc">$</span>p.value</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1.122178e-316</code></pre>
+</div>
+</div>
 
 
 <div id="refs" class="references csl-bib-body hanging-indent" role="doc-bibliography" style="display: none">
@@ -703,8 +928,8 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./references.html" class="pagination-link">
-        <span class="nav-page-text">References</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="./chapter_8.html" class="pagination-link">
+        <span class="nav-page-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Creating Complex Data Sets for Analysis</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
