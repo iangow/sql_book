@@ -22,7 +22,7 @@ dbExecute(pg, "SET search_path TO sql_book")
 
 ## Date, Datetime, and Time Manipulations
 
-## Time Zone Conversions
+### Time Zone Conversions
 
 @tanimura2021sql points out that often "timestamps in the database are not encoded with the time zone, and you will need to consult with the source or developer to figure out how your data was stored."
 When pushing data to a PostgreSQL database, I use the `timestamp with time zone` type as much as possible.
@@ -171,7 +171,7 @@ If `shipping` table uses `TIMESTAMP WITH TIME ZONE` using timestamps in the time
 I think that fully fleshing out the issues here would require a separate chapter.
 In fact, nothing in the core part of Chapter 3 of @tanimura2021sql (which focuses on the `retail_sales` table) really uses timestamp information, so we can put these issues aside for now.
 
-## Date and Timestamp Format Conversions
+### Date and Timestamp Format Conversions
 
 As discussed in @tanimura2021sql, PostgreSQL has a rich array of functions for converting dates and times and extracting such information as months and days of the week.
 
@@ -195,9 +195,9 @@ a_time_df %>%
   collect()
 ```
 
-## Date Math
+### Date Math
 
-## Time Math
+### Time Math
 
 ```{r}
 a_time_df <- tbl(pg, sql("SELECT '2020-10-04 12:33:35 US/Pacific'::timestamp with time zone AS a_time"))
@@ -219,11 +219,11 @@ a_time_df %>%
   collect()
 ```
 
-## Joining Data from Different Sources
+### Joining Data from Different Sources
 
 ## The Retail Sales Data Set
 
-### Trending the Data
+## Trending the Data
 
 ### Simple Trends
 
@@ -279,7 +279,7 @@ GROUP BY 1,2
 ORDER BY 1;
 ```
 
-## Comparing Components
+### Comparing Components
 
 ```{r}
 retail_sales %>%
@@ -413,6 +413,9 @@ pivoted_sales %>%
   ggplot(aes(y = womens_pct_of_mens, x = sales_year)) +
   geom_line()
 ```
+
+### Percent of Total Calculations
+
 ```{r}
 retail_sales %>%
   filter(kind_of_business %in% 
@@ -451,6 +454,8 @@ retail_sales %>%
   geom_line()
 ```
 
+### Indexing to See Percent Change over Time
+
 ```{r}
 retail_sales %>%
   filter(kind_of_business == "Women's clothing stores") %>%
@@ -480,6 +485,46 @@ retail_sales %>%
   geom_line()
 ```
 
+## Rolling Time Windows
+
+### Calculating Rolling Time Windows
+
+```{r}
+mvg_avg <-
+  retail_sales %>%
+  filter(kind_of_business == "Women's clothing stores") %>%
+  window_order(sales_month) %>%
+  window_frame(-11, 0) %>%
+  mutate(moving_avg = mean(sales, na.rm = TRUE),
+         records_count = n()) %>%
+  filter(sales_month >= '1993-01-01') 
+
+mvg_avg %>%
+  select(sales_month, moving_avg, records_count) %>%
+  collect(n = 10) %>%
+  kable(digits = 2)
+```
+
+```{r}
+mvg_avg %>%
+  ggplot(aes(x = sales_month)) +
+  geom_line(aes(y = sales, colour = "Sales")) +
+  geom_line(aes(y = moving_avg, colour = "Moving average")) 
+```
+
+
+```{sql}
+#| connection: pg
+SELECT 
+  sales_month,
+  avg(sales) over w AS moving_avg,
+  count(sales) over w AS records_count
+FROM retail_sales
+WHERE kind_of_business = 'Women''s clothing stores'
+WINDOW w AS (order by sales_month 
+             rows between 11 preceding and current row)
+```
+
 ```{r}
 retail_sales %>%
   filter(kind_of_business == "Women's clothing stores") %>%
@@ -488,5 +533,134 @@ retail_sales %>%
   mutate(moving_avg = mean(sales, na.rm = TRUE),
          records_count = n()) %>%
   select(sales_month, moving_avg, records_count) %>%
-  collect(n = 10)
+  collect(n = 10) %>%
+  kable()
 ```
+
+```{sql}
+#| connection: pg
+WITH jan_jul AS (
+  SELECT sales_month, sales
+  FROM retail_sales 
+  WHERE kind_of_business = 'Women''s clothing stores'
+     and date_part('month',sales_month) in (1,7))
+     
+SELECT a.date, b.sales_month, b.sales
+FROM date_dim a
+JOIN jan_jul b 
+ON b.sales_month between a.date - interval '11 months' and a.date
+WHERE a.date = a.first_day_of_month 
+  and a.date between '1993-01-01' and '2020-12-01';
+```
+```{r}
+date_dim <-
+  tibble(date = seq(as.Date('1993-01-01'), 
+                    as.Date('2020-12-01'), 
+                    by = "1 month")) %>%
+  copy_to(pg, ., overwrite = TRUE)
+
+jan_jul <-
+  retail_sales %>%
+  filter(kind_of_business == "Women's clothing stores",
+         month(sales_month) %in% c(1, 7)) %>%
+  select(sales_month, sales)
+
+date_dim %>%
+  mutate(date_start = date - months(11)) %>%
+  inner_join(jan_jul, 
+             join_by(between(y$sales_month, x$date_start, x$date))) %>%
+  select(date, sales_month, sales)
+```
+
+```{r}
+date_dim %>%
+  mutate(date_start = date - months(11)) %>%
+  inner_join(jan_jul, 
+             join_by(between(y$sales_month, x$date_start, x$date))) %>%
+  group_by(date) %>%
+  summarize(moving_avg = mean(sales, na.rm = TRUE),
+            records = n())
+```
+
+```{sql}
+#| connection: pg
+WITH sales_months AS (
+  SELECT distinct sales_month
+  FROM retail_sales
+  WHERE sales_month between '1993-01-01' and '2020-12-01')
+
+SELECT a.sales_month, avg(b.sales) as moving_avg
+FROM sales_months a
+JOIN retail_sales b 
+on b.sales_month between 
+    a.sales_month - interval '11 months' and a.sales_month
+  and b.kind_of_business = 'Women''s clothing stores' 
+GROUP BY 1
+ORDER BY 1
+LIMIT 3;
+```
+
+```{r}
+sales_months <-
+  retail_sales %>%
+  filter(between(sales_month, '1993-01-01', '2020-12-01')) %>%
+  distinct(sales_month)
+
+sales_months %>%
+  mutate(month_start = sales_month - months(11)) %>%
+  inner_join(retail_sales, 
+             join_by(between(y$sales_month, x$month_start, x$sales_month)),
+                     suffix = c("", "_y")) %>%
+  filter(kind_of_business == "Women's clothing stores") %>%
+  group_by(sales_month) %>%
+  summarize(moving_avg = mean(sales, na.rm = TRUE)) %>%
+  arrange(sales_month) %>%
+  collect(n = 3) %>%
+  kable()
+``` 
+
+### Calculating Cumulative Values
+
+```{sql}
+#| connection: pg
+SELECT sales_month, sales,
+  sum(sales) over w as sales_ytd
+FROM retail_sales
+WHERE kind_of_business = 'Women''s clothing stores'
+WINDOW w AS (partition by date_part('year',sales_month) 
+             order by sales_month)
+LIMIT 3
+```
+
+```{r}
+ytd_sales <-
+  retail_sales %>%
+  filter(kind_of_business == "Women's clothing stores") %>%
+  mutate(year = year(sales_month)) %>%
+  group_by(year) %>%
+  window_order(sales_month) %>%
+  mutate(sales_ytd = cumsum(sales)) %>%
+  ungroup() %>%
+  select(sales_month, sales, sales_ytd) 
+
+ytd_sales %>%
+  filter(month(sales_month) %in% c(1:3, 12)) %>%
+  collect(n = 6) %>%
+  kable()
+```
+
+```{r}
+factor <- 40/4.5
+
+ytd_sales %>%
+  filter(year(sales_month) %in% 2016:2020) %>%
+  ggplot(aes(x = sales_month, y = sales_ytd)) +
+  geom_bar(stat = "identity") +
+  geom_line(aes(y = sales * factor, colour = I("blue"))) +
+  scale_y_continuous(
+    "Sales YTD", 
+    sec.axis = sec_axis(~ . / factor, name = "Monthly Sales")
+  )
+```
+             
+             
