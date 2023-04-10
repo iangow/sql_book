@@ -663,4 +663,40 @@ ytd_sales %>%
   )
 ```
              
-             
+```{sql}
+#| connection: pg
+SELECT a.sales_month, a.sales
+,sum(b.sales) as sales_ytd
+FROM retail_sales a
+JOIN retail_sales b on 
+ date_part('year',a.sales_month) = date_part('year',b.sales_month)
+ and b.sales_month <= a.sales_month
+ and b.kind_of_business = 'Women''s clothing stores'
+WHERE a.kind_of_business = 'Women''s clothing stores'
+GROUP BY 1,2;
+```
+
+```{r}
+retail_sales_yr <-
+  retail_sales %>%
+  mutate(year = year(sales_month))
+  
+retail_sales_yr %>%
+  filter(kind_of_business == "Women's clothing stores") %>%
+  inner_join(retail_sales_yr, 
+             join_by(year, kind_of_business, sales_month >= sales_month),
+             suffix = c("", "_y")) %>%
+  group_by(sales_month, sales) %>%
+  summarize(sales_ytd = sum(sales_y), .groups = "drop") %>%
+  filter(month(sales_month) %in% c(1:3, 12)) %>%
+  collect(n = 6) %>%
+  kable()
+```
+
+## Analyzing with Seasonality
+
+### Period-over-Period Comparisons: YoY and MoM
+
+### Period-over-Period Comparisons: Same Month Versus Last Year
+
+### Comparing to Multiple Prior Periods
