@@ -5,6 +5,7 @@
 library(DBI)
 library(tidyverse)
 library(dbplyr)
+library(knitr)
 ```
 
 ```{r}
@@ -67,12 +68,14 @@ SELECT
     '2020-09-01 17:00:01 US/Pacific'::timestamptz AS t1,
     '2020-09-01 17:00:01 PDT'::timestamptz  AS t2;
 ```
+
 ```{sql}
 #| connection: pg
 SELECT 
     '2020-12-01 16:00:01 US/Pacific'::timestamptz AS t1,
     '2020-12-01 16:00:01 PST'::timestamptz  AS t2;
 ```
+
 ```{r}
 sql <-
   "SELECT     
@@ -80,10 +83,11 @@ sql <-
     '2020-12-01 16:00:01 PST'::timestamptz AS t2"
 
 two_times <- tbl(pg, sql(sql))
-two_times
 two_times %>%
-  collect()
+  kable()
+```
 
+```{r}
 one_time <-
   two_times %>%
   select(t1) %>%
@@ -142,14 +146,13 @@ sql <-
     '2020-12-01 00:00:01-00'::timestamptz AS t2"
 
 two_times_notz <- tbl(pg, sql(sql))
-two_times_notz
+two_times_notz %>% kable()
 ```
 
 ```{r}
 two_times_notz_r <-
   collect(two_times_notz)
-
-
+  
 print(two_times_notz_r$t1)
 Sys.timezone()
 print(two_times_notz_r$t1, tz = Sys.timezone())
@@ -176,6 +179,7 @@ As discussed in @tanimura2021sql, PostgreSQL has a rich array of functions for c
 #| connection: pg
 SELECT date_trunc('month','2020-10-04 12:33:35 -00'::timestamptz);
 ```
+
 One such function 
 
 ```{r}
@@ -191,6 +195,9 @@ a_time_df %>%
   collect()
 ```
 
+## Date Math
+
+## Time Math
 
 ```{r}
 a_time_df <- tbl(pg, sql("SELECT '2020-10-04 12:33:35 US/Pacific'::timestamp with time zone AS a_time"))
@@ -211,7 +218,14 @@ a_time_df %>%
   mutate(new_time = a_time + sql("interval '3 hours'")) %>%
   collect()
 ```
+
+## Joining Data from Different Sources
+
 ## The Retail Sales Data Set
+
+### Trending the Data
+
+### Simple Trends
 
 ```{sql}
 #| connection: pg
@@ -265,6 +279,7 @@ GROUP BY 1,2
 ORDER BY 1;
 ```
 
+## Comparing Components
 
 ```{r}
 retail_sales %>%
@@ -464,6 +479,7 @@ retail_sales %>%
   ggplot(aes(y = pct_from_index, x = sales_year, color = kind_of_business)) +
   geom_line()
 ```
+
 ```{r}
 retail_sales %>%
   filter(kind_of_business == "Women's clothing stores") %>%
