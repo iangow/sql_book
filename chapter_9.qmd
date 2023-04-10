@@ -1,0 +1,148 @@
+# Conclusion
+
+```{r}
+#| message: false
+library(tidyverse)
+library(DBI)
+library(knitr)
+library(dbplyr)
+```
+
+```{r}
+#| output: false
+pg <- dbConnect(RPostgres::Postgres(), 
+                bigint = "integer",
+                check_interrupts = TRUE)
+```
+
+```{r}
+#| include: false
+dbExecute(pg, "SET search_path TO sql_book")
+```
+
+## Funnel Analysis
+
+## Churn, Lapse, and Other Definitions of Departure
+
+## Basket Analysis
+
+This seems like a case where the programmability of R and the SQL-generation capability of `dbplyr` to address this more comprehensively.
+To make this tangible, let's make some data and put it in the database:
+
+```{r}
+purchases <- tribble(
+  ~customer_id, ~product,
+  1, "bananas",
+  2, "apples",
+  2, "oranges",
+  3, "apples",
+  3, "oranges",
+  3, "bananas",
+  4, "bananas",
+  4, "apples",
+  4, "oranges",
+  4, "passionfruit") %>%
+  mutate(customer_id = as.integer(customer_id)) %>%
+  copy_inline(pg, .)
+```
+
+Now, let's make a function that performs as much of the analysis in the database as possible.
+The only data we bring into R relates to the distinct number of products purchased by customers.
+So let's say some customers purchase one product, others two, three, or four, while some customers purchase six products.
+In this case `n_prods = c(1, 2, 3, 4, 6)` and that is the only data we need in R from the database.
+If `p = 2` (i.e., we're interested in product pairs), we then create all the combinations of 2 products for each value in `n_prods`.
+For a customer with one product, there is no pair.
+For a customer with two products, there is one pair.
+For a customer with three products, there are two pairs: `{1, 2}` and `{2, 3}`.
+These combos are created in R and the resulting table passed back to the database.
+
+From there, everything is processed in the database.
+
+```{r}
+get_baskets <- function(p) {
+  
+  get_combos <- function(n, p) {
+    if (n < p) return(NULL)
+    combos <- t(matrix(combn(sort(n), p), nrow = p))
+    colnames(combos) <- paste0("p_", 1:p)
+    combos <- as_tibble(combos)
+    combos$row_num <- 1:nrow(combos)
+    cross_join(tibble(n_products = n), combos)
+  }
+
+  n_prods <- 
+    purchases %>%
+    distinct(customer_id, product) %>%
+    group_by(customer_id) %>%
+    summarize(n_products = n()) %>%
+    select(n_products) %>%
+    distinct() %>%
+    pull()
+
+  combos <-
+    n_prods %>% 
+    lapply(get_combos, p = p) %>%
+    bind_rows() %>%
+    copy_inline(pg, .)
+
+  cust_prods <-
+    purchases %>% 
+    group_by(customer_id) %>% 
+    window_order(product) %>% 
+    mutate(prod_num = row_number()) %>%
+    ungroup() %>%
+    group_by(customer_id) %>% 
+    mutate(n_products = n()) %>%
+    ungroup()
+
+  base <- 
+    cust_prods %>%
+    select(customer_id, n_products) %>%
+    distinct() %>%
+    inner_join(combos, by = join_by(n_products)) %>%
+    select(-n_products)
+
+  get_prod <- function(i) {
+    cust_prods %>%
+      rename_with(function(x) paste0("p_", i), "prod_num") %>%
+      inner_join(base) %>%
+      rename_with(function(x) paste0("product_", i), "product") %>%
+      select(customer_id, row_num, starts_with("product_"))
+  }
+
+  Reduce(inner_join, lapply(1:p, get_prod)) %>%
+    arrange(customer_id, row_num) %>%
+    mutate(basket = 
+             sql(paste0("concat(", paste0("product_", 1:p, collapse = ", ', ', "), ")"))) %>%
+    compute() %>%
+    select(customer_id, basket)
+}
+```
+
+```{r}
+#| message: false
+pairs <- get_baskets(2) 
+
+pairs %>% kable()
+```
+```{r}
+pairs %>%
+  count(basket) %>%
+  arrange(desc(n)) %>%
+  kable()
+```
+
+```{r}
+#| message: false
+get_baskets(3) %>% kable()
+```
+
+```{r}
+#| message: false
+get_baskets(4) %>% kable()
+```
+
+## Resources
+
+## Final Thoughts
+
