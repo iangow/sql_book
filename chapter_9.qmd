@@ -20,9 +20,70 @@ pg <- dbConnect(RPostgres::Postgres(),
 dbExecute(pg, "SET search_path TO sql_book")
 ```
 
+```{r}
+#| include: false
+legislators_terms <- tbl(pg, "legislators_terms")
+```
+
+
 ## Funnel Analysis
 
 ## Churn, Lapse, and Other Definitions of Departure
+
+```{sql}
+#| connection: pg
+WITH gap_intervals AS (
+  SELECT id_bioguide, term_start,
+    lag(term_start) OVER w AS prev,
+    age(term_start, lag(term_start) OVER w) as gap_interval
+  FROM legislators_terms
+  WHERE term_type = 'rep'
+  WINDOW w AS (partition by id_bioguide 
+               order by term_start))
+
+SELECT avg(gap_interval) as avg_gap
+FROM gap_intervals
+WHERE gap_interval is not null;
+```
+```{r}
+gap_intervals <-
+  legislators_terms %>%
+  filter(term_type == 'rep') %>%
+  group_by(id_bioguide) %>%
+  window_order(term_start) %>%
+  mutate(prev = lag(term_start),
+         gap_interval = age(term_start, prev)) %>%
+  ungroup() %>%
+  select(id_bioguide, term_start, prev, gap_interval)
+```
+
+```{r}
+gap_intervals %>%
+  summarize(avg_gap = mean(gap_interval, na.rm = TRUE)) %>%
+  kable()
+```
+With `gap_intervals` in our pocket, the following query is *much* simpler than the SQL shown in the book.
+
+```{r}
+gap_months <-
+  gap_intervals %>%
+  mutate(gap_months = year(gap_interval) * 12 + month(gap_interval)) %>%
+  count(gap_months, name = "instances") %>%
+  arrange(gap_months) %>%
+  ungroup()
+
+gap_months %>%
+  collect(n = 3) %>%
+  kable()
+```
+
+```{r} 
+gap_months %>%
+  filter(between(gap_months, 14, 49)) %>%
+  ggplot(aes(x = gap_months, y = instances)) +
+  geom_bar(stat = "identity")
+```
+
 
 ## Basket Analysis
 
