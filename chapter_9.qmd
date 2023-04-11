@@ -28,7 +28,47 @@ legislators_terms <- tbl(pg, "legislators_terms")
 
 ## Funnel Analysis
 
+The issue described in this section of @tanimura2021 is more difficult to get to using `dbplyr`.
+This seems the natural translation of the ideas represented in the SQL there. 
+
+```{r}
+#| eval: false
+users %>%
+  left_join(step_one, by = "user_id",
+            keep = TRUE, suffix = c("", "_1")) %>%
+  left_join(step_two, by = "user_id",
+            keep = TRUE, suffix = c("", "_2")) %>%
+  summarize(all_users = n_distinct(user_id),
+            step_one_users = n_distinct(user_id_1),
+            step_two_users = n_distinct(user_id_2)) %>%
+  mutate(pct_step_one = step_one_users/all_users,
+         pct_one_to_two = step_two_users / step_one_users)
+```
+
+This yields the second of the two options provided, which seems to be the implicitly preferred one if we want to capture  all `step_two_users`---even if some customers go directly to `step_two`---though it does make `pct_one_to_two` a bit more difficult to interpret in such cases.
+
 ## Churn, Lapse, and Other Definitions of Departure
+
+This query seems easier to follow with a separate window specification (`WINDOW w AS`) and using a CTE.
+
+```{sql}
+#| connection: pg
+WITH gap_intervals AS (
+  SELECT id_bioguide, term_start,
+    lag(term_start) OVER w AS prev,
+    age(term_start, lag(term_start) OVER w) as gap_interval
+  FROM legislators_terms
+  WHERE term_type = 'rep'
+  WINDOW w AS (partition BY id_bioguide 
+               ORDER BY term_start))
+
+SELECT avg(gap_interval) AS avg_gap
+FROM gap_intervals
+WHERE gap_interval IS NOT NULL;
+```
+Translating this query into `dplyr` is straightforward, with again most of the work being done in creation of `gap_intervals`.
+Note that we can refer to `prev` created in an earlier part of the `mutate` call in creating `gap_interval`.
+It seems that `dbplyr` detects this kind of situation and cleverly puts the calculation of `prev` into a subquery.
 
 ```{r}
 gap_intervals <-
@@ -41,6 +81,8 @@ gap_intervals <-
   ungroup() %>%
   select(id_bioguide, term_start, prev, gap_interval)
 ```
+
+This makes it effectively a single line of code to transform the data into the average shown above.
 
 ```{r}
 gap_intervals %>%
@@ -61,6 +103,8 @@ gap_months %>%
   collect(n = 3) %>%
   kable()
 ```
+
+The following plot better matches what is shown in the book, where it seems the caption is incorrect.
 
 ```{r} 
 gap_months %>%
@@ -133,12 +177,21 @@ If `p = 2` (i.e., we're interested in product pairs), we then create all the com
 For a customer with one product, there is no pair.
 For a customer with two products, there is one pair.
 For a customer with three products, there are two pairs: `{1, 2}` and `{2, 3}`.
-These combos are created in R and the resulting table passed back to the database.
+These combinations are created in R and the resulting table (`combos`) is passed back to the database.
 
 From there, everything is processed in the database.
 
+In creating `cust_prods`, each unique product purchased by each customer is given a within-customer ID (`prod_num`) using the `row_number()` window function, and note is made of the number of unique products purchased by the customer (`n_products`).
+We then join `cust_prods` with `combos` using `(customer_id, n_products)` to create `base`, which contains customer IDs, as well as the "baskets" of products represented in the form of `prod_num` values stored in `p_1`, `p_2`, etc.
+
+Next, we want to add the `p` actual products in each basket from `cust_prods` to the data stored in `base`.
+For example, we want to turn `p_1` of `1` into `product_1` of `"apples"`.
+The `get_prod()` function does this for one product at a time and we use `Reduce` from base R to repeatedly apply this idea `p` times.
+
+Finally, we collapse the `product_i` fields into a single `basket` field analogous to what is done in @tanimura2021sql.
+
 ```{r}
-get_baskets <- function(p) {
+get_baskets <- function(df, p) {
   
   get_combos <- function(n, p) {
     if (n < p) return(NULL)
@@ -150,7 +203,7 @@ get_baskets <- function(p) {
   }
 
   n_prods <- 
-    purchases %>%
+    df %>%
     distinct(customer_id, product) %>%
     group_by(customer_id) %>%
     summarize(n_products = n()) %>%
@@ -165,7 +218,7 @@ get_baskets <- function(p) {
     copy_inline(pg, .)
 
   cust_prods <-
-    purchases %>% 
+    df %>% 
     group_by(customer_id) %>% 
     window_order(product) %>% 
     mutate(prod_num = row_number()) %>%
@@ -198,12 +251,17 @@ get_baskets <- function(p) {
 }
 ```
 
+Now we can apply our function to our data to get two-item baskets.
+
 ```{r}
 #| message: false
-pairs <- get_baskets(2) 
+pairs <- get_baskets(purchases, 2) 
 
 pairs %>% kable()
 ```
+
+And we can identify the most popular baskets easily:
+
 ```{r}
 pairs %>%
   count(basket) %>%
@@ -211,14 +269,18 @@ pairs %>%
   kable()
 ```
 
-```{r}
-#| message: false
-get_baskets(3) %>% kable()
-```
+But the function also works for three-item baskets ...
 
 ```{r}
 #| message: false
-get_baskets(4) %>% kable()
+get_baskets(purchases, 3) %>% kable()
+```
+
+... and four-item baskets too.
+
+```{r}
+#| message: false
+get_baskets(purchases, 4) %>% kable()
 ```
 
 ## Resources
