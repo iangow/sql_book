@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.2.335">
+<meta name="generator" content="quarto-1.2.269">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -735,7 +735,7 @@ div.csl-indent {
 <span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">a_trunced_time =</span> <span class="fu">date_trunc</span>(<span class="st">'month'</span>, a_time))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># Source:   SQL [1 x 2]
-# Database: postgres  [igow@/tmp:5432/igow]
+# Database: postgres  [iangow@/tmp:5432/iangow]
   a_time              a_trunced_time     
   &lt;dttm&gt;              &lt;dttm&gt;             
 1 2020-10-04 12:33:35 2020-10-01 00:00:00</code></pre>
@@ -770,7 +770,7 @@ FROM (SELECT '2020-10-04 12:33:35'::timestamp AS a_time) "q01"</code></pre>
 <span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">a_trunced_time =</span> <span class="fu">date_trunc</span>(<span class="st">'month'</span>, a_time)) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># Source:   SQL [1 x 2]
-# Database: postgres  [igow@/tmp:5432/igow]
+# Database: postgres  [iangow@/tmp:5432/iangow]
   a_time              a_trunced_time     
   &lt;dttm&gt;              &lt;dttm&gt;             
 1 2020-10-04 19:33:35 2020-10-01 00:00:00</code></pre>
@@ -1532,7 +1532,7 @@ FROM (
 <span id="cb71-9"><a href="#cb71-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">pct_from_index =</span> (sales<span class="sc">/</span>index_sales <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">*</span> <span class="dv">100</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># Source:     SQL [?? x 4]
-# Database:   postgres  [igow@/tmp:5432/igow]
+# Database:   postgres  [iangow@/tmp:5432/iangow]
 # Ordered by: sales_year
    sales_year sales index_sales pct_from_index
         &lt;dbl&gt; &lt;dbl&gt;       &lt;dbl&gt;          &lt;dbl&gt;
@@ -1907,7 +1907,7 @@ FROM (
 <span id="cb79-17"><a href="#cb79-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(date, sales_month, sales)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># Source:   SQL [?? x 3]
-# Database: postgres  [igow@/tmp:5432/igow]
+# Database: postgres  [iangow@/tmp:5432/iangow]
    date       sales_month sales
    &lt;date&gt;     &lt;date&gt;      &lt;dbl&gt;
  1 1993-01-01 1992-07-01   2373
@@ -1933,7 +1933,7 @@ FROM (
 <span id="cb81-7"><a href="#cb81-7" aria-hidden="true" tabindex="-1"></a>            <span class="at">records =</span> <span class="fu">n</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># Source:   SQL [?? x 3]
-# Database: postgres  [igow@/tmp:5432/igow]
+# Database: postgres  [iangow@/tmp:5432/iangow]
    date       moving_avg records
    &lt;date&gt;          &lt;dbl&gt;   &lt;int&gt;
  1 1993-01-01       2248       2
