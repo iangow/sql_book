@@ -223,6 +223,104 @@ a_time_df %>%
 
 ## The Retail Sales Data Set
 
+As discussed in @tanimura2021sql, the data set used in this chapter comes from the website of the US Census Bureau.
+The data set is a little messy, but not too large, so we can easily grab it directly from the website and clean it up in much the same way that Cathy has done for us.
+
+**INSERT CODE TO GET DATA SET HERE.**
+
+```{r}
+#| include: false
+#| eval: false
+retail_sales <- tbl(pg, "retail_sales") %>% collect()
+
+# dbDisconnect(pg)
+# pg <- dbConnect(duckdb::duckdb())
+
+retail_sales <- copy_to(pg, retail_sales_local, 
+                        name = "retail_sales", overwrite = TRUE)
+```
+
+Now that we have the data in R, a few questions arise.
+
+First, why would we move it to a database?
+Second, how can we move it to a database?
+Related to the previous question will be: which database to we want to move it to?
+
+Taking these questions in turn, the first one is a good question.
+With `retail_sales` as a local data frame, we can run almost all the analyses below with only the slightest modifications.
+The modifications needed are to replace every instance of `window_order()` with `arrange()`.^[I requested a tweak to `dplyr` that would have avoided the need to do this, but my request was denied.
+Given how awesome `dbplyr`/`dplyr` is, I cannot complain.]
+The "almost all" relates to the moving average, which relies on `window_frame()` from `dbplyr`, which has no exact equivalent in `dplyr`.
+
+So the first point is that "almost all" implies an advantage for using `dbplyr`.
+On occasion, the SQL engine provided by PostgreSQL will allow us to do some data manipulations more easily than we can in R.
+But of course, there are many cases when the opposite is true.
+That said, why not have both?
+Store data in a database and `collect()` as necessary to do things that R is better at?
+
+Second, performance can be better using SQL.
+Compiling a version of this chapter using `dplyr` with a local data frame for the remainder took just under 14 seconds.
+Using a PostgreSQL backend, it took 8.5 seconds.
+Adding back in the queries with `window_order()` that I removed so that I could compile with `dplyr` and using DuckDB as the backend, the document took 8.3 seconds to compile (this beat out PostgreSQL doing the same in 9.6 seconds).
+While these differences are not practically very significant, they could be with more demanding tasks.
+Also, a database will not always beat R or Python for performance, but often will and having the option to use a database backend is a good thing.
+
+Third, having the data in a database allows you to interrogate the data using SQL.
+If you are more familiar with SQL, or just know how to do a particular task in SQL, this can be beneficial.^[Though I will argue later that transitioning to `dplyr`/`dbplyr` is actually not difficult.]
+
+Fourth, I think there is merit in separating the tasks of acquiring and cleaning data from the task of analysing those data.
+Many data analysts have a work flow that entails ingesting and cleaning data for each analysis task.
+My experience is that it is often better to do the ingesting and cleaning once and then reuse the cleaned data in subsequent analyses.
+A common pattern involves reusing the same data in many analyses and it can be helpful to divide the tasks in a way that using an SQL database encourages.
+Also the skills in ingesting and cleaning data can be different from those for analysing those data, so sometimes it makes sense for one person to do one task, push the data to a database, and then have someone else do some or all of the analysis.
+
+Now, what about the second question.
+Here there are a few options.
+
+First, if we have a PostgreSQL database, we could connect to that, much as we did at the start of the chapter:
+
+```{r}
+#| eval: false
+pg <- dbConnect(RPostgres::Postgres(), 
+                bigint = "integer",
+                check_interrupts = TRUE)
+```
+
+Alternatively, we could use DuckDB.
+To install DuckDB, all we have to do is `install.packages("duckdb")`.
+Then we can create a connection as follows:
+
+```{r}
+#| eval: false
+pg <- dbConnect(duckdb::duckdb())
+```
+
+By default, the `duckdb` will use an in-memory database, though we could easily specify a file (say, `sql_book.duckdb`) if we want persistent storage or are using an existing database.
+
+Having created a database connection, we can write the local data frame to the database using (say) `copy_to()`.
+
+```{r}
+#| eval: false
+retail_sales <- copy_to(pg, retail_sales_local, 
+                        name = "retail_sales", overwrite = TRUE)
+```
+
+We could specify `temporary = FALSE` if we wanted the data to be there permanently.^[Obviously this would not make sense if `pg` is a connection to an in-memory database.]
+
+In some cases, you will have access to a database, but no write privileges for that database.
+In such a case, `copy_inline()` can be useful.
+Note that it seems you cannot interrogate a table created using `copy_inline()` using SQL, though it will behave in most respects just like a table created using `copy_to()` when using `dbplyr`.
+It is useful to note that `copy_inline()` is probably not a good solution if your data are hundreds of thousands of rows or more because the table is effectively turned into literal SQL.
+
+```{r}
+#| eval: false
+retail_sales_alt <- copy_inline(pg, retail_sales_local)
+```
+
+```{r}
+retail_sales <- tbl(pg, "retail_sales")
+```
+
 ## Trending the Data
 
 ### Simple Trends
@@ -236,7 +334,6 @@ ORDER BY 1
 ```
 
 ```{r}
-retail_sales <- tbl(pg, "retail_sales")
 retail_sales %>%
   filter(kind_of_business == 'Retail and food services sales, total') %>%
   select(sales_month, sales) %>%
@@ -258,7 +355,7 @@ GROUP BY 1
 ```{r}
 retail_sales %>%
   filter(kind_of_business == 'Retail and food services sales, total') %>%
-  mutate(sales_year = date_part('year', sales_month)) %>%
+  mutate(sales_year = year(sales_month)) %>%
   group_by(sales_year) %>%
   summarize(sales = sum(sales, na.rm = TRUE)) %>%
   arrange(sales_year) %>%
@@ -287,7 +384,7 @@ retail_sales %>%
            c('Book stores',
              'Sporting goods stores',
              'Hobby, toy, and game stores')) %>%
-  mutate(sales_year = date_part('year', sales_month)) %>%
+  mutate(sales_year = year(sales_month)) %>%
   group_by(sales_year, kind_of_business) %>%
   summarize(sales = sum(sales, na.rm = TRUE), .groups = "drop") %>%
   arrange(sales_year) %>%
@@ -332,7 +429,7 @@ retail_sales %>%
   filter(kind_of_business %in% 
            c("Men's clothing stores",
              "Women's clothing stores")) %>%
-  mutate(sales_year = date_part('year', sales_month)) %>%
+  mutate(sales_year = year(sales_month)) %>%
   group_by(sales_year, kind_of_business) %>%
   summarize(sales = sum(sales, na.rm = TRUE), .groups = "drop") %>%
   arrange(sales_year) %>%
@@ -366,7 +463,7 @@ pivoted_sales <-
              "Women's clothing stores")) %>%
   mutate(kind_of_business = if_else(kind_of_business == "Women's clothing stores",
                                     "womens", "mens"),
-         sales_year = date_part('year', sales_month)) %>%
+         sales_year = year(sales_month)) %>%
   group_by(sales_year, kind_of_business) %>%
   summarize(sales = sum(sales, na.rm = TRUE), .groups = "drop") %>%
   pivot_wider(id_cols = "sales_year",
@@ -404,6 +501,7 @@ pivoted_sales %>%
   ggplot(aes(y = womens_times_of_mens, x = sales_year)) +
   geom_line()
 ```
+
 ```{r}
 pivoted_sales %>%
   filter(sales_year <= 2019) %>%
@@ -459,7 +557,7 @@ retail_sales %>%
 ```{r}
 retail_sales %>%
   filter(kind_of_business == "Women's clothing stores") %>%
-  mutate(sales_year = date_part('year',sales_month)) %>%
+  mutate(sales_year = year(sales_month)) %>%
   group_by(sales_year) %>%
   summarize(sales = sum(sales, na.rm = TRUE)) %>%
   ungroup() %>%
@@ -473,7 +571,7 @@ retail_sales %>%
   filter(kind_of_business %in% c("Women's clothing stores",
                                  "Men's clothing stores"),
          sales_month <= '2019-12-31') %>%
-  mutate(sales_year = date_part('year',sales_month)) %>%
+  mutate(sales_year = year(sales_month)) %>%
   group_by(kind_of_business, sales_year) %>%
   summarize(sales = sum(sales, na.rm = TRUE), .groups = "drop") %>%
   group_by(kind_of_business) %>%
@@ -537,28 +635,30 @@ retail_sales %>%
   kable()
 ```
 
+```{r}
+date_dim <-
+  tibble(date = seq(as.Date('1993-01-01'), 
+                    as.Date('2020-12-01'), 
+                    by = "1 month")) %>%
+  copy_to(pg, ., overwrite = TRUE, name = "date_dim")
+```
+
 ```{sql}
 #| connection: pg
 WITH jan_jul AS (
   SELECT sales_month, sales
   FROM retail_sales 
   WHERE kind_of_business = 'Women''s clothing stores'
-     and date_part('month',sales_month) in (1,7))
+     and date_part('month', sales_month) IN (1, 7))
      
 SELECT a.date, b.sales_month, b.sales
 FROM date_dim a
 JOIN jan_jul b 
-ON b.sales_month between a.date - interval '11 months' and a.date
-WHERE a.date = a.first_day_of_month 
-  and a.date between '1993-01-01' and '2020-12-01';
+ON b.sales_month between a.date - interval '11 months' AND a.date
+WHERE a.date between '1993-01-01' and '2020-12-01';
 ```
-```{r}
-date_dim <-
-  tibble(date = seq(as.Date('1993-01-01'), 
-                    as.Date('2020-12-01'), 
-                    by = "1 month")) %>%
-  copy_to(pg, ., overwrite = TRUE)
 
+```{r}
 jan_jul <-
   retail_sales %>%
   filter(kind_of_business == "Women's clothing stores",
@@ -603,7 +703,9 @@ LIMIT 3;
 ```{r}
 sales_months <-
   retail_sales %>%
-  filter(between(sales_month, '1993-01-01', '2020-12-01')) %>%
+  filter(between(sales_month, 
+                 as.Date('1993-01-01'), 
+                 as.Date('2020-12-01'))) %>%
   distinct(sales_month)
 
 sales_months %>%
@@ -700,3 +802,10 @@ retail_sales_yr %>%
 ### Period-over-Period Comparisons: Same Month Versus Last Year
 
 ### Comparing to Multiple Prior Periods
+
+
+
+```{r}
+#| include: false
+dbDisconnect(pg, shutdown=TRUE)
+```

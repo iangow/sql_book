@@ -217,6 +217,15 @@ retained_data %>%
 
 ## Adjusting Time Series to Increase Retention Accuracy
 
+```{r}
+date_dim <-
+  tibble(date = seq(as.Date('1770-12-31'), 
+                    as.Date('2020-12-31'), 
+                    by = "1 year")) %>%
+  copy_to(pg, ., overwrite = TRUE, name = "date_dim")
+```
+
+
 ```{sql}
 #| connection: pg
 WITH
@@ -231,8 +240,7 @@ SELECT a.id_bioguide, a.first_term, b.term_start, b.term_end,
   date_part('year', age(c.date, a.first_term)) AS period
 FROM first_terms a
 JOIN legislators_terms b USING (id_bioguide)
-LEFT JOIN date_dim c ON c.date BETWEEN b.term_start and b.term_end 
-and c.month_name = 'December' and c.day_of_month = 31;
+LEFT JOIN date_dim c ON c.date BETWEEN b.term_start and b.term_end;
 ```
 
 ```{r}
@@ -298,8 +306,7 @@ cohorts_retained AS (
     count(distinct a.id_bioguide) as cohort_retained
     FROM first_terms a
     JOIN legislators_terms b USING (id_bioguide)
-    LEFT JOIN date_dim c ON c.date BETWEEN b.term_start AND b.term_end 
-      AND c.month_name = 'December' AND c.day_of_month = 31
+    LEFT JOIN date_dim c ON c.date BETWEEN b.term_start AND b.term_end
     GROUP BY 1)
     
 SELECT period,
@@ -383,7 +390,6 @@ FROM
         ) a
         JOIN legislators_terms b on a.id_bioguide = b.id_bioguide 
         LEFT JOIN date_dim c on c.date between b.term_start and b.term_end 
-        and c.month_name = 'December' and c.day_of_month = 31
         GROUP BY 1,2
 ) aa
 ORDER BY 1,2
