@@ -30,21 +30,6 @@ legislators_terms <- tbl(pg, "legislators_terms")
 
 ## Churn, Lapse, and Other Definitions of Departure
 
-```{sql}
-#| connection: pg
-WITH gap_intervals AS (
-  SELECT id_bioguide, term_start,
-    lag(term_start) OVER w AS prev,
-    age(term_start, lag(term_start) OVER w) as gap_interval
-  FROM legislators_terms
-  WHERE term_type = 'rep'
-  WINDOW w AS (partition by id_bioguide 
-               order by term_start))
-
-SELECT avg(gap_interval) as avg_gap
-FROM gap_intervals
-WHERE gap_interval is not null;
-```
 ```{r}
 gap_intervals <-
   legislators_terms %>%
@@ -84,6 +69,39 @@ gap_months %>%
   geom_bar(stat = "identity")
 ```
 
+```{r}
+latest_date <- 
+  legislators_terms %>% 
+  summarize(max = max(term_start)) %>%
+  pull()
+
+intervals <-
+  legislators_terms %>%
+  filter(term_type == 'rep') %>%
+  group_by(id_bioguide) %>%
+  summarize(max_date = max(term_start), .groups = "drop") %>%
+  mutate(interval_since_last = age(latest_date, max_date))
+
+intervals %>%
+  mutate(years_since_last = year(interval_since_last)) %>%
+  count(years_since_last) %>%
+  arrange(years_since_last) %>%
+  collect(n = 3) %>%
+  kable()
+```
+
+```{r}
+intervals %>%
+  mutate(months_since_last = year(interval_since_last) * 12 +
+           month(interval_since_last)) %>%
+  count(months_since_last, name = "reps") %>%
+  mutate(status = case_when(months_since_last <= 23 ~ 'Current',
+                            months_since_last <= 48 ~ 'Lapsed',
+                            TRUE ~ 'Churned')) %>%
+  group_by(status) %>%
+  summarize(total_reps = sum(reps, na.rm = TRUE)) %>%
+  kable()
+```
 
 ## Basket Analysis
 
