@@ -33,6 +33,7 @@ db <- dbConnect(duckdb::duckdb())
 ```{sql}
 #| connection: db
 #| output: false
+#| warning  : false
 INSTALL 'icu';
 LOAD 'icu';
 ```
@@ -242,6 +243,59 @@ As discussed in @tanimura2021sql, the data set used in this chapter comes from t
 The data set is a little messy, but not too large, so we can easily grab it directly from the website and clean it up in much the same way that Cathy has done for us.
 
 ```{r}
+#| cache: true  
+library(tidyverse)
+library(readxl)
+
+# Use tmpdir = "." or known directory if you have trouble with 
+# this part.
+mrtssales <- tempfile(fileext = ".xlsx")
+url <- paste0("https://www.census.gov/retail/mrts/www/",
+              "mrtssales92-present.xlsx")
+download.file(url, mrtssales)
+
+read_tab <- function(year) {
+  
+  # Initially we read all columns as text, as we want to process
+  # more precise than read_excel() would do unsupervised.
+  temp <- read_excel(mrtssales,
+                     range = "A4:N71", 
+                     sheet = as.character(year),
+                     col_types = "text",
+                     col_names = paste0("v", 1:14))
+  
+  # The third row has the dates for columns 3:14
+  names(temp) <- c("naics_code", "kind_of_business",
+                   as.character(temp[2, 3:14]))
+  
+  # The actual data are found after row 3
+  temp <- temp[-1:-3, ]
+  
+  # Now pivot the data and convert sales to numeric values.
+  # Also convert sales_month to dates (start of respective month).
+  df <-
+    temp %>%
+    pivot_longer(names_to = "sales_month",
+                 values_to = "sales",
+                 cols = -1:-2) %>%
+    mutate(sales_month = paste("01", str_remove(sales_month, "\\.")),
+           sales_month = as.Date(sales_month, "%d %b %Y")) %>%
+    mutate(reason_for_null = case_when(sales == "(NA)" ~ "Not Available",
+                                       sales == "(S)" ~ "Supressed",
+                                       TRUE ~ NA),
+           sales = case_when(sales == "(NA)" ~ NA,
+                             sales == "(S)" ~ NA,
+                             TRUE ~ sales)) %>%
+    mutate(sales = as.double(sales)) %>%
+    select(sales_month, naics_code, kind_of_business,
+           reason_for_null, sales)
+  df
+}
+
+retail_sales_local <- bind_rows(lapply(1992:2020, read_tab)) 
+```
+
+```{r}
 #| warning: false
 #| eval: false
 db <- dbConnect(duckdb::duckdb(), "sql_book.duckdb")
@@ -249,27 +303,6 @@ df <- read_csv("data/us_retail_sales.csv.gz", show_col_types = FALSE)
 dbWriteTable(db, "retail_sales", df,
              overwrite = TRUE, row.names = FALSE)
 dbDisconnect(db, shutdown = TRUE)
-```
-
-```{r}
-db <- dbConnect(duckdb::duckdb(), 
-                "sql_book.duckdb",
-                read_only = TRUE)
-retail_sales <- tbl(db, "retail_sales")
-```
-
-**INSERT CODE TO GET DATA SET HERE.**
-
-```{r}
-#| include: false
-#| eval: false
-retail_sales <- tbl(db, "retail_sales") %>% collect()
-
-# dbDisconnect(db)
-# db <- dbConnect(duckdb::duckdb())
-
-retail_sales <- copy_to(db, retail_sales_local, 
-                        name = "retail_sales", overwrite = TRUE)
 ```
 
 Now that we have the data in R, a few questions arise.
@@ -318,6 +351,11 @@ db <- dbConnect(RPostgres::Postgres(),
                 check_interrupts = TRUE)
 ```
 
+```{r}
+db <- dbConnect(duckdb::duckdb(), read_only = TRUE)
+retail_sales <- copy_to(db, retail_sales_local, "retail_sales")
+```
+
 Alternatively, we could use DuckDB.
 To install DuckDB, all we have to do is `install.packages("duckdb")`.
 Then we can create a connection as follows:
@@ -332,6 +370,7 @@ By default, the `duckdb` will use an in-memory database, though we could easily 
 Having created a database connection, we can write the local data frame to the database using (say) `copy_to()`.
 
 ```{r}
+#| include: false
 #| eval: false
 retail_sales <- copy_to(db, retail_sales_local, 
                         name = "retail_sales", overwrite = TRUE)
@@ -636,6 +675,7 @@ mvg_avg %>%
 ```
 
 ```{r}
+#| eval: false
 mvg_avg %>%
   ggplot(aes(x = sales_month)) +
   geom_line(aes(y = sales, colour = "Sales")) +
@@ -656,9 +696,10 @@ WINDOW w AS (order by sales_month
 ```
 
 ```{r}
+#| eval: false
 retail_sales %>%
   filter(kind_of_business == "Women's clothing stores") %>%
-  window_order(sales_month) %>%
+  arrange(sales_month) %>%
   window_frame(-11, 0) %>%
   mutate(moving_avg = mean(sales, na.rm = TRUE),
          records_count = n()) %>%
