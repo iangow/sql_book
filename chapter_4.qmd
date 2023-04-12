@@ -67,39 +67,69 @@ If the latter, how accurate were the former as estimates of these values?
 Now that we understand cohorts, let's move onto the *legislators* data set.
 
 ```{r}
+#| warning: false
 library(DBI)
 library(tidyverse)
 library(dbplyr)
 library(ggplot2)
 library(knitr)
+library(duckdb)
+```
+
+```{r}
+#| warning: false
+#| eval: false
+db <- dbConnect(duckdb(), "legislators.duckdb")
+
+legislators <- read_csv("data/legislators.csv.gz",
+                        show_col_types = FALSE)
+copy_to(db, legislators,
+        name = "legislators",
+        overwrite = TRUE, temporary = FALSE)
+
+legislators_terms <- read_csv("data/legislators_terms.csv.gz",
+                              show_col_types = FALSE)
+copy_to(db, legislators_terms,
+        name = "legislators_terms",
+        overwrite = TRUE, temporary = FALSE)
+dbDisconnect(db, shutdown = TRUE)
 ```
 
 ```{r}
 #| output: false
-pg <- dbConnect(RPostgres::Postgres(), 
+#| include: false
+#| eval: false
+db <- dbConnect(RPostgres::Postgres(), 
                 bigint = "integer",
                 check_interrupts = TRUE)
 ```
 
 ```{r}
 #| include: false
-dbExecute(pg, "SET search_path TO sql_book")
+#| eval: false
+dbExecute(db, "SET search_path TO sql_book")
 ```
 
 ```{r}
-legislators_terms <- tbl(pg, "legislators_terms")
+db <- dbConnect(duckdb(), "legislators.duckdb", read_only = TRUE)
+```
+
+```{r}
+legislators_terms <- tbl(db, "legislators_terms")
+legislators <- tbl(db, "legislators")
 ```
 
 ```{sql}
-#| connection: pg
-SELECT id_bioguide ,min(term_start) AS first_term
+#| connection: db
+SELECT id_bioguide, min(term_start) AS first_term
 FROM legislators_terms 
 GROUP BY 1
+ORDER BY 1
 LIMIT 10;
 ```
 
 ```{sql}
-#| connection: pg
+#| connection: db
 WITH first_terms AS (
       SELECT id_bioguide, min(term_start) AS first_term
       FROM legislators_terms 
@@ -113,7 +143,6 @@ LIMIT 10;
 ```
 
 ```{r}
-
 first_terms <- 
   legislators_terms %>%
   group_by(id_bioguide) %>%
@@ -127,11 +156,12 @@ cohorts <-
   summarize(cohort_retained = sql("count(distinct id_bioguide)")) 
 
 cohorts %>%
-  collect(n = 10)
+  collect(n = 10) %>%
+  kable()
 ```
 
 ```{sql}
-#| connection: pg
+#| connection: db
 WITH 
 first_terms AS (
   SELECT id_bioguide, min(term_start) AS first_term
@@ -161,7 +191,8 @@ retained_data <-
   select(period, cohort_size, cohort_retained, pct_retained) 
 
 retained_data %>%
-  collect(n = 10)
+  collect(n = 10) %>%
+  kable()
 ```
 
 ```{r}
@@ -171,7 +202,7 @@ retained_data %>%
 ```
 
 ```{sql}
-#| connection: pg
+#| connection: db
 WITH 
 first_terms AS (
   SELECT id_bioguide, min(term_start) AS first_term
@@ -222,12 +253,12 @@ date_dim <-
   tibble(date = seq(as.Date('1770-12-31'), 
                     as.Date('2020-12-31'), 
                     by = "1 year")) %>%
-  copy_to(pg, ., overwrite = TRUE, name = "date_dim")
+  copy_to(db, ., overwrite = TRUE, name = "date_dim")
 ```
 
 
 ```{sql}
-#| connection: pg
+#| connection: db
 WITH
 
 first_terms AS (
@@ -245,10 +276,12 @@ LEFT JOIN date_dim c ON c.date BETWEEN b.term_start and b.term_end;
 
 ```{r}
 year_ends <-
-  tbl(pg, sql("
-    SELECT generate_series::date AS date
-    FROM generate_series('1770-12-31', '2030-12-31', interval '1 year')"))
-
+  tibble(date = seq(as.Date('1770-12-31'), 
+                    as.Date('2030-12-31'), 
+                    "1 year")) %>%
+  copy_to(db, ., names = "year_ends",
+          overwrite = TRUE)
+  
 cohorts <-
   first_terms %>%
   inner_join(legislators_terms, by = join_by(id_bioguide)) %>%
@@ -267,11 +300,11 @@ year_ends <-
   tibble(date = seq(as.Date("1770-12-31"), 
                     as.Date("2030-12-31"), 
                     by = "year")) %>%
-  copy_inline(pg, .)
+  copy_inline(db, .)
 ```
 
 ```{sql}
-#| connection: pg
+#| connection: db
 WITH 
 first_terms AS (
   SELECT id_bioguide, min(term_start) AS first_term
@@ -280,7 +313,10 @@ first_terms AS (
   
 year_ends AS (
   SELECT generate_series::date as date
-  FROM generate_series('1770-12-31', '2030-12-31', interval '1 year')
+  FROM generate_series('1770-12-31'::TIMESTAMP, 
+                       '2030-12-31'::TIMESTAMP, 
+                       interval '1 year')
+  
 )
   
 SELECT 
@@ -289,11 +325,12 @@ SELECT
 FROM first_terms a
 JOIN legislators_terms b ON a.id_bioguide = b.id_bioguide 
 LEFT JOIN year_ends c ON c.date BETWEEN b.term_start AND b.term_end 
-GROUP BY 1;
+GROUP BY 1
+ORDER BY 1;
 ```
 
 ```{sql}
-#| connection: pg
+#| connection: db
 WITH
 
 first_terms AS (
@@ -344,7 +381,7 @@ pct_retained %>%
 ```
 
 ```{sql}
-#| connection: pg
+#| connection: db
 WITH 
 first_terms AS (
   SELECT id_bioguide, min(term_start) AS first_term
@@ -371,7 +408,7 @@ first_terms %>%
 ```
 
 ```{sql}
-#| connection: pg
+#| connection: db
 SELECT first_century, period
 ,first_value(cohort_retained) over (partition by first_century order by period) as cohort_size
 ,cohort_retained
@@ -394,4 +431,8 @@ FROM
 ) aa
 ORDER BY 1,2
 ;
+```
+
+```{r}
+dbDisconnect(db, shutdown = TRUE)
 ```
