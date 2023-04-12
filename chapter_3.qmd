@@ -362,7 +362,7 @@ Also the skills in ingesting and cleaning data can be different from those for a
 Now, what about the second question.
 Here there are a few options.
 
-First, if we have a PostgreSQL database, we could connect to that, much as we did at the start of the chapter:
+First, if we have a PostgreSQL database, we could connect to that.
 
 ```{r}
 #| eval: false
