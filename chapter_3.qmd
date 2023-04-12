@@ -758,7 +758,9 @@ date_dim %>%
   mutate(date_start = date - months(11)) %>%
   inner_join(jan_jul, 
              join_by(between(y$sales_month, x$date_start, x$date))) %>%
-  select(date, sales_month, sales)
+  select(date, sales_month, sales) %>%
+  collect(n = 3) %>%
+  kable()
 ```
 
 ```{r}

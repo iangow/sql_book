@@ -28,7 +28,7 @@ legislators_terms <- tbl(pg, "legislators_terms")
 
 ## Funnel Analysis
 
-The issue described in this section of @tanimura2021 is more difficult to get to using `dbplyr`.
+The issue described in this section of @tanimura2021sql is more difficult to get to using `dbplyr`.
 This seems the natural translation of the ideas represented in the SQL there. 
 
 ```{r}
