@@ -6,8 +6,39 @@ library(DBI)
 library(tidyverse)
 library(dbplyr)
 library(knitr)
-library(forcats)
+library(duckdb)
 ```
+
+```{r}
+#| eval: false
+weeks <- 
+  tibble(start_date = seq(as.Date("2010-01-01"), 
+                          as.Date("2020-12-01"),
+                          by = 7)) %>%
+  mutate(end_date = start_date + days(7))
+  
+get_quake_data <- function(start, end) {
+  db <- dbConnect(duckdb::duckdb(), "earthquakes_new.duckdb")
+  url <- paste0("https://earthquake.usgs.gov/fdsnws/event/1/",
+                "query?format=csv&starttime=", as.character(start), 
+                "&endtime=", as.character(end))
+  df <- read_csv(url, show_col_types = FALSE)
+  dbWriteTable(db, "earthquakes_new2", df,
+               append = TRUE, row.names = FALSE)
+  dbDisconnect(db, shutdown = TRUE)
+  return(TRUE)
+}
+
+db <- dbConnect(duckdb::duckdb(), "earthquakes_new.duckdb")
+dbExecute(db, "DROP TABLE IF EXISTS earthquakes")
+dbDisconnect(db, shutdown = TRUE)
+
+res <- map2(weeks$start_date,
+            weeks$end_date, 
+            get_quake_data,
+            .progress = TRUE)
+```
+
 
 ```{r}
 #| warning: false
@@ -15,22 +46,12 @@ library(forcats)
 files <- list.files("data", "earthquakes.*",
                     full.names = TRUE)
 db <- dbConnect(duckdb::duckdb(), "sql_book.duckdb")
-dbExecute(db, "DROP TABLE IF EXISTS earthquakes")
+duckdb::duckdb_read_csv(db, "earthquakes", files)
 dbDisconnect(db, shutdown = TRUE)
-
-read_files <- function(file) {
-  db <- dbConnect(duckdb::duckdb(),"sql_book.duckdb")
-  df <- read_csv(file, show_col_types = FALSE)
-  dbWriteTable(db, "earthquakes", df,
-               append = TRUE, row.names = FALSE)
-  dbDisconnect(db, shutdown = TRUE)
-}
-
-res <- lapply(files, read_files)
 ```
+
 ```{r}
-db <- dbConnect(duckdb::duckdb(), 
-                "sql_book.duckdb",
+db <- dbConnect(duckdb::duckdb(), "earthquakes.duckdb",
                 read_only = TRUE)
 earthquakes <- tbl(db, "earthquakes")
 ```
