@@ -10,17 +10,32 @@ library(knitr)
 
 ```{r}
 #| output: false
-pg <- dbConnect(RPostgres::Postgres(), 
+#| include: false
+#| eval: false
+db <- dbConnect(RPostgres::Postgres(), 
                 bigint = "integer",
                 check_interrupts = TRUE)
 ```
 
 ```{r}
 #| include: false
-dbExecute(pg, "SET search_path TO sql_book")
+#| eval: false
+dbExecute(db, "SET search_path TO sql_book")
 ```
 
+```{r}
+db <- dbConnect(duckdb::duckdb())
+```
+
+
 ## Date, Datetime, and Time Manipulations
+
+```{sql}
+#| connection: db
+#| output: false
+INSTALL 'icu';
+LOAD 'icu';
+```
 
 ### Time Zone Conversions
 
@@ -31,74 +46,67 @@ When pushing data to a PostgreSQL database, I use the `timestamp with time zone`
 Instead, it would be on PDT.
 
 ```{sql}
-#| connection: pg
-SELECT '2020-09-01 00:00:00' AT TIME ZONE 'pst';
+#| connection: db
+SELECT timestamptz '2020-09-01 00:00:00 -0' AT TIME ZONE 'PST' AS time;
 ```
+In PostgreSQL, we would get a different answer with the following query, but in DuckDB it seems that `PDT` is not recognized as a time zone abbreviation at all, so we just get the original UTC timestamp back.
 
 ```{sql}
-#| connection: pg
-SELECT '2020-09-01 00:00:00' AT TIME ZONE 'pdt';
+#| connection: db
+SELECT timestamptz '2020-09-01 00:00:00 -0' AT TIME ZONE 'PDT' AS time;
 ```
 
 I think most people barely know the difference between PST and PDT and even fewer would know the exact dates that one switches from one to the other.
 A better approach is to use a time zone that encodes information about when PDT is used and when PST is used.
-In PostgreSQL, the table `pg_timezone_names` has information that we need.
+In PostgreSQL and DuckDB, the function `pg_timezone_names()` returns a table with the information that we need.
+
+However, it seems that there are inconsistencies between PostgreSQL and DuckDB in terms of the abbreviations used.
+As such it's probably safer to use the `name` form (e.g., `US/Pacific`) whenever possible.
+Given the widespread confusion about the meaning of terms like `EST`, `EDT`, and so on, just use `US/Eastern`, etc.
 
 ```{sql}
-#| connection: pg
-SELECT * 
-FROM pg_timezone_names
-WHERE name ~ '^US/';
+#| connection: db
+SELECT name, abbrev
+FROM pg_timezone_names()
+WHERE regexp_matches(name, '^US/');
+-- use WHERE name ~ '^US/'; in PostgreSQL
+```
+
+The following queries demonstrate that daylight savings information is encoded in the database.
+
+```{sql}
+#| connection: db
+SELECT '2020-09-01 17:00:01 US/Pacific'::timestamptz AS t1,
+       '2020-09-02 10:00:01 Australia/Melbourne'::timestamptz  AS t2;
 ```
 
 ```{sql}
-#| connection: pg
-SELECT * 
-FROM pg_timezone_names
-WHERE abbrev IN ('PDT', 'PST') 
-ORDER BY name DESC
-LIMIT 5;
-```
-
-The following two queries show that `US/Pacific` is sometimes `PDT` and sometimes `PST`.
-
-```{sql}
-#| connection: pg
-SELECT 
-    '2020-09-01 17:00:01 US/Pacific'::timestamptz AS t1,
-    '2020-09-01 17:00:01 PDT'::timestamptz  AS t2;
-```
-
-```{sql}
-#| connection: pg
-SELECT 
-    '2020-12-01 16:00:01 US/Pacific'::timestamptz AS t1,
-    '2020-12-01 16:00:01 PST'::timestamptz  AS t2;
+#| connection: db
+SELECT '2020-12-01 16:00:01 US/Pacific'::timestamptz AS t1,
+       '2020-12-02 11:00:01 Australia/Melbourne'::timestamptz  AS t2;
 ```
 
 ```{r}
 sql <-
-  "SELECT     
-    '2020-12-01 16:00:01 US/Pacific'::timestamptz AS t1,
-    '2020-12-01 16:00:01 PST'::timestamptz AS t2"
+  "(SELECT     
+    '2020-12-01 16:00:01 US/Pacific'::timestamptz AS t1)"
 
-two_times <- tbl(pg, sql(sql))
-two_times %>%
+a_time <- tbl(db, sql(sql))
+a_time %>%
   kable()
 ```
 
 ```{r}
-one_time <-
-  two_times %>%
+a_time_r <-
+  a_time %>%
   select(t1) %>%
   pull()
 
-print(one_time, tz = "UTC")
-print(one_time, tz = "US/Pacific")
+print(a_time_r, tz = "UTC")
+print(a_time_r, tz = "US/Pacific")
 Sys.timezone()
-print(one_time, tz = Sys.timezone())
+print(a_time_r, tz = Sys.timezone())
 ```
-
 The above examples illustrate a few key ideas.
 
 First, while we supply the literal form `'2020-09-01 17:00:01 US/Pacific'::timestamptz`, it seems that once a variable has been encoded as `TIMESTAMP WITH TIME ZONE`, it behaves as though it is actually being *stored* as a timestamp in the UTC time zone, just with the *displayed* time perhaps being different.
@@ -109,31 +117,34 @@ Third, we can see that we can choose to *display* information in a different tim
 
 Some care is needed with timestamp data.
 I think the `AT TIME ZONE` queries provided in @tanimura2021sql are actually pretty dangerous, as can be seen in the following query.
-While we supply `2020-09-01 00:00:00` as UTC and then render it `AT TIME ZONE 'PDT'`, it turns out that the returned value is interpreted as a `TIMESTAMP WITHOUT TIME ZONE` and subsequent queries lead to confusing behaviour.
+While we supply `2020-09-01 00:00:01` as UTC and then render it `AT TIME ZONE 'US/Pacific'`, it turns out that the returned value is interpreted as a `TIMESTAMP WITHOUT TIME ZONE` and subsequent queries lead to confusing behaviour.
 In the query below, the second application of `AT TIME ZONE` interprets the `TIMESTAMP WITHOUT TIME ZONE` as though it came from the stated time zone and the results seem to have `AT TIME ZONE` doing the opposite of what it did when given a `TIMESTAMP WITH TIME ZONE` (as in the initial literal `'2020-09-01 00:00:01 -0'`). 
 
 ```{sql}
-#| connection: pg
+#| connection: db
 WITH q1 AS
- (SELECT '2020-09-01 00:00:01 -0' AT TIME ZONE 'PDT' AS t1)
+ (SELECT timestamptz '2020-09-01 00:00:01-00' AT TIME ZONE 'US/Pacific' AS t1,
+         timestamp '2020-09-01 00:00:01' AT TIME ZONE 'US/Pacific' AS t2)
  
-SELECT t1 AT TIME ZONE 'UTC' AS t2,
-  to_char(t1, 'YYYY-MM-DD HH24:MI:SS TZ'),
-  t1 AT TIME ZONE 'PDT' AS t3,
-  t1 AT TIME ZONE 'Australia/Melbourne' AS t4,
-  pg_typeof(t1)
+SELECT 
+  t1,
+  t1::varchar AS t1_char,
+  t1 AT TIME ZONE 'UTC' AS t3,
+  t2 AT TIME ZONE 'UTC' AS t4,
+  typeof(t1),
+  typeof(t2)
 FROM q1
 ```
-It seems that `TIMESTAMP WITHOUT TIME ZONE` values should be converted to a time zone as quickly as possible to avoid confusion and that great care is needed with `AT TIME ZONE` given that it does very different things according to the supplied data type.
+It seems that `TIMESTAMP WITHOUT TIME ZONE` values should be converted to a time zone as quickly as possible to avoid confusion and that care is needed with `AT TIME ZONE` given that it does very different (essentially opposite) things according to the supplied data type.
 
 ```{sql}
-#| connection: pg
+#| connection: db
 WITH q1 AS
- (SELECT '2020-09-01 00:00:01 -0'::timestamptz AS t1)
+ (SELECT '2020-09-01 00:00:01-00'::timestamptz AS t1)
  
 SELECT t1,
-  to_char(t1, 'YYYY-MM-DD HH24:MI:SS TZ'),
-  pg_typeof(t1)
+  t1::varchar AS t2,
+  typeof(t1)
 FROM q1
 ```
 Strange behaviour can result from values stored as `TIMESTAMP WITHOUT TIME ZONE`.
@@ -141,11 +152,11 @@ Below we see that `t1` is printed as UTC no matter what, while the behaviour of 
 
 ```{r}
 sql <-
-  "SELECT     
+  "(SELECT     
     '2020-12-01 00:00:01-00' AS t1,
-    '2020-12-01 00:00:01-00'::timestamptz AS t2"
+    '2020-12-01 00:00:01-00'::timestamptz AS t2)"
 
-two_times_notz <- tbl(pg, sql(sql))
+two_times_notz <- tbl(db, sql(sql))
 two_times_notz %>% kable()
 ```
 
@@ -161,8 +172,6 @@ print(two_times_notz_r$t2)
 Sys.timezone()
 print(two_times_notz_r$t2, tz = Sys.timezone())
 ```
-
-
 As pointed out by @tanimura2021sql, one drawback to storing information as UTC is that localtime information may be lost.
 But it seems it would be more prudent to store information as `TIMESTAMP WITH TIME ZONE` and keep local time zone information as a separate column to avoid confusion.
 For example, if the `orders` table is stored as `TIMESTAMP WITHOUT TIME ZONE` based on the local time of the customer, which might be `Australia/Melbourne` and the `shipping` table uses `TIMESTAMP WITH TIME ZONE`, then an analyst of time-to-ship data would be confused by orders apparently being shipped before they are made.
@@ -176,14 +185,15 @@ In fact, nothing in the core part of Chapter 3 of @tanimura2021sql (which focuse
 As discussed in @tanimura2021sql, PostgreSQL has a rich array of functions for converting dates and times and extracting such information as months and days of the week.
 
 ```{sql}
-#| connection: pg
+#| connection: db
 SELECT date_trunc('month','2020-10-04 12:33:35 -00'::timestamptz);
 ```
 
 One such function 
 
 ```{r}
-a_time_df <- tbl(pg, sql("SELECT '2020-10-04 12:33:35'::timestamp AS a_time"))
+a_time_df <- tbl(db, sql("(SELECT '2020-10-04 12:33:35'::timestamp AS a_time)"))
+
 a_time_df %>% 
   mutate(a_trunced_time = date_trunc('month', a_time))
 
@@ -200,7 +210,7 @@ a_time_df %>%
 ### Time Math
 
 ```{r}
-a_time_df <- tbl(pg, sql("SELECT '2020-10-04 12:33:35 US/Pacific'::timestamp with time zone AS a_time"))
+a_time_df <- tbl(db, sql("(SELECT '2020-10-04 12:33:35 US/Pacific'::timestamptz AS a_time)"))
 
 a_time_df %>% 
   mutate(a_trunced_time = date_trunc('month', a_time)) 
@@ -219,6 +229,11 @@ a_time_df %>%
   collect()
 ```
 
+```{r}
+#| include: false
+dbDisconnect(db, shutdown=TRUE)
+```
+
 ### Joining Data from Different Sources
 
 ## The Retail Sales Data Set
@@ -226,17 +241,34 @@ a_time_df %>%
 As discussed in @tanimura2021sql, the data set used in this chapter comes from the website of the US Census Bureau.
 The data set is a little messy, but not too large, so we can easily grab it directly from the website and clean it up in much the same way that Cathy has done for us.
 
+```{r}
+#| warning: false
+#| eval: false
+db <- dbConnect(duckdb::duckdb(), "sql_book.duckdb")
+df <- read_csv("data/us_retail_sales.csv.gz", show_col_types = FALSE)
+dbWriteTable(db, "retail_sales", df,
+             overwrite = TRUE, row.names = FALSE)
+dbDisconnect(db, shutdown = TRUE)
+```
+
+```{r}
+db <- dbConnect(duckdb::duckdb(), 
+                "sql_book.duckdb",
+                read_only = TRUE)
+retail_sales <- tbl(db, "retail_sales")
+```
+
 **INSERT CODE TO GET DATA SET HERE.**
 
 ```{r}
 #| include: false
 #| eval: false
-retail_sales <- tbl(pg, "retail_sales") %>% collect()
+retail_sales <- tbl(db, "retail_sales") %>% collect()
 
-# dbDisconnect(pg)
-# pg <- dbConnect(duckdb::duckdb())
+# dbDisconnect(db)
+# db <- dbConnect(duckdb::duckdb())
 
-retail_sales <- copy_to(pg, retail_sales_local, 
+retail_sales <- copy_to(db, retail_sales_local, 
                         name = "retail_sales", overwrite = TRUE)
 ```
 
@@ -281,7 +313,7 @@ First, if we have a PostgreSQL database, we could connect to that, much as we di
 
 ```{r}
 #| eval: false
-pg <- dbConnect(RPostgres::Postgres(), 
+db <- dbConnect(RPostgres::Postgres(), 
                 bigint = "integer",
                 check_interrupts = TRUE)
 ```
@@ -292,7 +324,7 @@ Then we can create a connection as follows:
 
 ```{r}
 #| eval: false
-pg <- dbConnect(duckdb::duckdb())
+db <- dbConnect(duckdb::duckdb())
 ```
 
 By default, the `duckdb` will use an in-memory database, though we could easily specify a file (say, `sql_book.duckdb`) if we want persistent storage or are using an existing database.
@@ -301,11 +333,11 @@ Having created a database connection, we can write the local data frame to the d
 
 ```{r}
 #| eval: false
-retail_sales <- copy_to(pg, retail_sales_local, 
+retail_sales <- copy_to(db, retail_sales_local, 
                         name = "retail_sales", overwrite = TRUE)
 ```
 
-We could specify `temporary = FALSE` if we wanted the data to be there permanently.^[Obviously this would not make sense if `pg` is a connection to an in-memory database.]
+We could specify `temporary = FALSE` if we wanted the data to be there permanently.^[Obviously this would not make sense if `db` is a connection to an in-memory database.]
 
 In some cases, you will have access to a database, but no write privileges for that database.
 In such a case, `copy_inline()` can be useful.
@@ -314,11 +346,11 @@ It is useful to note that `copy_inline()` is probably not a good solution if you
 
 ```{r}
 #| eval: false
-retail_sales_alt <- copy_inline(pg, retail_sales_local)
+retail_sales_alt <- copy_inline(db, retail_sales_local)
 ```
 
 ```{r}
-retail_sales <- tbl(pg, "retail_sales")
+retail_sales <- tbl(db, "retail_sales")
 ```
 
 ## Trending the Data
@@ -326,7 +358,7 @@ retail_sales <- tbl(pg, "retail_sales")
 ### Simple Trends
 
 ```{sql}
-#| connection: pg
+#| connection: db
 SELECT sales_month, sales
 FROM retail_sales
 WHERE kind_of_business = 'Retail and food services sales, total'
@@ -343,7 +375,7 @@ retail_sales %>%
 ```
 
 ```{sql}
-#| connection: pg
+#| connection: db
 SELECT date_part('year',sales_month) as sales_year,
     sum(sales) as sales
 FROM retail_sales
@@ -364,7 +396,7 @@ retail_sales %>%
 ```
 
 ```{sql}
-#| connection: pg
+#| connection: db
 SELECT date_part('year',sales_month) as sales_year, 
   kind_of_business, sum(sales) as sales
 FROM retail_sales
@@ -394,7 +426,7 @@ retail_sales %>%
 ```
 
 ```{sql}
-#| connection: pg
+#| connection: db
 SELECT sales_month, kind_of_business, sales
 FROM retail_sales
 WHERE kind_of_business IN ('Men''s clothing stores','Women''s clothing stores')
@@ -413,7 +445,7 @@ retail_sales %>%
 ```
 
 ```{sql}
-#| connection: pg
+#| connection: db
 SELECT date_part('year',sales_month) as sales_year,
   kind_of_business, sum(sales) as sales
 FROM retail_sales
@@ -439,7 +471,7 @@ retail_sales %>%
 ```
 
 ```{sql}
-#| connection: pg
+#| connection: db
 SELECT date_part('year', sales_month) AS sales_year,
   sum(CASE WHEN kind_of_business = 'Women''s clothing stores' 
           then sales 
@@ -612,7 +644,7 @@ mvg_avg %>%
 
 
 ```{sql}
-#| connection: pg
+#| connection: db
 SELECT 
   sales_month,
   avg(sales) over w AS moving_avg,
@@ -640,11 +672,11 @@ date_dim <-
   tibble(date = seq(as.Date('1993-01-01'), 
                     as.Date('2020-12-01'), 
                     by = "1 month")) %>%
-  copy_to(pg, ., overwrite = TRUE, name = "date_dim")
+  copy_to(db, ., overwrite = TRUE, name = "date_dim")
 ```
 
 ```{sql}
-#| connection: pg
+#| connection: db
 WITH jan_jul AS (
   SELECT sales_month, sales
   FROM retail_sales 
@@ -683,7 +715,7 @@ date_dim %>%
 ```
 
 ```{sql}
-#| connection: pg
+#| connection: db
 WITH sales_months AS (
   SELECT distinct sales_month
   FROM retail_sales
@@ -724,7 +756,7 @@ sales_months %>%
 ### Calculating Cumulative Values
 
 ```{sql}
-#| connection: pg
+#| connection: db
 SELECT sales_month, sales,
   sum(sales) over w as sales_ytd
 FROM retail_sales
@@ -766,7 +798,7 @@ ytd_sales %>%
 ```
              
 ```{sql}
-#| connection: pg
+#| connection: db
 SELECT a.sales_month, a.sales
 ,sum(b.sales) as sales_ytd
 FROM retail_sales a
@@ -807,5 +839,5 @@ retail_sales_yr %>%
 
 ```{r}
 #| include: false
-dbDisconnect(pg, shutdown=TRUE)
+dbDisconnect(db, shutdown=TRUE)
 ```
