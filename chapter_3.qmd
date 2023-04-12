@@ -295,11 +295,31 @@ read_tab <- function(year) {
 retail_sales_local <- bind_rows(lapply(1992:2020, read_tab)) 
 ```
 
+Alternatively, we could just grab a CSV file from the GitHub repository for @tanimura2021sql.
+
+```{r}
+#| eval: true
+#| cache: true
+url <- paste0("https://raw.githubusercontent.com/",
+              "cathytanimura/sql_book/master/",
+              "Chapter%203%3A%20Time%20Series%20Analysis/",
+              "us_retail_sales.csv")
+retail_sales_local <- read_csv(url, show_col_types = FALSE)
+```
+
+Note that there are differences between the two versions of `retail_sales_local` above, as US Census economic data is continually being revised even after being released.    
+
 ```{r}
 #| warning: false
 #| eval: false
+#| include: false
+# Code to put data in sql_book.duckdb.
 db <- dbConnect(duckdb::duckdb(), "sql_book.duckdb")
-df <- read_csv("data/us_retail_sales.csv.gz", show_col_types = FALSE)
+url <- paste0("https://raw.githubusercontent.com/",
+              "cathytanimura/sql_book/master/",
+              "Chapter%203%3A%20Time%20Series%20Analysis/",
+              "us_retail_sales.csv")
+df <- read_csv(url, show_col_types = FALSE)
 dbWriteTable(db, "retail_sales", df,
              overwrite = TRUE, row.names = FALSE)
 dbDisconnect(db, shutdown = TRUE)
