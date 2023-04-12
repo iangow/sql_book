@@ -363,6 +363,7 @@ Then we can create a connection as follows:
 ```{r}
 #| eval: false
 db <- dbConnect(duckdb::duckdb())
+
 ```
 
 By default, the `duckdb` will use an in-memory database, though we could easily specify a file (say, `sql_book.duckdb`) if we want persistent storage or are using an existing database.
@@ -408,7 +409,6 @@ ORDER BY 1
 retail_sales %>%
   filter(kind_of_business == 'Retail and food services sales, total') %>%
   select(sales_month, sales) %>%
-  arrange(sales_month) %>%
   ggplot(aes(x = sales_month, y = sales)) +
   geom_line()
 ```
@@ -429,7 +429,6 @@ retail_sales %>%
   mutate(sales_year = year(sales_month)) %>%
   group_by(sales_year) %>%
   summarize(sales = sum(sales, na.rm = TRUE)) %>%
-  arrange(sales_year) %>%
   ggplot(aes(x = sales_year, y = sales)) +
   geom_line()
 ```
@@ -458,7 +457,6 @@ retail_sales %>%
   mutate(sales_year = year(sales_month)) %>%
   group_by(sales_year, kind_of_business) %>%
   summarize(sales = sum(sales, na.rm = TRUE), .groups = "drop") %>%
-  arrange(sales_year) %>%
   ggplot(aes(x = sales_year, y = sales, color = kind_of_business)) +
   geom_line() +
   theme(legend.position = "top")
@@ -477,7 +475,6 @@ retail_sales %>%
   filter(kind_of_business %in% c("Men's clothing stores",
                                  "Women's clothing stores")) %>%
   select(sales_month, kind_of_business, sales) %>%
-  arrange(sales_month) %>%
   ggplot(aes(x = sales_month, y = sales, color = kind_of_business)) +
   geom_line() +
   theme(legend.position = "top")
@@ -503,7 +500,6 @@ retail_sales %>%
   mutate(sales_year = year(sales_month)) %>%
   group_by(sales_year, kind_of_business) %>%
   summarize(sales = sum(sales, na.rm = TRUE), .groups = "drop") %>%
-  arrange(sales_year) %>%
   ggplot(aes(x = sales_year, y = sales, color = kind_of_business)) +
   geom_line() +
   theme(legend.position = "top")
@@ -548,7 +544,7 @@ pivoted_sales %>%
 pivoted_sales %>%
   arrange(sales_year) %>%
   collect(n = 10) %>%
-  knitr::kable()
+  kable()
 ```
 
 ```{r}
@@ -558,7 +554,6 @@ pivoted_sales %>%
   mutate(womens_minus_mens = womens_sales - mens_sales,
          mens_minus_womens = mens_sales - womens_sales) %>%
   select(sales_year, womens_minus_mens, mens_minus_womens) %>%
-  arrange(sales_year) %>%
   ggplot(aes(y = womens_minus_mens, x = sales_year)) +
   geom_line()
 ```
@@ -568,7 +563,6 @@ pivoted_sales %>%
   filter(sales_year <= 2019) %>%
   group_by(sales_year) %>%
   mutate(womens_times_of_mens = womens_sales / mens_sales) %>%
-  arrange(sales_year) %>%
   ggplot(aes(y = womens_times_of_mens, x = sales_year)) +
   geom_line()
 ```
@@ -578,7 +572,6 @@ pivoted_sales %>%
   filter(sales_year <= 2019) %>%
   group_by(sales_year) %>%
   mutate(womens_pct_of_mens = (womens_sales / mens_sales - 1) * 100) %>%
-  arrange(sales_year) %>%
   ggplot(aes(y = womens_pct_of_mens, x = sales_year)) +
   geom_line()
 ```
@@ -670,12 +663,11 @@ mvg_avg <-
 
 mvg_avg %>%
   select(sales_month, moving_avg, records_count) %>%
-  collect(n = 10) %>%
+  collect(n = 3) %>%
   kable(digits = 2)
 ```
 
 ```{r}
-#| eval: false
 mvg_avg %>%
   ggplot(aes(x = sales_month)) +
   geom_line(aes(y = sales, colour = "Sales")) +
@@ -699,7 +691,7 @@ WINDOW w AS (order by sales_month
 #| eval: false
 retail_sales %>%
   filter(kind_of_business == "Women's clothing stores") %>%
-  arrange(sales_month) %>%
+  window_order(sales_month) %>%
   window_frame(-11, 0) %>%
   mutate(moving_avg = mean(sales, na.rm = TRUE),
          records_count = n()) %>%
@@ -722,13 +714,13 @@ WITH jan_jul AS (
   SELECT sales_month, sales
   FROM retail_sales 
   WHERE kind_of_business = 'Women''s clothing stores'
-     and date_part('month', sales_month) IN (1, 7))
+     AND date_part('month', sales_month) IN (1, 7))
      
 SELECT a.date, b.sales_month, b.sales
 FROM date_dim a
-JOIN jan_jul b 
-ON b.sales_month between a.date - interval '11 months' AND a.date
-WHERE a.date between '1993-01-01' and '2020-12-01';
+INNER JOIN jan_jul b 
+ON b.sales_month BETWEEN a.date - interval '11 months' AND a.date
+WHERE a.date BETWEEN '1993-01-01' AND '2020-12-01';
 ```
 
 ```{r}
