@@ -10,19 +10,48 @@ library(forcats)
 ```
 
 ```{r}
+#| warning: false
+#| eval: false
+files <- list.files("data", "earthquakes.*",
+                    full.names = TRUE)
+db <- dbConnect(duckdb::duckdb(), "sql_book.duckdb")
+dbExecute(db, "DROP TABLE IF EXISTS earthquakes")
+dbDisconnect(db, shutdown = TRUE)
+
+read_files <- function(file) {
+  db <- dbConnect(duckdb::duckdb(),"sql_book.duckdb")
+  df <- read_csv(file, show_col_types = FALSE)
+  dbWriteTable(db, "earthquakes", df,
+               append = TRUE, row.names = FALSE)
+  dbDisconnect(db, shutdown = TRUE)
+}
+
+res <- lapply(files, read_files)
+```
+```{r}
+db <- dbConnect(duckdb::duckdb(), 
+                "sql_book.duckdb",
+                read_only = TRUE)
+earthquakes <- tbl(db, "earthquakes")
+```
+
+```{r}
 #| output: false
-pg <- dbConnect(RPostgres::Postgres(), 
+#| eval: false
+#| include: false
+db <- dbConnect(RPostgres::Postgres(), 
                 bigint = "integer",
                 check_interrupts = TRUE)
 ```
 
 ```{r}
 #| include: false
-dbExecute(pg, "SET search_path TO sql_book")
+#| eval: false
+dbExecute(db, "SET search_path TO sql_book")
 ```
 
 ```{r}
-earthquakes <- tbl(pg, "earthquakes")
+earthquakes <- tbl(db, "earthquakes")
 ```
 
 ```{r}
@@ -99,6 +128,7 @@ earthquakes %>%
   arrange(place, desc(mag)) %>%
   show_query()
 ```
+
 The `ntile()` offered by `dbplyr` works a little differently from other window functions.
 Rather than preceding the `mutate` with a `window_order()`, we need to specify an `order_by` argument.^[The reason for this is not clear and I have filed a feature request to make the handling of `ntile()` similar to that of other window functions.]
 
@@ -341,7 +371,7 @@ earthquakes %>%
 Why use `date_trunc('year',time)::date as earthquake_year`?
 
 ```{sql}
-#| connection = pg
+#| connection = db
 SELECT EXTRACT(year FROM time) AS earthquake_year, 
   COUNT(*) AS earthquakes
 FROM earthquakes
@@ -489,6 +519,7 @@ And `dbplyr` will translate `pmin` and `pmax` for us, so we can get winsorized d
 #| warning: false
 earthquakes_wins <-
   earthquakes %>%
+  mutate(mag = if_else(mag %in% c(-9.99, -9), NA, mag)) %>%
   filter(!is.na(mag)) %>%
   cross_join(extremes) %>%
   mutate(mag_winsorized = pmin(pmax(mag, p05), p95)) %>%
@@ -518,11 +549,15 @@ In the book, it says `WHERE depth >= 0.05`, but I need to use `WHERE depth > 0.0
 quake_depths <-
   earthquakes %>%
   filter(depth > 0.05) %>%
-  mutate(depth = sql("round(depth, 1)")) %>%
+  mutate(depth = round(depth, 1)) %>%
   select(depth)
 
 quake_depths %>%
-  count(depth)
+  mutate(log_depth = log(depth, base = 10)) %>%
+  count(depth, log_depth) %>%
+  arrange(depth) %>%
+  collect(n = 3) %>%
+  kable()
 
 quake_depths %>%
   ggplot(aes(x = depth)) +
@@ -533,4 +568,9 @@ quake_depths %>%
 quake_depths %>%
   ggplot(aes(x = log(depth, base = 10))) +
   geom_histogram(binwidth = 0.1)
+```
+
+```{r}
+#| include: FALSE
+dbDisconnect(db, shutdown = TRUE)
 ```
