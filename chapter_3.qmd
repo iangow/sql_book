@@ -243,7 +243,8 @@ As discussed in @tanimura2021sql, the data set used in this chapter comes from t
 The data set is a little messy, but not too large, so we can easily grab it directly from the website and clean it up in much the same way that Cathy has done for us.
 
 ```{r}
-#| cache: true  
+#| cache: true
+#| eval: false 
 library(tidyverse)
 library(readxl)
 
@@ -604,11 +605,12 @@ retail_sales %>%
            c("Men's clothing stores",
              "Women's clothing stores")) %>%
   group_by(sales_month) %>%
-  mutate(total_sales = sum(sales)) %>%
+  mutate(total_sales = sum(sales, na.rm = TRUE))  %>%
   ungroup() %>%
   mutate(pct_total_sales = sales * 100 / total_sales) %>%
   select(sales_month, kind_of_business, pct_total_sales) %>%
-  collect(n = 3)
+  collect(n = 3) %>%
+  kable()
 ```
 
 ```{r}
@@ -617,7 +619,7 @@ retail_sales %>%
            c("Men's clothing stores",
              "Women's clothing stores")) %>%
   group_by(sales_month) %>%
-  mutate(total_sales = sum(sales)) %>%
+  mutate(total_sales = sum(sales, na.rm = TRUE)) %>%
   ungroup() %>%
   mutate(pct_total_sales = sales * 100 / total_sales) %>%
   show_query()
@@ -629,7 +631,7 @@ retail_sales %>%
            c("Men's clothing stores",
              "Women's clothing stores")) %>%
   group_by(sales_month) %>%
-  mutate(total_sales = sum(sales)) %>%
+  mutate(total_sales = sum(sales, na.rm = TRUE)) %>%
   ungroup() %>%
   mutate(pct_total_sales = sales * 100 / total_sales) %>%
   ggplot(aes(y = pct_total_sales, x = sales_month, color = kind_of_business)) +
@@ -647,7 +649,9 @@ retail_sales %>%
   ungroup() %>%
   window_order(sales_year) %>%
   mutate(index_sales = first(sales),
-         pct_from_index = (sales/index_sales - 1) * 100)
+         pct_from_index = (sales/index_sales - 1) * 100) %>%
+  collect(n = 3) %>%
+  kable()
 ```
 
 ```{r}
@@ -764,7 +768,9 @@ date_dim %>%
              join_by(between(y$sales_month, x$date_start, x$date))) %>%
   group_by(date) %>%
   summarize(moving_avg = mean(sales, na.rm = TRUE),
-            records = n())
+            records = n()) %>%
+  collect(n = 3) %>%
+  kable()
 ```
 
 ```{sql}
@@ -811,12 +817,12 @@ sales_months %>%
 ```{sql}
 #| connection: db
 SELECT sales_month, sales,
-  sum(sales) over w as sales_ytd
+  sum(sales) OVER w AS sales_ytd
 FROM retail_sales
 WHERE kind_of_business = 'Women''s clothing stores'
-WINDOW w AS (partition by date_part('year',sales_month) 
-             order by sales_month)
-LIMIT 3
+WINDOW w AS (PARTITION BY date_part('year', sales_month) 
+             ORDER BY sales_month)
+LIMIT 3;
 ```
 
 ```{r}
