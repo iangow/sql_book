@@ -76,28 +76,11 @@ library(knitr)
 library(duckdb)
 ```
 
-```{r}
-#| warning: false
-#| eval: false
-db <- dbConnect(duckdb(), "legislators.duckdb")
-
-legislators <- read_csv("data/legislators.csv.gz",
-                        show_col_types = FALSE)
-copy_to(db, legislators,
-        name = "legislators",
-        overwrite = TRUE, temporary = FALSE)
-
-legislators_terms <- read_csv("data/legislators_terms.csv.gz",
-                              show_col_types = FALSE)
-copy_to(db, legislators_terms,
-        name = "legislators_terms",
-        overwrite = TRUE, temporary = FALSE)
-dbDisconnect(db, shutdown = TRUE)
-```
+If you have the tables `legislators` and `legislators_terms` in a PostgreSQL database, then you could connect to that database.
 
 ```{r}
 #| output: false
-#| include: false
+#| include: true
 #| eval: false
 db <- dbConnect(RPostgres::Postgres(), 
                 bigint = "integer",
@@ -110,8 +93,22 @@ db <- dbConnect(RPostgres::Postgres(),
 dbExecute(db, "SET search_path TO sql_book")
 ```
 
+Otherwise, the easiest way to get the *legislators* data set is to get the data from the GitHub site provided with @tanimura2021sql.
+
 ```{r}
-db <- dbConnect(duckdb(), "legislators.duckdb", read_only = TRUE)
+#| warning: false
+url <- paste0("https://raw.githubusercontent.com/cathytanimura/",
+              "sql_book/master/Chapter%204%3A%20Cohorts/")
+
+db <- dbConnect(duckdb())
+
+legislators <- read_csv(paste0(url, "legislators.csv"),
+                        show_col_types = FALSE)
+copy_to(db, legislators, name = "legislators")
+
+legislators_terms <- read_csv(paste0(url, "legislators_terms.csv"),
+                              show_col_types = FALSE)
+copy_to(db, legislators_terms, name = "legislators_terms")
 ```
 
 ```{r}
@@ -131,14 +128,17 @@ LIMIT 10;
 ```{sql}
 #| connection: db
 WITH first_terms AS (
-      SELECT id_bioguide, min(term_start) AS first_term
-      FROM legislators_terms 
-      GROUP BY 1) 
+  SELECT id_bioguide, min(term_start) AS first_term
+  FROM legislators_terms 
+  GROUP BY 1) 
+
 SELECT date_part('year', age(b.term_start, a.first_term)) AS period,
-    count(distinct a.id_bioguide) as cohort_retained
+  COUNT(DISTINCT a.id_bioguide) AS cohort_retained
 FROM first_terms a
-JOIN legislators_terms b on a.id_bioguide = b.id_bioguide 
+INNER JOIN legislators_terms b
+USING (id_bioguide)
 GROUP BY 1
+ORDER BY 1
 LIMIT 10;
 ```
 
@@ -170,16 +170,19 @@ first_terms AS (
 
 cohorts AS (
   SELECT date_part('year', age(b.term_start, a.first_term)) AS period,
-      count(distinct a.id_bioguide) as cohort_retained
+    COUNT(DISTINCT a.id_bioguide) AS cohort_retained
   FROM first_terms a
-  JOIN legislators_terms b on a.id_bioguide = b.id_bioguide 
+  JOIN legislators_terms b 
+  USING (id_bioguide)
   GROUP BY 1)
   
 SELECT period,
-  first_value(cohort_retained) OVER (ORDER BY period) AS cohort_size,
+  first_value(cohort_retained) OVER w AS cohort_size,
   cohort_retained,
-  cohort_retained * 1.0 / first_value(cohort_retained) OVER (ORDER BY period) AS pct_retained
-FROM cohorts;
+  cohort_retained * 1.0 / 
+    first_value(cohort_retained) OVER w AS prop_retained
+FROM cohorts
+WINDOW w AS (ORDER BY period);
 ```
 
 ```{r}
@@ -409,28 +412,30 @@ first_terms %>%
 
 ```{sql}
 #| connection: db
-SELECT first_century, period
-,first_value(cohort_retained) over (partition by first_century order by period) as cohort_size
-,cohort_retained
-,cohort_retained * 1.0 / 
- first_value(cohort_retained) over (partition by first_century order by period) as pct_retained
-FROM
-(
-        SELECT date_part('century',a.first_term) as first_century
-        ,coalesce(date_part('year',age(c.date,a.first_term)),0) as period
-        ,count(distinct a.id_bioguide) as cohort_retained
-        FROM
-        (
-                SELECT id_bioguide, min(term_start) as first_term
-                FROM legislators_terms 
-                GROUP BY 1
-        ) a
-        JOIN legislators_terms b on a.id_bioguide = b.id_bioguide 
-        LEFT JOIN date_dim c on c.date between b.term_start and b.term_end 
-        GROUP BY 1,2
-) aa
-ORDER BY 1,2
-;
+WITH first_terms AS (
+  SELECT id_bioguide, min(term_start) AS first_term
+  FROM legislators_terms 
+  GROUP BY 1),
+                
+first_centuries AS (
+  SELECT 
+    date_part('century', a.first_term) AS first_century,
+    coalesce(date_part('year', age(c.date, a.first_term)), 0) AS period,
+    COUNT(DISTINCT a.id_bioguide) AS cohort_retained
+  FROM first_terms AS a
+  INNER JOIN legislators_terms b 
+  USING (id_bioguide)
+  LEFT JOIN date_dim c 
+  ON c.date BETWEEN b.term_start AND b.term_end 
+  GROUP BY 1,2)
+              
+SELECT first_century, period,
+  first_value(cohort_retained) OVER w AS cohort_size,
+  cohort_retained,
+  cohort_retained * 1.0 / first_value(cohort_retained) OVER w AS prop_retained
+FROM first_centuries AS aa
+WINDOW w AS (PARTITION BY first_century ORDER BY period)
+ORDER BY 1, 2;
 ```
 
 ```{r}
