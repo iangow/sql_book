@@ -1,5 +1,13 @@
 # Time Series Analysis {#sec-time-series}
 
+This chapter is really two chapters.
+The first part of the chapter discusses some finer details of dates, date-times, and time stamps.
+This material is important, but a little technical and bewildering wihtout some concrete use cases.
+
+The second part of the chapter is where @tanimura2021sql really starts to take off.
+This is where it starts playing around with real data.
+A first-time reader could probably skip ahead to @sec-retail-data without much loss.
+
 ```{r}
 #| message: false
 library(DBI)
@@ -26,7 +34,6 @@ dbExecute(db, "SET search_path TO sql_book")
 ```{r}
 db <- dbConnect(duckdb::duckdb())
 ```
-
 
 ## Date, Datetime, and Time Manipulations
 
@@ -237,7 +244,7 @@ dbDisconnect(db, shutdown=TRUE)
 
 ### Joining Data from Different Sources
 
-## The Retail Sales Data Set
+## The Retail Sales Data Set {#sec-retail-data}
 
 As discussed in @tanimura2021sql, the data set used in this chapter comes from the website of the US Census Bureau.
 The data set is a little messy, but not too large, so we can easily grab it directly from the website and clean it up in much the same way that Cathy has done for us.
@@ -310,22 +317,6 @@ retail_sales_local <- read_csv(url, show_col_types = FALSE)
 
 Note that there are differences between the two versions of `retail_sales_local` above, as US Census economic data is continually being revised even after being released.    
 
-```{r}
-#| warning: false
-#| eval: false
-#| include: false
-# Code to put data in sql_book.duckdb.
-db <- dbConnect(duckdb::duckdb(), "sql_book.duckdb")
-url <- paste0("https://raw.githubusercontent.com/",
-              "cathytanimura/sql_book/master/",
-              "Chapter%203%3A%20Time%20Series%20Analysis/",
-              "us_retail_sales.csv")
-df <- read_csv(url, show_col_types = FALSE)
-dbWriteTable(db, "retail_sales", df,
-             overwrite = TRUE, row.names = FALSE)
-dbDisconnect(db, shutdown = TRUE)
-```
-
 Now that we have the data in R, a few questions arise.
 
 First, why would we move it to a database?
@@ -360,59 +351,22 @@ My experience is that it is often better to do the ingesting and cleaning once a
 A common pattern involves reusing the same data in many analyses and it can be helpful to divide the tasks in a way that using an SQL database encourages.
 Also the skills in ingesting and cleaning data can be different from those for analysing those data, so sometimes it makes sense for one person to do one task, push the data to a database, and then have someone else do some or all of the analysis.
 
-Now, what about the second question.
-Here there are a few options.
+Regarding the second question, there are a few options.
+But for this chapter we will use `duckdb` 
 
-First, if we have a PostgreSQL database, we could connect to that.
-
-```{r}
-#| eval: false
-db <- dbConnect(RPostgres::Postgres(), 
-                bigint = "integer",
-                check_interrupts = TRUE)
-```
-
-```{r}
-db <- dbConnect(duckdb::duckdb(), read_only = TRUE)
-retail_sales <- copy_to(db, retail_sales_local, "retail_sales")
-```
-
-Alternatively, we could use DuckDB.
 To install DuckDB, all we have to do is `install.packages("duckdb")`.
-Then we can create a connection as follows:
+
+Then we can create a connection as follows.
 
 ```{r}
-#| eval: false
 db <- dbConnect(duckdb::duckdb())
-
 ```
 
-By default, the `duckdb` will use an in-memory database, though we could easily specify a file (say, `sql_book.duckdb`) if we want persistent storage or are using an existing database.
-
-Having created a database connection, we can write the local data frame to the database using (say) `copy_to()`.
-
-```{r}
-#| include: false
-#| eval: false
-retail_sales <- copy_to(db, retail_sales_local, 
-                        name = "retail_sales", overwrite = TRUE)
-```
-
-We could specify `temporary = FALSE` if we wanted the data to be there permanently.^[Obviously this would not make sense if `db` is a connection to an in-memory database.]
-
-In some cases, you will have access to a database, but no write privileges for that database.
-In such a case, `copy_inline()` can be useful.^[I [requested](https://github.com/tidyverse/dbplyr/issues/628) this function for a common use case I have.
-Thank you to the `dbplyr` team for making it happen.]
-Note that it seems you cannot interrogate a table created using `copy_inline()` using SQL, though it will behave in most respects just like a table created using `copy_to()` when using `dbplyr`.
-It is useful to note that `copy_inline()` is probably not a good solution if your data are hundreds of thousands of rows or more because the table is effectively turned into literal SQL.
+Here we use the default of an in-memory database.
+At the end of this chapter, we discuss how we could store the data in a file (say, `legislators.duckdb`) if we want persistent storage.
 
 ```{r}
-#| eval: false
-retail_sales_alt <- copy_inline(db, retail_sales_local)
-```
-
-```{r}
-retail_sales <- tbl(db, "retail_sales")
+retail_sales <- copy_to(db, retail_sales_local, "retail_sales")
 ```
 
 ## Trending the Data
@@ -903,7 +857,6 @@ retail_sales %>%
   facet_wrap(vars(kind_of_business), nrow = 3, scales = "free")
 ```
 
-
 ### Period-over-Period Comparisons: YoY and MoM
 
 ```{sql}
@@ -963,8 +916,6 @@ books_monthly %>%
   ggplot(aes(x = sales_month, y = pct_growth)) +
   geom_line()
 ```
-
-
 
 ### Period-over-Period Comparisons: Same Month Versus Last Year
 
@@ -1099,7 +1050,61 @@ prev_three_win %>%
   kable(digits = 2)
 ```
 
+## Persistent storage
+
+Having created a database connection, we can write the local data frame to the database using (say) `copy_to()`.
+
 ```{r}
 #| include: false
+#| eval: false
+retail_sales <- copy_to(db, retail_sales_local, 
+                        name = "retail_sales", overwrite = TRUE)
+```
+
+We could specify `temporary = FALSE` if we wanted the data to be there permanently.^[Obviously this would not make sense if `db` is a connection to an in-memory database.]
+
+```{r}
+#| warning: false
+#| eval: false
+#| include: false
+# Code to put data in sql_book.duckdb.
+db <- dbConnect(duckdb::duckdb(), "sql_book.duckdb")
+url <- paste0("https://raw.githubusercontent.com/",
+              "cathytanimura/sql_book/master/",
+              "Chapter%203%3A%20Time%20Series%20Analysis/",
+              "us_retail_sales.csv")
+df <- read_csv(url, show_col_types = FALSE)
+dbWriteTable(db, "retail_sales", df,
+             overwrite = TRUE, row.names = FALSE)
+dbDisconnect(db, shutdown = TRUE)
+```
+
+### Using PostgreSQL
+
+```{r}
+#| eval: false
+#| include: false
+# First, if we have a PostgreSQL database, we could connect to that.
+db <- dbConnect(RPostgres::Postgres(), 
+                bigint = "integer",
+                check_interrupts = TRUE)
+```
+
+### Read-only databases
+
+In some cases, you will have access to a database, but no write privileges for that database.
+In such a case, `copy_inline()` can be useful.^[I [requested](https://github.com/tidyverse/dbplyr/issues/628) this function for a common use case I have.
+Thank you to the `dbplyr` team for making it happen.]
+Note that it seems you cannot interrogate a table created using `copy_inline()` using SQL, though it will behave in most respects just like a table created using `copy_to()` when using `dbplyr`.
+It is useful to note that `copy_inline()` is probably not a good solution if your data are hundreds of thousands of rows or more because the table is effectively turned into literal SQL.
+
+```{r}
+#| eval: false
+retail_sales_alt <- copy_inline(db, retail_sales_local)
+```
+
+### Closing the database connection
+
+```{r}
 dbDisconnect(db, shutdown=TRUE)
 ```
