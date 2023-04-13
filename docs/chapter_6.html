@@ -1881,6 +1881,12 @@ ORDER BY place, mag DESC</code></pre>
 <span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped small">
+<colgroup>
+<col style="width: 24%">
+<col style="width: 51%">
+<col style="width: 6%">
+<col style="width: 18%">
+</colgroup>
 <thead>
 <tr class="header">
 <th style="text-align: left;">time</th>
@@ -1891,22 +1897,22 @@ ORDER BY place, mag DESC</code></pre>
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">2010-01-01 00:10:43</td>
-<td style="text-align: left;">Southern Alaska</td>
-<td style="text-align: right;">1.6</td>
-<td style="text-align: right;">1.6</td>
+<td style="text-align: left;">2017-09-08 05:10:54</td>
+<td style="text-align: left;">6km NW of The Geysers, California</td>
+<td style="text-align: right;">1.35</td>
+<td style="text-align: right;">1.35</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">2010-01-01 00:16:49</td>
-<td style="text-align: left;">Washington</td>
-<td style="text-align: right;">2.2</td>
-<td style="text-align: right;">2.2</td>
+<td style="text-align: left;">2017-09-08 05:14:03</td>
+<td style="text-align: left;">75km NE of Punta Cana, Dominican Republic</td>
+<td style="text-align: right;">3.73</td>
+<td style="text-align: right;">3.73</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">2010-01-01 00:16:54</td>
-<td style="text-align: left;">15km E of Coso Junction, CA</td>
-<td style="text-align: right;">1.1</td>
-<td style="text-align: right;">1.1</td>
+<td style="text-align: left;">2017-09-08 05:15:09</td>
+<td style="text-align: left;">7km W of Cobb, California</td>
+<td style="text-align: right;">1.17</td>
+<td style="text-align: right;">1.17</td>
 </tr>
 </tbody>
 </table>
@@ -2021,7 +2027,7 @@ ORDER BY place, mag DESC</code></pre>
 <section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes">
 <hr>
 <ol>
-<li id="fn1"><p>The reason for this is not clear and I have filed a feature request to make the handling of <code>ntile()</code> similar to that of other window functions.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn1"><p>The reason for this is not clear and I have filed <a href="https://github.com/tidyverse/dbplyr/issues/1235">a feature request</a> to make the handling of <code>ntile()</code> similar to that of other window functions.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 <li id="fn2"><p>Without the <code>select(earthquake_year)</code>, the following plot would take 4 seconds to produce—versus 0.4 seconds needed here. This suggests that <code>ggplot</code> is triggering a <code>collect()</code> on fields that it does not need to make the plot.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 <li id="fn3"><p>Unlike the plot in the book, I leave observations with “manual” status in the plot, as they are in the SQL query.<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 <li id="fn4"><p>I simplify the SQL from the book assuming that the table already includes a <code>CROSS JOIN</code> with the SQL equivalent of <code>extremes</code> and I use shorter variable names for the extremes.<a href="#fnref4" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
