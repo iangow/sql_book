@@ -75,7 +75,7 @@ However, in compiling a version of this chapter, I could do it in about 24 secon
 Using PostgreSQL instead of DuckDB yield a time of around 6 seconds; so a substantial improvement over `dplyr`, but not quite as quick as in-memory DuckDB.]
 
 ```{r}
-#| eval: false
+#| eval: true
 db <- dbConnect(duckdb::duckdb())
 game_users <- copy_to(db, game_users, "game_users")
 game_actions <- copy_to(db, game_actions, "game_actions")
@@ -84,7 +84,8 @@ exp_assignment <- copy_to(db, exp_assignment, "exp_assignment")
 ```
 
 ```{r}
-#| eval: true 
+#| eval: false
+#| include: false
 db <- dbConnect(RPostgres::Postgres())
 game_users <- copy_to(db, game_users, "game_users")
 game_actions <- copy_to(db, game_actions, "game_actions")
