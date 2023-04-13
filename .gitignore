@@ -6,4 +6,5 @@
 *.html
 *_files
 docs
+*.duckdb
 *_cache
