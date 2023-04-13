@@ -12,18 +12,12 @@ If the data are in a database, it would be better to cut out the middleman and j
 The limitations of SQL essentially vanish when we access the data using `dbplyr`.
 R can do any statistical calculation we can think of, so we have no need of an online statistical calculator (though such calculators can help us frame our analyses and check our results).
 
-
 Cathy does say that "many databases allow developers to extend SQL functionality with *user-defined functions* (UDFs) ... but they are beyond the scope of this book."
 For PostgreSQL there are [PL/Python](https://www.postgresql.org/docs/current/plpython.html) and [PL/R](https://github.com/postgres-plr/plr), which allow creation of functions in Python and R, respectively.
 When I first started to use PostgreSQL, these extensions seemed pretty exciting and, because I was maintaining my own databases, I could use them.
 But over time, I found maintaining UDFs to be more effort than could be justified and I no longer use them.
 Instead, if I need to do analysis in Python or R, I will extract data from the database, do the analysis, then write data back to the database.
 While this likely partly reflects the kinds of analysis I do, I think that UDFs are likely to be off limits to most users because of the additional complexity of turning code into UDFs and because many users would lack sufficient database privileges to create these.
-
-## The Data Set
-
-As discussed in @tanimura2021sql, there are four tables used in this chapter.
-Here we set up references to each of these tables.
 
 ```{r}
 #| message: false
@@ -33,25 +27,55 @@ library(dbplyr)
 library(knitr)
 library(flextable)
 library(janitor)
-```
+```   
+
+## The Data Set
+
+As discussed in @tanimura2021sql, there are four tables used in this chapter.
+We can get these data from the [GitHub site](https://github.com/cathytanimura/sql_book) associated with @tanimura2021sql.
 
 ```{r}
 #| output: false
-pg <- dbConnect(RPostgres::Postgres(), 
+#| include: false
+#| eval: false
+db <- dbConnect(RPostgres::Postgres(), 
                 bigint = "integer",
                 check_interrupts = TRUE)
 ```
 
 ```{r}
 #| include: false
-dbExecute(pg, "SET search_path TO sql_book")
+#| eval: false
+dbExecute(db, "SET search_path TO sql_book")
 ```
 
 ```{r}
-game_users <- tbl(pg, "game_users")
-game_actions <- tbl(pg, "game_actions")
-game_purchases <- tbl(pg, "game_purchases")
-exp_assignment <- tbl(pg, "exp_assignment")
+#| cache: true
+#| warning: false
+url <- paste0("https://raw.githubusercontent.com/",
+              "cathytanimura/sql_book/master/",
+              "Chapter%207%3A%20Experiment%20Analysis/")
+
+game_users <- read_csv(paste0(url, "game_users.csv"),
+                        col_types = "iDc")
+
+game_actions <- read_csv(paste0(url, "game_actions.csv"),
+                         col_types = "icD")
+
+game_purchases <- read_csv(paste0(url, "game_purchases.csv"),
+                         col_types = "iDd")
+
+exp_assignment <- read_csv(paste0(url, "exp_assignment.csv"),
+                           col_types = "ciDc")
+```              
+
+```{r}
+#| eval: true 
+db <- dbConnect(duckdb::duckdb())
+game_users <- copy_to(db, game_users, "game_users")
+game_actions <- copy_to(db, game_actions, "game_actions")
+game_purchases <- copy_to(db, game_purchases, "game_purchases")
+exp_assignment <- copy_to(db, exp_assignment, "exp_assignment")
 ```
 
 ## Types of Experiments
@@ -234,7 +258,8 @@ t_test(t_test_stats_boxed)
 ### Pre-Post Analysis
 
 ```{sql}
-#| connection: pg
+#| connection: db
+#| eval: false  
 SELECT 
   CASE WHEN a.created BETWEEN '2020-01-13' AND '2020-01-26' THEN 'pre'
      when a.created BETWEEN '2020-01-27' AND '2020-02-09' THEN 'post'
@@ -254,7 +279,9 @@ GROUP BY 1
 ```{r}
 opt_in_df <-
   game_users %>%
-  filter(between(created, '2020-01-13', '2020-02-09')) %>%
+  filter(between(created, 
+                 as.Date('2020-01-13'), 
+                 as.Date('2020-02-09'))) %>%
   left_join(game_actions %>% 
               filter(action == 'email_optin'), by = "user_id",
             keep = TRUE,
