@@ -403,7 +403,7 @@ earthquakes %>%
 Why use `date_trunc('year',time)::date as earthquake_year`?
 
 ```{sql}
-#| connection = db
+#| connection: db
 SELECT EXTRACT(year FROM time) AS earthquake_year, 
   COUNT(*) AS earthquakes
 FROM earthquakes
@@ -412,7 +412,7 @@ ORDER BY 1;
 ```
 
 ```{sql}
-#| connection = db
+#| connection: db
 SELECT *
 FROM earthquakes
 LIMIT 10;
