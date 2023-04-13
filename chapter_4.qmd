@@ -97,23 +97,21 @@ Otherwise, the easiest way to get the *legislators* data set is to get the data 
 
 ```{r}
 #| warning: false
+#| cache: true
 url <- paste0("https://raw.githubusercontent.com/cathytanimura/",
               "sql_book/master/Chapter%204%3A%20Cohorts/")
-
-db <- dbConnect(duckdb())
-
-legislators <- read_csv(paste0(url, "legislators.csv"),
-                        show_col_types = FALSE)
-copy_to(db, legislators, name = "legislators")
-
-legislators_terms <- read_csv(paste0(url, "legislators_terms.csv"),
-                              show_col_types = FALSE)
-copy_to(db, legislators_terms, name = "legislators_terms")
+legislators_df <- read_csv(paste0(url, "legislators.csv"),
+                           show_col_types = FALSE)
+legislators_terms_df <- read_csv(paste0(url, "legislators_terms.csv"),
+                                 show_col_types = FALSE)
 ```
 
 ```{r}
-legislators_terms <- tbl(db, "legislators_terms")
-legislators <- tbl(db, "legislators")
+db <- dbConnect(duckdb())
+legislators <- 
+  copy_to(db, legislators_df, name = "legislators")
+legislators_terms <- 
+  copy_to(db, legislators_terms_df, name = "legislators_terms")
 ```
 
 ```{sql}
