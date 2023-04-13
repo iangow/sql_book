@@ -43,11 +43,22 @@ res <- map2(weeks$start_date,
 ```{r}
 #| warning: false
 #| eval: false
+db <- dbConnect(duckdb::duckdb(), "earthquakes.duckdb")
+dbExecute(db, "DROP TABLE IF EXISTS earthquakes")
+dbDisconnect(db, shutdown = TRUE)
+
+csv_to_db <- function(file) {
+  db <- dbConnect(duckdb::duckdb(), "earthquakes.duckdb")
+  df <- read_csv(file, show_col_types = FALSE)
+  copy_to(db, df, name = "earthquakes",
+          append = TRUE, temporary = FALSE)
+  dbDisconnect(db, shutdown = TRUE)
+}
+
 files <- list.files("data", "earthquakes.*",
                     full.names = TRUE)
-db <- dbConnect(duckdb::duckdb(), "sql_book.duckdb")
-duckdb::duckdb_read_csv(db, "earthquakes", files)
-dbDisconnect(db, shutdown = TRUE)
+
+res <- lapply(files, csv_to_db)
 ```
 
 ```{r}
@@ -399,6 +410,14 @@ FROM earthquakes
 GROUP BY 1
 ORDER BY 1;
 ```
+
+```{sql}
+#| connection = db
+SELECT *
+FROM earthquakes
+LIMIT 10;
+```
+
 ```{r}
 earthquakes %>%
   mutate(earthquake_year = as.character(year(time))) %>%
