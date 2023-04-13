@@ -69,6 +69,10 @@ exp_assignment <- read_csv(paste0(url, "exp_assignment.csv"),
                            col_types = "ciDc")
 ```              
 
+Having obtained these four data tables, we replace the `tibble` version of each with an equivalents sorted in an in-memory DuckDB database.
+Note that all the code below works if you skip the following five lines of code.
+However, in compiling a version of this chapter, I could do it in about 24 seconds without these lines (i.e., using local data frames) and in about 4 seconds with these lines (i.e., using DuckDB).
+
 ```{r}
 #| eval: true 
 db <- dbConnect(duckdb::duckdb())
@@ -78,6 +82,16 @@ game_purchases <- copy_to(db, game_purchases, "game_purchases")
 exp_assignment <- copy_to(db, exp_assignment, "exp_assignment")
 ```
 
+```{r}
+#| eval: false
+#| include: false 
+library(data.table)
+game_users <- as.data.table(game_users)
+game_actions <- as.data.table(game_actions)
+game_purchases <- as.data.table(game_purchases)
+exp_assignment <- as.data.table(exp_assignment)
+```
+
 ## Types of Experiments
 
 I would reword the first paragraph here to the following for clarity (edits in *italics*):
@@ -85,7 +99,7 @@ I would reword the first paragraph here to the following for clarity (edits in *
 > There is a wide range of experiments,
 > If you can change something that a user, customer, constituent, or other entity experiences, you can in theory test *the effect of* that change *on some outcome*.
 
-### Experiments wtih Binary Outcomes: The Chi-Squared Test
+### Experiments with Binary Outcomes: The Chi-Squared Test
 
 To better match the approach of the book, I essentially create the contingency table in the database.
 An alternative approach would have been to `collect()` after `summarize()` and then do the statistical analysis in R.
@@ -257,24 +271,35 @@ t_test(t_test_stats_boxed)
 
 ### Pre-Post Analysis
 
+The original SQL query is something like this, but we make some tweaks to get this to work more naturally using `dbplyr`.
+
 ```{sql}
 #| connection: db
 #| eval: false  
 SELECT 
   CASE WHEN a.created BETWEEN '2020-01-13' AND '2020-01-26' THEN 'pre'
-     when a.created BETWEEN '2020-01-27' AND '2020-02-09' THEN 'post'
-     end as variant,
+     WHEN a.created BETWEEN '2020-01-27' AND '2020-02-09' THEN 'post'
+     END AS variant,
   count(distinct a.user_id) AS cohorted,
   count(distinct b.user_id) AS opted_in,
   count(distinct b.user_id) * 1.0 / count(DISTINCT a.user_id) AS pct_optin,
-  count(distinct a.created) as days
+  count(distinct a.created) AS days
 FROM game_users a
-LEFT JOIN game_actions b on a.user_id = b.user_id 
+LEFT JOIN game_actions b ON a.user_id = b.user_id 
   AND b.action = 'email_optin'
 WHERE a.created BETWEEN '2020-01-13' AND '2020-02-09'
 GROUP BY 1
 ;
 ```
+
+The first tweak is to translate the `b.action = 'email_optin'` part of the join into a filter, which we embed in the `left_join()` portion of our code (mirroring how it works in the SQL).
+The second tweak is to move the `pct_optin` out of the grouped aggregation portion of the query, as in the SQL it is referring to what we will later have as `opted_in` and `cohorted`.
+(In fact, I don't bother with ``pct_optin` at all, as it's easy to calculate when we use it in making a table.)
+
+Note that `COUNT(DISTINCT col)` becomes `n_distinct(col)`.
+We use `keep = TRUE` and `suffix = c("", ".y")` to store what is `b.user_id` in the SQL as `user_id.y`.
+
+We calculate `not_opted_in` so that our table is better prepared for the `chisq.test()` we will pass it to later on.
 
 ```{r}
 opt_in_df <-
@@ -346,4 +371,18 @@ res <-
 
 res$statistic
 res$p.value
+```
+
+To avoid a warning, we disconnect from the database once we're done with it.
+
+```{r}
+#| eval: false
+dbDisconnect(db, shutdown = TRUE)
+```
+
+```{r}
+#| include: false
+if (exists("db")) {
+  dbDisconnect(db, shutdown = TRUE)
+}
 ```
