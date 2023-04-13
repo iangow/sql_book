@@ -879,10 +879,12 @@ retail_sales_yr <-
 retail_sales_yr %>%
   filter(kind_of_business == "Women's clothing stores") %>%
   inner_join(retail_sales_yr, 
-             join_by(year, kind_of_business, sales_month >= sales_month),
+             join_by(year, kind_of_business,
+                     sales_month >= sales_month),
              suffix = c("", "_y")) %>%
   group_by(sales_month, sales) %>%
-  summarize(sales_ytd = sum(sales_y, narm = TRUE), .groups = "drop") %>%
+  summarize(sales_ytd = sum(sales_y, na.rm = TRUE),
+            .groups = "drop") %>%
   filter(month(sales_month) %in% c(1:3, 12)) %>%
   collect(n = 6) %>%
   kable()
@@ -903,11 +905,198 @@ retail_sales %>%
 
 ### Period-over-Period Comparisons: YoY and MoM
 
+```{sql}
+#| connection: db
+SELECT kind_of_business, sales_month, sales,
+  lag(sales_month) OVER w AS prev_month,
+  lag(sales) OVER w AS prev_month_sales
+FROM retail_sales
+WHERE kind_of_business = 'Book stores'
+WINDOW w AS (PARTITION BY kind_of_business ORDER BY sales_month)
+```
+
+```{r}
+books_w_lag <-
+  retail_sales %>%
+  filter(kind_of_business == 'Book stores') %>%
+  group_by(kind_of_business) %>%
+  window_order(sales_month) %>%
+  mutate(prev_month = lag(sales_month),
+         prev_month_sales = lag(sales)) %>%
+  select(kind_of_business,
+         sales_month, sales,
+         prev_month, prev_month_sales)
+
+books_w_lag %>%
+  collect(n = 3) %>%
+  kable()
+```
+
+```{r}
+books_monthly <-
+  books_w_lag %>%
+  mutate(pct_growth = (sales / prev_month_sales - 1) * 100) %>%
+  select(-prev_month, -prev_month_sales)
+```
+
+```{r}
+books_yearly <- 
+  retail_sales %>%
+  filter(kind_of_business == 'Book stores') %>%
+  mutate(sales_year = year(sales_month)) %>%
+  group_by(sales_year) %>%
+  summarize(yearly_sales = sum(sales, na.rm = TRUE),
+            .groups = "drop") %>%
+  window_order(sales_year) %>%
+  mutate(prev_year_sales = lag(yearly_sales),
+         pct_growth = (yearly_sales/prev_year_sales - 1) * 100)
+
+books_yearly %>%
+  collect(n = 3) %>%
+  kable(digits = 2)
+```
+
+```{r}
+books_monthly %>%
+  filter(!is.na(pct_growth)) %>%
+  ggplot(aes(x = sales_month, y = pct_growth)) +
+  geom_line()
+```
+
+
+
 ### Period-over-Period Comparisons: Same Month Versus Last Year
+
+```{r}
+books_lagged_year_month <-
+  retail_sales %>%
+  filter(kind_of_business == 'Book stores') %>%
+  mutate(month = month(sales_month)) %>%
+  group_by(month) %>%
+  window_order(sales_month) %>%
+  mutate(prev_year_month = lag(sales_month),
+         prev_year_sales = lag(sales)) %>%
+  ungroup() %>%
+  select(sales_month, sales, prev_year_month, prev_year_sales)
+
+books_lagged_year_month %>%
+  filter(month(sales_month) <= 2, 
+         year(sales_month) <= 1994) %>%
+  arrange(sales_month) %>%
+  collect(n = 6) %>%
+  kable()
+```
+
+```{r}
+books_lagged_year_month %>%
+  mutate(dollar_diff = sales - prev_year_sales,
+         pct_diff = dollar_diff/prev_year_sales * 100) %>%
+  select(-prev_year_month, -prev_year_sales) %>%
+  filter(month(sales_month) == 1) %>%
+  collect(n = 3) %>%
+  kable(digits = 2)
+```
+```{r}
+books_lagged_year_month %>%
+  filter(!is.na(prev_year_sales)) %>%
+  mutate(dollar_diff = sales - prev_year_sales,
+         pct_diff = dollar_diff/prev_year_sales * 100) %>%
+  select(sales_month, sales, dollar_diff, pct_diff) %>%
+  pivot_longer(-sales_month) %>%
+  collect() %>%
+  mutate(name = fct_inorder(name)) %>%
+  ggplot(aes(x = sales_month, y = value)) +
+  geom_line() +
+  facet_wrap(. ~ name, nrow = 3, scales = "free")
+```
+
+With PostgreSQL, we would use `to_char(sales_month,'Month')`; with DuckDB, the equivalent is `monthname(sales_month)`.
+To use an approach that works with either backend, we draw on arguments to the `lubridate` function `month()`.
+
+```{r}
+sales_92_94 <-
+  retail_sales %>%
+  filter(kind_of_business == 'Book stores',
+         year(sales_month) %in% 1992:1994) %>%
+  select(sales_month, sales) %>%
+  mutate(month_number = month(sales_month),
+         month_name = month(sales_month, 
+                            label = TRUE, abbr = FALSE),
+         year = as.integer(year(sales_month)))
+
+sales_92_94 %>%
+  pivot_wider(id_cols = c(month_number, month_name),
+              names_from = year,
+              names_prefix = "sales_",
+              values_from = sales) %>%
+  kable()
+```
+
+```{r}
+sales_92_94 %>%
+  collect() %>%
+  mutate(year = factor(year),
+         month_name = month(month_number, label = TRUE)) %>%
+  ggplot(aes(x = month_name, y = sales, 
+             group = year, colour = year)) +
+  geom_line()
+```
 
 ### Comparing to Multiple Prior Periods
 
+```{r}
+prev_three <-
+  retail_sales %>%
+  filter(kind_of_business == 'Book stores') %>%
+  mutate(month = month(sales_month)) %>%
+  group_by(month) %>%
+  window_order(sales_month) %>%
+  mutate(prev_sales_1 = lag(sales, 1),
+         prev_sales_2 = lag(sales, 2),
+         prev_sales_3 = lag(sales, 3)) %>%
+  ungroup()
 
+prev_three %>%
+  filter(month == 1) %>%
+  select(sales_month, sales, starts_with("prev_sales")) %>%
+  collect(n = 5) %>%
+  kable()
+```
+
+```{r}
+prev_three %>%
+  mutate(avg_prev_three = (prev_sales_1 + 
+                         prev_sales_2 + 
+                         prev_sales_3)/3,
+         pct_of_prev_3 = 100 * sales/avg_prev_three) %>%
+  select(sales_month, sales, pct_of_prev_3) %>%
+  filter(month(sales_month) == 1,
+         year(sales_month) %in% c(1995:1997, 2017:2019)) %>%
+  collect(n = 10) %>%
+  kable(digits = 2)
+```
+
+```{r}
+prev_three_win <-
+  retail_sales %>%
+  filter(kind_of_business == 'Book stores') %>%
+  mutate(month = month(sales_month)) %>%
+  group_by(month) %>%
+  window_order(sales_month) %>%
+  window_frame(-3, -1) %>%
+  mutate(avg_prev_three = mean(sales, na.rm = TRUE)) %>%
+  ungroup() %>%
+  mutate(pct_of_prev_3 = 100 * sales/avg_prev_three)
+```
+
+```{r}
+prev_three_win %>%
+  select(sales_month, sales, pct_of_prev_3) %>%
+  filter(month(sales_month) == 1,
+         year(sales_month) %in% c(1995:1997, 2017:2019)) %>%
+  collect(n = 10) %>%
+  kable(digits = 2)
+```
 
 ```{r}
 #| include: false
