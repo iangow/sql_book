@@ -82,49 +82,6 @@ pg <- dbConnect(RPostgres::Postgres(),
 dbExecute(pg, "SET search_path TO sql_book")
 ```
 
-```{r}
-dates_sql <-
-   "SELECT * 
-    FROM generate_series('2000-01-01'::timestamp,
-                         '2030-12-31', '1 day')"
-
-dates <- 
-  tbl(pg, sql(dates_sql)) %>%
-  rename(date = generate_series)
-
-dates_processed <-
-  dates %>%
-  mutate(date_key = as.integer(to_char(date, 'yyyymmdd')),
-         day_of_month = as.integer(date_part('day',date)),
-         day_of_year = as.integer(date_part('doy', date)),
-         day_of_week = as.integer(date_part('dow', date)),
-         day_name  = trim(to_char(date, 'Day')),
-         day_short_name = trim(to_char(date, 'Dy')),
-         week_number = as.integer(date_part('week', date)),
-         week_of_month = as.integer(to_char(date, 'W')),
-         week = as.Date(date_trunc('week', date)),
-         month_number = as.integer(date_part('month',date)),
-         month_name = trim(to_char(date, 'Month')),
-         month_short_name = trim(to_char(date, 'Mon')),
-         first_day_of_month = as.Date(date_trunc('month', date)),
-         last_day_of_month = as.Date(date_trunc('month', date) +
-                                       months(1) - days(1)),
-         quarter_number = as.integer(date_part('quarter', date)),
-         quarter_name = trim('Q' %||% as.integer(date_part('quarter', date))),
-         first_day_of_quarter = as.Date(date_trunc('quarter', date)),
-         last_day_of_quarter = as.Date(date_trunc('quarter', date) + 
-                                         months(3) - days(1)),
-         year = as.integer(year(date)),
-         decade = as.integer(date_part('decade', date)) * 10,
-         century = as.integer(date_part('century', date)))
-
-dates_processed %>%
-  collect(n = 10)
-
-dates_processed %>%
-  show_query()
-```
-
 ## Preparing: Shaping Data
 
 ### For Which Output: BI, Visualization, Statistics, ML
