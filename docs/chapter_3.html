@@ -1853,35 +1853,48 @@ FROM (
 <span id="cb84-8"><a href="#cb84-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">date_start =</span> date <span class="sc">-</span> <span class="fu">months</span>(<span class="dv">11</span>)) <span class="sc">%&gt;%</span></span>
 <span id="cb84-9"><a href="#cb84-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">inner_join</span>(jan_jul, </span>
 <span id="cb84-10"><a href="#cb84-10" aria-hidden="true" tabindex="-1"></a>             <span class="fu">join_by</span>(<span class="fu">between</span>(y<span class="sc">$</span>sales_month, x<span class="sc">$</span>date_start, x<span class="sc">$</span>date))) <span class="sc">%&gt;%</span></span>
-<span id="cb84-11"><a href="#cb84-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(date, sales_month, sales)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># Source:   SQL [?? x 3]
-# Database: DuckDB 0.7.1 [root@Darwin 22.4.0:R 4.2.2/:memory:]
-   date       sales_month sales
-   &lt;date&gt;     &lt;date&gt;      &lt;dbl&gt;
- 1 1993-01-01 1992-07-01   2373
- 2 1993-02-01 1992-07-01   2373
- 3 1993-03-01 1992-07-01   2373
- 4 1993-04-01 1992-07-01   2373
- 5 1993-05-01 1992-07-01   2373
- 6 1993-06-01 1992-07-01   2373
- 7 1993-01-01 1993-01-01   2123
- 8 1993-02-01 1993-01-01   2123
- 9 1993-03-01 1993-01-01   2123
-10 1993-04-01 1993-01-01   2123
-# ℹ more rows</code></pre>
+<span id="cb84-11"><a href="#cb84-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(date, sales_month, sales) <span class="sc">%&gt;%</span></span>
+<span id="cb84-12"><a href="#cb84-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>(<span class="at">n =</span> <span class="dv">3</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb84-13"><a href="#cb84-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped">
+<thead>
+<tr class="header">
+<th style="text-align: left;">date</th>
+<th style="text-align: left;">sales_month</th>
+<th style="text-align: right;">sales</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">1993-01-01</td>
+<td style="text-align: left;">1992-07-01</td>
+<td style="text-align: right;">2373</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">1993-02-01</td>
+<td style="text-align: left;">1992-07-01</td>
+<td style="text-align: right;">2373</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">1993-03-01</td>
+<td style="text-align: left;">1992-07-01</td>
+<td style="text-align: right;">2373</td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb86"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb86-1"><a href="#cb86-1" aria-hidden="true" tabindex="-1"></a>date_dim <span class="sc">%&gt;%</span></span>
-<span id="cb86-2"><a href="#cb86-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">date_start =</span> date <span class="sc">-</span> <span class="fu">months</span>(<span class="dv">11</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb86-3"><a href="#cb86-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">inner_join</span>(jan_jul, </span>
-<span id="cb86-4"><a href="#cb86-4" aria-hidden="true" tabindex="-1"></a>             <span class="fu">join_by</span>(<span class="fu">between</span>(y<span class="sc">$</span>sales_month, x<span class="sc">$</span>date_start, x<span class="sc">$</span>date))) <span class="sc">%&gt;%</span></span>
-<span id="cb86-5"><a href="#cb86-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(date) <span class="sc">%&gt;%</span></span>
-<span id="cb86-6"><a href="#cb86-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">moving_avg =</span> <span class="fu">mean</span>(sales, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb86-7"><a href="#cb86-7" aria-hidden="true" tabindex="-1"></a>            <span class="at">records =</span> <span class="fu">n</span>()) <span class="sc">%&gt;%</span></span>
-<span id="cb86-8"><a href="#cb86-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>(<span class="at">n =</span> <span class="dv">3</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb86-9"><a href="#cb86-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb85"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb85-1"><a href="#cb85-1" aria-hidden="true" tabindex="-1"></a>date_dim <span class="sc">%&gt;%</span></span>
+<span id="cb85-2"><a href="#cb85-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">date_start =</span> date <span class="sc">-</span> <span class="fu">months</span>(<span class="dv">11</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb85-3"><a href="#cb85-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">inner_join</span>(jan_jul, </span>
+<span id="cb85-4"><a href="#cb85-4" aria-hidden="true" tabindex="-1"></a>             <span class="fu">join_by</span>(<span class="fu">between</span>(y<span class="sc">$</span>sales_month, x<span class="sc">$</span>date_start, x<span class="sc">$</span>date))) <span class="sc">%&gt;%</span></span>
+<span id="cb85-5"><a href="#cb85-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(date) <span class="sc">%&gt;%</span></span>
+<span id="cb85-6"><a href="#cb85-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">moving_avg =</span> <span class="fu">mean</span>(sales, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb85-7"><a href="#cb85-7" aria-hidden="true" tabindex="-1"></a>            <span class="at">records =</span> <span class="fu">n</span>()) <span class="sc">%&gt;%</span></span>
+<span id="cb85-8"><a href="#cb85-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>(<span class="at">n =</span> <span class="dv">3</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb85-9"><a href="#cb85-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped">
 <thead>
@@ -1912,20 +1925,20 @@ FROM (
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb87"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb87-1"><a href="#cb87-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span> sales_months <span class="kw">AS</span> (</span>
-<span id="cb87-2"><a href="#cb87-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">SELECT</span> <span class="kw">distinct</span> sales_month</span>
-<span id="cb87-3"><a href="#cb87-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> retail_sales</span>
-<span id="cb87-4"><a href="#cb87-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">WHERE</span> sales_month <span class="kw">between</span> <span class="st">'1993-01-01'</span> <span class="kw">and</span> <span class="st">'2020-12-01'</span>)</span>
-<span id="cb87-5"><a href="#cb87-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb87-6"><a href="#cb87-6" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> a.sales_month, <span class="fu">avg</span>(b.sales) <span class="kw">as</span> moving_avg</span>
-<span id="cb87-7"><a href="#cb87-7" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> sales_months a</span>
-<span id="cb87-8"><a href="#cb87-8" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> retail_sales b </span>
-<span id="cb87-9"><a href="#cb87-9" aria-hidden="true" tabindex="-1"></a><span class="kw">on</span> b.sales_month <span class="kw">between</span> </span>
-<span id="cb87-10"><a href="#cb87-10" aria-hidden="true" tabindex="-1"></a>    a.sales_month <span class="op">-</span> <span class="dt">interval</span> <span class="st">'11 months'</span> <span class="kw">and</span> a.sales_month</span>
-<span id="cb87-11"><a href="#cb87-11" aria-hidden="true" tabindex="-1"></a>  <span class="kw">and</span> b.kind_of_business <span class="op">=</span> <span class="st">'Women</span><span class="ch">''</span><span class="st">s clothing stores'</span> </span>
-<span id="cb87-12"><a href="#cb87-12" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> <span class="dv">1</span></span>
-<span id="cb87-13"><a href="#cb87-13" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> <span class="dv">1</span></span>
-<span id="cb87-14"><a href="#cb87-14" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">3</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb86"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb86-1"><a href="#cb86-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span> sales_months <span class="kw">AS</span> (</span>
+<span id="cb86-2"><a href="#cb86-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">SELECT</span> <span class="kw">distinct</span> sales_month</span>
+<span id="cb86-3"><a href="#cb86-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> retail_sales</span>
+<span id="cb86-4"><a href="#cb86-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">WHERE</span> sales_month <span class="kw">between</span> <span class="st">'1993-01-01'</span> <span class="kw">and</span> <span class="st">'2020-12-01'</span>)</span>
+<span id="cb86-5"><a href="#cb86-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb86-6"><a href="#cb86-6" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> a.sales_month, <span class="fu">avg</span>(b.sales) <span class="kw">as</span> moving_avg</span>
+<span id="cb86-7"><a href="#cb86-7" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> sales_months a</span>
+<span id="cb86-8"><a href="#cb86-8" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> retail_sales b </span>
+<span id="cb86-9"><a href="#cb86-9" aria-hidden="true" tabindex="-1"></a><span class="kw">on</span> b.sales_month <span class="kw">between</span> </span>
+<span id="cb86-10"><a href="#cb86-10" aria-hidden="true" tabindex="-1"></a>    a.sales_month <span class="op">-</span> <span class="dt">interval</span> <span class="st">'11 months'</span> <span class="kw">and</span> a.sales_month</span>
+<span id="cb86-11"><a href="#cb86-11" aria-hidden="true" tabindex="-1"></a>  <span class="kw">and</span> b.kind_of_business <span class="op">=</span> <span class="st">'Women</span><span class="ch">''</span><span class="st">s clothing stores'</span> </span>
+<span id="cb86-12"><a href="#cb86-12" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> <span class="dv">1</span></span>
+<span id="cb86-13"><a href="#cb86-13" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> <span class="dv">1</span></span>
+<span id="cb86-14"><a href="#cb86-14" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">3</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="knitsql-table">
 <table class="table table-sm table-striped">
 <caption>3 records</caption>
@@ -1953,24 +1966,24 @@ FROM (
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb88"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb88-1"><a href="#cb88-1" aria-hidden="true" tabindex="-1"></a>sales_months <span class="ot">&lt;-</span></span>
-<span id="cb88-2"><a href="#cb88-2" aria-hidden="true" tabindex="-1"></a>  retail_sales <span class="sc">%&gt;%</span></span>
-<span id="cb88-3"><a href="#cb88-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">between</span>(sales_month, </span>
-<span id="cb88-4"><a href="#cb88-4" aria-hidden="true" tabindex="-1"></a>                 <span class="fu">as.Date</span>(<span class="st">'1993-01-01'</span>), </span>
-<span id="cb88-5"><a href="#cb88-5" aria-hidden="true" tabindex="-1"></a>                 <span class="fu">as.Date</span>(<span class="st">'2020-12-01'</span>))) <span class="sc">%&gt;%</span></span>
-<span id="cb88-6"><a href="#cb88-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(sales_month)</span>
-<span id="cb88-7"><a href="#cb88-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb88-8"><a href="#cb88-8" aria-hidden="true" tabindex="-1"></a>sales_months <span class="sc">%&gt;%</span></span>
-<span id="cb88-9"><a href="#cb88-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">month_start =</span> sales_month <span class="sc">-</span> <span class="fu">months</span>(<span class="dv">11</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb88-10"><a href="#cb88-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">inner_join</span>(retail_sales, </span>
-<span id="cb88-11"><a href="#cb88-11" aria-hidden="true" tabindex="-1"></a>             <span class="fu">join_by</span>(<span class="fu">between</span>(y<span class="sc">$</span>sales_month, x<span class="sc">$</span>month_start, x<span class="sc">$</span>sales_month)),</span>
-<span id="cb88-12"><a href="#cb88-12" aria-hidden="true" tabindex="-1"></a>                     <span class="at">suffix =</span> <span class="fu">c</span>(<span class="st">""</span>, <span class="st">"_y"</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb88-13"><a href="#cb88-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(kind_of_business <span class="sc">==</span> <span class="st">"Women's clothing stores"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb88-14"><a href="#cb88-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(sales_month) <span class="sc">%&gt;%</span></span>
-<span id="cb88-15"><a href="#cb88-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">moving_avg =</span> <span class="fu">mean</span>(sales, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb88-16"><a href="#cb88-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(sales_month) <span class="sc">%&gt;%</span></span>
-<span id="cb88-17"><a href="#cb88-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>(<span class="at">n =</span> <span class="dv">3</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb88-18"><a href="#cb88-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb87"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb87-1"><a href="#cb87-1" aria-hidden="true" tabindex="-1"></a>sales_months <span class="ot">&lt;-</span></span>
+<span id="cb87-2"><a href="#cb87-2" aria-hidden="true" tabindex="-1"></a>  retail_sales <span class="sc">%&gt;%</span></span>
+<span id="cb87-3"><a href="#cb87-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">between</span>(sales_month, </span>
+<span id="cb87-4"><a href="#cb87-4" aria-hidden="true" tabindex="-1"></a>                 <span class="fu">as.Date</span>(<span class="st">'1993-01-01'</span>), </span>
+<span id="cb87-5"><a href="#cb87-5" aria-hidden="true" tabindex="-1"></a>                 <span class="fu">as.Date</span>(<span class="st">'2020-12-01'</span>))) <span class="sc">%&gt;%</span></span>
+<span id="cb87-6"><a href="#cb87-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(sales_month)</span>
+<span id="cb87-7"><a href="#cb87-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb87-8"><a href="#cb87-8" aria-hidden="true" tabindex="-1"></a>sales_months <span class="sc">%&gt;%</span></span>
+<span id="cb87-9"><a href="#cb87-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">month_start =</span> sales_month <span class="sc">-</span> <span class="fu">months</span>(<span class="dv">11</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb87-10"><a href="#cb87-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">inner_join</span>(retail_sales, </span>
+<span id="cb87-11"><a href="#cb87-11" aria-hidden="true" tabindex="-1"></a>             <span class="fu">join_by</span>(<span class="fu">between</span>(y<span class="sc">$</span>sales_month, x<span class="sc">$</span>month_start, x<span class="sc">$</span>sales_month)),</span>
+<span id="cb87-12"><a href="#cb87-12" aria-hidden="true" tabindex="-1"></a>                     <span class="at">suffix =</span> <span class="fu">c</span>(<span class="st">""</span>, <span class="st">"_y"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb87-13"><a href="#cb87-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(kind_of_business <span class="sc">==</span> <span class="st">"Women's clothing stores"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb87-14"><a href="#cb87-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(sales_month) <span class="sc">%&gt;%</span></span>
+<span id="cb87-15"><a href="#cb87-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">moving_avg =</span> <span class="fu">mean</span>(sales, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb87-16"><a href="#cb87-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(sales_month) <span class="sc">%&gt;%</span></span>
+<span id="cb87-17"><a href="#cb87-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>(<span class="at">n =</span> <span class="dv">3</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb87-18"><a href="#cb87-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped">
 <thead>
@@ -2000,13 +2013,13 @@ FROM (
 <section id="calculating-cumulative-values" class="level3" data-number="3.4.2">
 <h3 data-number="3.4.2" class="anchored" data-anchor-id="calculating-cumulative-values"><span class="header-section-number">3.4.2</span> Calculating Cumulative Values</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb89"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb89-1"><a href="#cb89-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> sales_month, sales,</span>
-<span id="cb89-2"><a href="#cb89-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sum</span>(sales) <span class="kw">OVER</span> w <span class="kw">AS</span> sales_ytd</span>
-<span id="cb89-3"><a href="#cb89-3" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> retail_sales</span>
-<span id="cb89-4"><a href="#cb89-4" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> kind_of_business <span class="op">=</span> <span class="st">'Women</span><span class="ch">''</span><span class="st">s clothing stores'</span></span>
-<span id="cb89-5"><a href="#cb89-5" aria-hidden="true" tabindex="-1"></a>WINDOW w <span class="kw">AS</span> (<span class="kw">PARTITION</span> <span class="kw">BY</span> date_part(<span class="st">'year'</span>, sales_month) </span>
-<span id="cb89-6"><a href="#cb89-6" aria-hidden="true" tabindex="-1"></a>             <span class="kw">ORDER</span> <span class="kw">BY</span> sales_month)</span>
-<span id="cb89-7"><a href="#cb89-7" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">3</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb88"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb88-1"><a href="#cb88-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> sales_month, sales,</span>
+<span id="cb88-2"><a href="#cb88-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sum</span>(sales) <span class="kw">OVER</span> w <span class="kw">AS</span> sales_ytd</span>
+<span id="cb88-3"><a href="#cb88-3" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> retail_sales</span>
+<span id="cb88-4"><a href="#cb88-4" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> kind_of_business <span class="op">=</span> <span class="st">'Women</span><span class="ch">''</span><span class="st">s clothing stores'</span></span>
+<span id="cb88-5"><a href="#cb88-5" aria-hidden="true" tabindex="-1"></a>WINDOW w <span class="kw">AS</span> (<span class="kw">PARTITION</span> <span class="kw">BY</span> date_part(<span class="st">'year'</span>, sales_month) </span>
+<span id="cb88-6"><a href="#cb88-6" aria-hidden="true" tabindex="-1"></a>             <span class="kw">ORDER</span> <span class="kw">BY</span> sales_month)</span>
+<span id="cb88-7"><a href="#cb88-7" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">3</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="knitsql-table">
 <table class="table table-sm table-striped">
 <caption>3 records</caption>
@@ -2038,20 +2051,20 @@ FROM (
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb90"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb90-1"><a href="#cb90-1" aria-hidden="true" tabindex="-1"></a>ytd_sales <span class="ot">&lt;-</span></span>
-<span id="cb90-2"><a href="#cb90-2" aria-hidden="true" tabindex="-1"></a>  retail_sales <span class="sc">%&gt;%</span></span>
-<span id="cb90-3"><a href="#cb90-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(kind_of_business <span class="sc">==</span> <span class="st">"Women's clothing stores"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb90-4"><a href="#cb90-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">year =</span> <span class="fu">year</span>(sales_month)) <span class="sc">%&gt;%</span></span>
-<span id="cb90-5"><a href="#cb90-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(year) <span class="sc">%&gt;%</span></span>
-<span id="cb90-6"><a href="#cb90-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">window_order</span>(sales_month) <span class="sc">%&gt;%</span></span>
-<span id="cb90-7"><a href="#cb90-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sales_ytd =</span> <span class="fu">cumsum</span>(sales)) <span class="sc">%&gt;%</span></span>
-<span id="cb90-8"><a href="#cb90-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb90-9"><a href="#cb90-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(sales_month, sales, sales_ytd) </span>
-<span id="cb90-10"><a href="#cb90-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb90-11"><a href="#cb90-11" aria-hidden="true" tabindex="-1"></a>ytd_sales <span class="sc">%&gt;%</span></span>
-<span id="cb90-12"><a href="#cb90-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">month</span>(sales_month) <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>, <span class="dv">12</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb90-13"><a href="#cb90-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>(<span class="at">n =</span> <span class="dv">6</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb90-14"><a href="#cb90-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb89"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb89-1"><a href="#cb89-1" aria-hidden="true" tabindex="-1"></a>ytd_sales <span class="ot">&lt;-</span></span>
+<span id="cb89-2"><a href="#cb89-2" aria-hidden="true" tabindex="-1"></a>  retail_sales <span class="sc">%&gt;%</span></span>
+<span id="cb89-3"><a href="#cb89-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(kind_of_business <span class="sc">==</span> <span class="st">"Women's clothing stores"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb89-4"><a href="#cb89-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">year =</span> <span class="fu">year</span>(sales_month)) <span class="sc">%&gt;%</span></span>
+<span id="cb89-5"><a href="#cb89-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(year) <span class="sc">%&gt;%</span></span>
+<span id="cb89-6"><a href="#cb89-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">window_order</span>(sales_month) <span class="sc">%&gt;%</span></span>
+<span id="cb89-7"><a href="#cb89-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sales_ytd =</span> <span class="fu">cumsum</span>(sales)) <span class="sc">%&gt;%</span></span>
+<span id="cb89-8"><a href="#cb89-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb89-9"><a href="#cb89-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(sales_month, sales, sales_ytd) </span>
+<span id="cb89-10"><a href="#cb89-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb89-11"><a href="#cb89-11" aria-hidden="true" tabindex="-1"></a>ytd_sales <span class="sc">%&gt;%</span></span>
+<span id="cb89-12"><a href="#cb89-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">month</span>(sales_month) <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>, <span class="dv">12</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb89-13"><a href="#cb89-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>(<span class="at">n =</span> <span class="dv">6</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb89-14"><a href="#cb89-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped">
 <thead>
@@ -2097,31 +2110,31 @@ FROM (
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb91"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb91-1"><a href="#cb91-1" aria-hidden="true" tabindex="-1"></a>factor <span class="ot">&lt;-</span> <span class="dv">40</span><span class="sc">/</span><span class="fl">4.5</span></span>
-<span id="cb91-2"><a href="#cb91-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb91-3"><a href="#cb91-3" aria-hidden="true" tabindex="-1"></a>ytd_sales <span class="sc">%&gt;%</span></span>
-<span id="cb91-4"><a href="#cb91-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">year</span>(sales_month) <span class="sc">%in%</span> <span class="dv">2016</span><span class="sc">:</span><span class="dv">2020</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb91-5"><a href="#cb91-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> sales_month, <span class="at">y =</span> sales_ytd)) <span class="sc">+</span></span>
-<span id="cb91-6"><a href="#cb91-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>) <span class="sc">+</span></span>
-<span id="cb91-7"><a href="#cb91-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">y =</span> sales <span class="sc">*</span> factor, <span class="at">colour =</span> <span class="fu">I</span>(<span class="st">"blue"</span>))) <span class="sc">+</span></span>
-<span id="cb91-8"><a href="#cb91-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(</span>
-<span id="cb91-9"><a href="#cb91-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Sales YTD"</span>, </span>
-<span id="cb91-10"><a href="#cb91-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">sec.axis =</span> <span class="fu">sec_axis</span>(<span class="sc">~</span> . <span class="sc">/</span> factor, <span class="at">name =</span> <span class="st">"Monthly Sales"</span>)</span>
-<span id="cb91-11"><a href="#cb91-11" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb90"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb90-1"><a href="#cb90-1" aria-hidden="true" tabindex="-1"></a>factor <span class="ot">&lt;-</span> <span class="dv">40</span><span class="sc">/</span><span class="fl">4.5</span></span>
+<span id="cb90-2"><a href="#cb90-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb90-3"><a href="#cb90-3" aria-hidden="true" tabindex="-1"></a>ytd_sales <span class="sc">%&gt;%</span></span>
+<span id="cb90-4"><a href="#cb90-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">year</span>(sales_month) <span class="sc">%in%</span> <span class="dv">2016</span><span class="sc">:</span><span class="dv">2020</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb90-5"><a href="#cb90-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> sales_month, <span class="at">y =</span> sales_ytd)) <span class="sc">+</span></span>
+<span id="cb90-6"><a href="#cb90-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>) <span class="sc">+</span></span>
+<span id="cb90-7"><a href="#cb90-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">y =</span> sales <span class="sc">*</span> factor, <span class="at">colour =</span> <span class="fu">I</span>(<span class="st">"blue"</span>))) <span class="sc">+</span></span>
+<span id="cb90-8"><a href="#cb90-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(</span>
+<span id="cb90-9"><a href="#cb90-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Sales YTD"</span>, </span>
+<span id="cb90-10"><a href="#cb90-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">sec.axis =</span> <span class="fu">sec_axis</span>(<span class="sc">~</span> . <span class="sc">/</span> factor, <span class="at">name =</span> <span class="st">"Monthly Sales"</span>)</span>
+<span id="cb90-11"><a href="#cb90-11" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="chapter_3_files/figure-html/unnamed-chunk-63-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb92"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb92-1"><a href="#cb92-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> a.sales_month, a.sales</span>
-<span id="cb92-2"><a href="#cb92-2" aria-hidden="true" tabindex="-1"></a>,<span class="fu">sum</span>(b.sales) <span class="kw">as</span> sales_ytd</span>
-<span id="cb92-3"><a href="#cb92-3" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> retail_sales a</span>
-<span id="cb92-4"><a href="#cb92-4" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> retail_sales b <span class="kw">on</span> </span>
-<span id="cb92-5"><a href="#cb92-5" aria-hidden="true" tabindex="-1"></a> date_part(<span class="st">'year'</span>,a.sales_month) <span class="op">=</span> date_part(<span class="st">'year'</span>,b.sales_month)</span>
-<span id="cb92-6"><a href="#cb92-6" aria-hidden="true" tabindex="-1"></a> <span class="kw">and</span> b.sales_month <span class="op">&lt;=</span> a.sales_month</span>
-<span id="cb92-7"><a href="#cb92-7" aria-hidden="true" tabindex="-1"></a> <span class="kw">and</span> b.kind_of_business <span class="op">=</span> <span class="st">'Women</span><span class="ch">''</span><span class="st">s clothing stores'</span></span>
-<span id="cb92-8"><a href="#cb92-8" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> a.kind_of_business <span class="op">=</span> <span class="st">'Women</span><span class="ch">''</span><span class="st">s clothing stores'</span></span>
-<span id="cb92-9"><a href="#cb92-9" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> <span class="dv">1</span>,<span class="dv">2</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb91"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb91-1"><a href="#cb91-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> a.sales_month, a.sales,</span>
+<span id="cb91-2"><a href="#cb91-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sum</span>(b.sales) <span class="kw">AS</span> sales_ytd</span>
+<span id="cb91-3"><a href="#cb91-3" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> retail_sales a</span>
+<span id="cb91-4"><a href="#cb91-4" aria-hidden="true" tabindex="-1"></a><span class="kw">INNER</span> <span class="kw">JOIN</span> retail_sales b <span class="kw">ON</span> </span>
+<span id="cb91-5"><a href="#cb91-5" aria-hidden="true" tabindex="-1"></a> date_part(<span class="st">'year'</span>,a.sales_month) <span class="op">=</span> date_part(<span class="st">'year'</span>,b.sales_month)</span>
+<span id="cb91-6"><a href="#cb91-6" aria-hidden="true" tabindex="-1"></a> <span class="kw">AND</span> b.sales_month <span class="op">&lt;=</span> a.sales_month</span>
+<span id="cb91-7"><a href="#cb91-7" aria-hidden="true" tabindex="-1"></a> <span class="kw">AND</span> b.kind_of_business <span class="op">=</span> <span class="st">'Women</span><span class="ch">''</span><span class="st">s clothing stores'</span></span>
+<span id="cb91-8"><a href="#cb91-8" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> a.kind_of_business <span class="op">=</span> <span class="st">'Women</span><span class="ch">''</span><span class="st">s clothing stores'</span></span>
+<span id="cb91-9"><a href="#cb91-9" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> <span class="dv">1</span>,<span class="dv">2</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="knitsql-table">
 <table class="table table-sm table-striped">
 <caption>Displaying records 1 - 10</caption>
@@ -2188,25 +2201,22 @@ FROM (
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb93"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb93-1"><a href="#cb93-1" aria-hidden="true" tabindex="-1"></a>retail_sales_yr <span class="ot">&lt;-</span></span>
-<span id="cb93-2"><a href="#cb93-2" aria-hidden="true" tabindex="-1"></a>  retail_sales <span class="sc">%&gt;%</span></span>
-<span id="cb93-3"><a href="#cb93-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">year =</span> <span class="fu">year</span>(sales_month))</span>
-<span id="cb93-4"><a href="#cb93-4" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb93-5"><a href="#cb93-5" aria-hidden="true" tabindex="-1"></a>retail_sales_yr <span class="sc">%&gt;%</span></span>
-<span id="cb93-6"><a href="#cb93-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(kind_of_business <span class="sc">==</span> <span class="st">"Women's clothing stores"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb93-7"><a href="#cb93-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">inner_join</span>(retail_sales_yr, </span>
-<span id="cb93-8"><a href="#cb93-8" aria-hidden="true" tabindex="-1"></a>             <span class="fu">join_by</span>(year, kind_of_business, sales_month <span class="sc">&gt;=</span> sales_month),</span>
-<span id="cb93-9"><a href="#cb93-9" aria-hidden="true" tabindex="-1"></a>             <span class="at">suffix =</span> <span class="fu">c</span>(<span class="st">""</span>, <span class="st">"_y"</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb93-10"><a href="#cb93-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(sales_month, sales) <span class="sc">%&gt;%</span></span>
-<span id="cb93-11"><a href="#cb93-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">sales_ytd =</span> <span class="fu">sum</span>(sales_y), <span class="at">.groups =</span> <span class="st">"drop"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb93-12"><a href="#cb93-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">month</span>(sales_month) <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>, <span class="dv">12</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb93-13"><a href="#cb93-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>(<span class="at">n =</span> <span class="dv">6</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb93-14"><a href="#cb93-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: Missing values are always removed in SQL aggregation functions.
-Use `na.rm = TRUE` to silence this warning
-This warning is displayed once every 8 hours.</code></pre>
-</div>
+<div class="sourceCode cell-code" id="cb92"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb92-1"><a href="#cb92-1" aria-hidden="true" tabindex="-1"></a>retail_sales_yr <span class="ot">&lt;-</span></span>
+<span id="cb92-2"><a href="#cb92-2" aria-hidden="true" tabindex="-1"></a>  retail_sales <span class="sc">%&gt;%</span></span>
+<span id="cb92-3"><a href="#cb92-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">year =</span> <span class="fu">year</span>(sales_month))</span>
+<span id="cb92-4"><a href="#cb92-4" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb92-5"><a href="#cb92-5" aria-hidden="true" tabindex="-1"></a>retail_sales_yr <span class="sc">%&gt;%</span></span>
+<span id="cb92-6"><a href="#cb92-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(kind_of_business <span class="sc">==</span> <span class="st">"Women's clothing stores"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb92-7"><a href="#cb92-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">inner_join</span>(retail_sales_yr, </span>
+<span id="cb92-8"><a href="#cb92-8" aria-hidden="true" tabindex="-1"></a>             <span class="fu">join_by</span>(year, kind_of_business,</span>
+<span id="cb92-9"><a href="#cb92-9" aria-hidden="true" tabindex="-1"></a>                     sales_month <span class="sc">&gt;=</span> sales_month),</span>
+<span id="cb92-10"><a href="#cb92-10" aria-hidden="true" tabindex="-1"></a>             <span class="at">suffix =</span> <span class="fu">c</span>(<span class="st">""</span>, <span class="st">"_y"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb92-11"><a href="#cb92-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(sales_month, sales) <span class="sc">%&gt;%</span></span>
+<span id="cb92-12"><a href="#cb92-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">sales_ytd =</span> <span class="fu">sum</span>(sales_y, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb92-13"><a href="#cb92-13" aria-hidden="true" tabindex="-1"></a>            <span class="at">.groups =</span> <span class="st">"drop"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb92-14"><a href="#cb92-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">month</span>(sales_month) <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>, <span class="dv">12</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb92-15"><a href="#cb92-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>(<span class="at">n =</span> <span class="dv">6</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb92-16"><a href="#cb92-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped">
 <thead>
@@ -2255,14 +2265,677 @@ This warning is displayed once every 8 hours.</code></pre>
 </section>
 <section id="analyzing-with-seasonality" class="level2" data-number="3.5">
 <h2 data-number="3.5" class="anchored" data-anchor-id="analyzing-with-seasonality"><span class="header-section-number">3.5</span> Analyzing with Seasonality</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb93"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb93-1"><a href="#cb93-1" aria-hidden="true" tabindex="-1"></a>retail_sales <span class="sc">%&gt;%</span></span>
+<span id="cb93-2"><a href="#cb93-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(kind_of_business <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"Jewelry stores"</span>,</span>
+<span id="cb93-3"><a href="#cb93-3" aria-hidden="true" tabindex="-1"></a>                                 <span class="st">"Book stores"</span>,</span>
+<span id="cb93-4"><a href="#cb93-4" aria-hidden="true" tabindex="-1"></a>                                 <span class="st">"Grocery stores"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb93-5"><a href="#cb93-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> sales_month, <span class="at">y =</span> sales)) <span class="sc">+</span></span>
+<span id="cb93-6"><a href="#cb93-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
+<span id="cb93-7"><a href="#cb93-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="fu">vars</span>(kind_of_business), <span class="at">nrow =</span> <span class="dv">3</span>, <span class="at">scales =</span> <span class="st">"free"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="chapter_3_files/figure-html/unnamed-chunk-66-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
 <section id="period-over-period-comparisons-yoy-and-mom" class="level3" data-number="3.5.1">
 <h3 data-number="3.5.1" class="anchored" data-anchor-id="period-over-period-comparisons-yoy-and-mom"><span class="header-section-number">3.5.1</span> Period-over-Period Comparisons: YoY and MoM</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb94"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb94-1"><a href="#cb94-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> kind_of_business, sales_month, sales,</span>
+<span id="cb94-2"><a href="#cb94-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lag</span>(sales_month) <span class="kw">OVER</span> w <span class="kw">AS</span> prev_month,</span>
+<span id="cb94-3"><a href="#cb94-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lag</span>(sales) <span class="kw">OVER</span> w <span class="kw">AS</span> prev_month_sales</span>
+<span id="cb94-4"><a href="#cb94-4" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> retail_sales</span>
+<span id="cb94-5"><a href="#cb94-5" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> kind_of_business <span class="op">=</span> <span class="st">'Book stores'</span></span>
+<span id="cb94-6"><a href="#cb94-6" aria-hidden="true" tabindex="-1"></a>WINDOW w <span class="kw">AS</span> (<span class="kw">PARTITION</span> <span class="kw">BY</span> kind_of_business <span class="kw">ORDER</span> <span class="kw">BY</span> sales_month)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="knitsql-table">
+<table class="table table-sm table-striped">
+<caption>Displaying records 1 - 10</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">kind_of_business</th>
+<th style="text-align: left;">sales_month</th>
+<th style="text-align: right;">sales</th>
+<th style="text-align: left;">prev_month</th>
+<th style="text-align: right;">prev_month_sales</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Book stores</td>
+<td style="text-align: left;">1992-01-01</td>
+<td style="text-align: right;">790</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Book stores</td>
+<td style="text-align: left;">1992-02-01</td>
+<td style="text-align: right;">539</td>
+<td style="text-align: left;">1992-01-01</td>
+<td style="text-align: right;">790</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Book stores</td>
+<td style="text-align: left;">1992-03-01</td>
+<td style="text-align: right;">535</td>
+<td style="text-align: left;">1992-02-01</td>
+<td style="text-align: right;">539</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Book stores</td>
+<td style="text-align: left;">1992-04-01</td>
+<td style="text-align: right;">523</td>
+<td style="text-align: left;">1992-03-01</td>
+<td style="text-align: right;">535</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Book stores</td>
+<td style="text-align: left;">1992-05-01</td>
+<td style="text-align: right;">552</td>
+<td style="text-align: left;">1992-04-01</td>
+<td style="text-align: right;">523</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Book stores</td>
+<td style="text-align: left;">1992-06-01</td>
+<td style="text-align: right;">589</td>
+<td style="text-align: left;">1992-05-01</td>
+<td style="text-align: right;">552</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Book stores</td>
+<td style="text-align: left;">1992-07-01</td>
+<td style="text-align: right;">592</td>
+<td style="text-align: left;">1992-06-01</td>
+<td style="text-align: right;">589</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Book stores</td>
+<td style="text-align: left;">1992-08-01</td>
+<td style="text-align: right;">894</td>
+<td style="text-align: left;">1992-07-01</td>
+<td style="text-align: right;">592</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Book stores</td>
+<td style="text-align: left;">1992-09-01</td>
+<td style="text-align: right;">861</td>
+<td style="text-align: left;">1992-08-01</td>
+<td style="text-align: right;">894</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Book stores</td>
+<td style="text-align: left;">1992-10-01</td>
+<td style="text-align: right;">645</td>
+<td style="text-align: left;">1992-09-01</td>
+<td style="text-align: right;">861</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb95"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb95-1"><a href="#cb95-1" aria-hidden="true" tabindex="-1"></a>books_w_lag <span class="ot">&lt;-</span></span>
+<span id="cb95-2"><a href="#cb95-2" aria-hidden="true" tabindex="-1"></a>  retail_sales <span class="sc">%&gt;%</span></span>
+<span id="cb95-3"><a href="#cb95-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(kind_of_business <span class="sc">==</span> <span class="st">'Book stores'</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb95-4"><a href="#cb95-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(kind_of_business) <span class="sc">%&gt;%</span></span>
+<span id="cb95-5"><a href="#cb95-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">window_order</span>(sales_month) <span class="sc">%&gt;%</span></span>
+<span id="cb95-6"><a href="#cb95-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">prev_month =</span> <span class="fu">lag</span>(sales_month),</span>
+<span id="cb95-7"><a href="#cb95-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">prev_month_sales =</span> <span class="fu">lag</span>(sales)) <span class="sc">%&gt;%</span></span>
+<span id="cb95-8"><a href="#cb95-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(kind_of_business,</span>
+<span id="cb95-9"><a href="#cb95-9" aria-hidden="true" tabindex="-1"></a>         sales_month, sales,</span>
+<span id="cb95-10"><a href="#cb95-10" aria-hidden="true" tabindex="-1"></a>         prev_month, prev_month_sales)</span>
+<span id="cb95-11"><a href="#cb95-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb95-12"><a href="#cb95-12" aria-hidden="true" tabindex="-1"></a>books_w_lag <span class="sc">%&gt;%</span></span>
+<span id="cb95-13"><a href="#cb95-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>(<span class="at">n =</span> <span class="dv">3</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb95-14"><a href="#cb95-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped">
+<thead>
+<tr class="header">
+<th style="text-align: left;">kind_of_business</th>
+<th style="text-align: left;">sales_month</th>
+<th style="text-align: right;">sales</th>
+<th style="text-align: left;">prev_month</th>
+<th style="text-align: right;">prev_month_sales</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Book stores</td>
+<td style="text-align: left;">1992-01-01</td>
+<td style="text-align: right;">790</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Book stores</td>
+<td style="text-align: left;">1992-02-01</td>
+<td style="text-align: right;">539</td>
+<td style="text-align: left;">1992-01-01</td>
+<td style="text-align: right;">790</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Book stores</td>
+<td style="text-align: left;">1992-03-01</td>
+<td style="text-align: right;">535</td>
+<td style="text-align: left;">1992-02-01</td>
+<td style="text-align: right;">539</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb96"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb96-1"><a href="#cb96-1" aria-hidden="true" tabindex="-1"></a>books_monthly <span class="ot">&lt;-</span></span>
+<span id="cb96-2"><a href="#cb96-2" aria-hidden="true" tabindex="-1"></a>  books_w_lag <span class="sc">%&gt;%</span></span>
+<span id="cb96-3"><a href="#cb96-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct_growth =</span> (sales <span class="sc">/</span> prev_month_sales <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">*</span> <span class="dv">100</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb96-4"><a href="#cb96-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>prev_month, <span class="sc">-</span>prev_month_sales)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb97"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb97-1"><a href="#cb97-1" aria-hidden="true" tabindex="-1"></a>books_yearly <span class="ot">&lt;-</span> </span>
+<span id="cb97-2"><a href="#cb97-2" aria-hidden="true" tabindex="-1"></a>  retail_sales <span class="sc">%&gt;%</span></span>
+<span id="cb97-3"><a href="#cb97-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(kind_of_business <span class="sc">==</span> <span class="st">'Book stores'</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb97-4"><a href="#cb97-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sales_year =</span> <span class="fu">year</span>(sales_month)) <span class="sc">%&gt;%</span></span>
+<span id="cb97-5"><a href="#cb97-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(sales_year) <span class="sc">%&gt;%</span></span>
+<span id="cb97-6"><a href="#cb97-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">yearly_sales =</span> <span class="fu">sum</span>(sales, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb97-7"><a href="#cb97-7" aria-hidden="true" tabindex="-1"></a>            <span class="at">.groups =</span> <span class="st">"drop"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb97-8"><a href="#cb97-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">window_order</span>(sales_year) <span class="sc">%&gt;%</span></span>
+<span id="cb97-9"><a href="#cb97-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">prev_year_sales =</span> <span class="fu">lag</span>(yearly_sales),</span>
+<span id="cb97-10"><a href="#cb97-10" aria-hidden="true" tabindex="-1"></a>         <span class="at">pct_growth =</span> (yearly_sales<span class="sc">/</span>prev_year_sales <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">*</span> <span class="dv">100</span>)</span>
+<span id="cb97-11"><a href="#cb97-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb97-12"><a href="#cb97-12" aria-hidden="true" tabindex="-1"></a>books_yearly <span class="sc">%&gt;%</span></span>
+<span id="cb97-13"><a href="#cb97-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>(<span class="at">n =</span> <span class="dv">3</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb97-14"><a href="#cb97-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped">
+<thead>
+<tr class="header">
+<th style="text-align: right;">sales_year</th>
+<th style="text-align: right;">yearly_sales</th>
+<th style="text-align: right;">prev_year_sales</th>
+<th style="text-align: right;">pct_growth</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">1992</td>
+<td style="text-align: right;">8327</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1993</td>
+<td style="text-align: right;">9108</td>
+<td style="text-align: right;">8327</td>
+<td style="text-align: right;">9.38</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">1994</td>
+<td style="text-align: right;">10107</td>
+<td style="text-align: right;">9108</td>
+<td style="text-align: right;">10.97</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb98"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb98-1"><a href="#cb98-1" aria-hidden="true" tabindex="-1"></a>books_monthly <span class="sc">%&gt;%</span></span>
+<span id="cb98-2"><a href="#cb98-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(pct_growth)) <span class="sc">%&gt;%</span></span>
+<span id="cb98-3"><a href="#cb98-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> sales_month, <span class="at">y =</span> pct_growth)) <span class="sc">+</span></span>
+<span id="cb98-4"><a href="#cb98-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="chapter_3_files/figure-html/unnamed-chunk-71-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
 </section>
 <section id="period-over-period-comparisons-same-month-versus-last-year" class="level3" data-number="3.5.2">
 <h3 data-number="3.5.2" class="anchored" data-anchor-id="period-over-period-comparisons-same-month-versus-last-year"><span class="header-section-number">3.5.2</span> Period-over-Period Comparisons: Same Month Versus Last Year</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb99"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb99-1"><a href="#cb99-1" aria-hidden="true" tabindex="-1"></a>books_lagged_year_month <span class="ot">&lt;-</span></span>
+<span id="cb99-2"><a href="#cb99-2" aria-hidden="true" tabindex="-1"></a>  retail_sales <span class="sc">%&gt;%</span></span>
+<span id="cb99-3"><a href="#cb99-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(kind_of_business <span class="sc">==</span> <span class="st">'Book stores'</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb99-4"><a href="#cb99-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">month =</span> <span class="fu">month</span>(sales_month)) <span class="sc">%&gt;%</span></span>
+<span id="cb99-5"><a href="#cb99-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(month) <span class="sc">%&gt;%</span></span>
+<span id="cb99-6"><a href="#cb99-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">window_order</span>(sales_month) <span class="sc">%&gt;%</span></span>
+<span id="cb99-7"><a href="#cb99-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">prev_year_month =</span> <span class="fu">lag</span>(sales_month),</span>
+<span id="cb99-8"><a href="#cb99-8" aria-hidden="true" tabindex="-1"></a>         <span class="at">prev_year_sales =</span> <span class="fu">lag</span>(sales)) <span class="sc">%&gt;%</span></span>
+<span id="cb99-9"><a href="#cb99-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb99-10"><a href="#cb99-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(sales_month, sales, prev_year_month, prev_year_sales)</span>
+<span id="cb99-11"><a href="#cb99-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb99-12"><a href="#cb99-12" aria-hidden="true" tabindex="-1"></a>books_lagged_year_month <span class="sc">%&gt;%</span></span>
+<span id="cb99-13"><a href="#cb99-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">month</span>(sales_month) <span class="sc">&lt;=</span> <span class="dv">2</span>, </span>
+<span id="cb99-14"><a href="#cb99-14" aria-hidden="true" tabindex="-1"></a>         <span class="fu">year</span>(sales_month) <span class="sc">&lt;=</span> <span class="dv">1994</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb99-15"><a href="#cb99-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(sales_month) <span class="sc">%&gt;%</span></span>
+<span id="cb99-16"><a href="#cb99-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>(<span class="at">n =</span> <span class="dv">6</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb99-17"><a href="#cb99-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped">
+<thead>
+<tr class="header">
+<th style="text-align: left;">sales_month</th>
+<th style="text-align: right;">sales</th>
+<th style="text-align: left;">prev_year_month</th>
+<th style="text-align: right;">prev_year_sales</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">1992-01-01</td>
+<td style="text-align: right;">790</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">1992-02-01</td>
+<td style="text-align: right;">539</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">1993-01-01</td>
+<td style="text-align: right;">998</td>
+<td style="text-align: left;">1992-01-01</td>
+<td style="text-align: right;">790</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">1993-02-01</td>
+<td style="text-align: right;">568</td>
+<td style="text-align: left;">1992-02-01</td>
+<td style="text-align: right;">539</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">1994-01-01</td>
+<td style="text-align: right;">1053</td>
+<td style="text-align: left;">1993-01-01</td>
+<td style="text-align: right;">998</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">1994-02-01</td>
+<td style="text-align: right;">635</td>
+<td style="text-align: left;">1993-02-01</td>
+<td style="text-align: right;">568</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb100"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb100-1"><a href="#cb100-1" aria-hidden="true" tabindex="-1"></a>books_lagged_year_month <span class="sc">%&gt;%</span></span>
+<span id="cb100-2"><a href="#cb100-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">dollar_diff =</span> sales <span class="sc">-</span> prev_year_sales,</span>
+<span id="cb100-3"><a href="#cb100-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">pct_diff =</span> dollar_diff<span class="sc">/</span>prev_year_sales <span class="sc">*</span> <span class="dv">100</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb100-4"><a href="#cb100-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>prev_year_month, <span class="sc">-</span>prev_year_sales) <span class="sc">%&gt;%</span></span>
+<span id="cb100-5"><a href="#cb100-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">month</span>(sales_month) <span class="sc">==</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb100-6"><a href="#cb100-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>(<span class="at">n =</span> <span class="dv">3</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb100-7"><a href="#cb100-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped">
+<thead>
+<tr class="header">
+<th style="text-align: left;">sales_month</th>
+<th style="text-align: right;">sales</th>
+<th style="text-align: right;">dollar_diff</th>
+<th style="text-align: right;">pct_diff</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">1992-01-01</td>
+<td style="text-align: right;">790</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">1993-01-01</td>
+<td style="text-align: right;">998</td>
+<td style="text-align: right;">208</td>
+<td style="text-align: right;">26.33</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">1994-01-01</td>
+<td style="text-align: right;">1053</td>
+<td style="text-align: right;">55</td>
+<td style="text-align: right;">5.51</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb101"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb101-1"><a href="#cb101-1" aria-hidden="true" tabindex="-1"></a>books_lagged_year_month <span class="sc">%&gt;%</span></span>
+<span id="cb101-2"><a href="#cb101-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(prev_year_sales)) <span class="sc">%&gt;%</span></span>
+<span id="cb101-3"><a href="#cb101-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">dollar_diff =</span> sales <span class="sc">-</span> prev_year_sales,</span>
+<span id="cb101-4"><a href="#cb101-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">pct_diff =</span> dollar_diff<span class="sc">/</span>prev_year_sales <span class="sc">*</span> <span class="dv">100</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb101-5"><a href="#cb101-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(sales_month, sales, dollar_diff, pct_diff) <span class="sc">%&gt;%</span></span>
+<span id="cb101-6"><a href="#cb101-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="sc">-</span>sales_month) <span class="sc">%&gt;%</span></span>
+<span id="cb101-7"><a href="#cb101-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb101-8"><a href="#cb101-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">name =</span> <span class="fu">fct_inorder</span>(name)) <span class="sc">%&gt;%</span></span>
+<span id="cb101-9"><a href="#cb101-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> sales_month, <span class="at">y =</span> value)) <span class="sc">+</span></span>
+<span id="cb101-10"><a href="#cb101-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
+<span id="cb101-11"><a href="#cb101-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(. <span class="sc">~</span> name, <span class="at">nrow =</span> <span class="dv">3</span>, <span class="at">scales =</span> <span class="st">"free"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="chapter_3_files/figure-html/unnamed-chunk-74-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>With PostgreSQL, we would use <code>to_char(sales_month,'Month')</code>; with DuckDB, the equivalent is <code>monthname(sales_month)</code>. To use an approach that works with either backend, we draw on arguments to the <code>lubridate</code> function <code>month()</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb102"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb102-1"><a href="#cb102-1" aria-hidden="true" tabindex="-1"></a>sales_92_94 <span class="ot">&lt;-</span></span>
+<span id="cb102-2"><a href="#cb102-2" aria-hidden="true" tabindex="-1"></a>  retail_sales <span class="sc">%&gt;%</span></span>
+<span id="cb102-3"><a href="#cb102-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(kind_of_business <span class="sc">==</span> <span class="st">'Book stores'</span>,</span>
+<span id="cb102-4"><a href="#cb102-4" aria-hidden="true" tabindex="-1"></a>         <span class="fu">year</span>(sales_month) <span class="sc">%in%</span> <span class="dv">1992</span><span class="sc">:</span><span class="dv">1994</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb102-5"><a href="#cb102-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(sales_month, sales) <span class="sc">%&gt;%</span></span>
+<span id="cb102-6"><a href="#cb102-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">month_number =</span> <span class="fu">month</span>(sales_month),</span>
+<span id="cb102-7"><a href="#cb102-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">month_name =</span> <span class="fu">month</span>(sales_month, </span>
+<span id="cb102-8"><a href="#cb102-8" aria-hidden="true" tabindex="-1"></a>                            <span class="at">label =</span> <span class="cn">TRUE</span>, <span class="at">abbr =</span> <span class="cn">FALSE</span>),</span>
+<span id="cb102-9"><a href="#cb102-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">year =</span> <span class="fu">as.integer</span>(<span class="fu">year</span>(sales_month)))</span>
+<span id="cb102-10"><a href="#cb102-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb102-11"><a href="#cb102-11" aria-hidden="true" tabindex="-1"></a>sales_92_94 <span class="sc">%&gt;%</span></span>
+<span id="cb102-12"><a href="#cb102-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">id_cols =</span> <span class="fu">c</span>(month_number, month_name),</span>
+<span id="cb102-13"><a href="#cb102-13" aria-hidden="true" tabindex="-1"></a>              <span class="at">names_from =</span> year,</span>
+<span id="cb102-14"><a href="#cb102-14" aria-hidden="true" tabindex="-1"></a>              <span class="at">names_prefix =</span> <span class="st">"sales_"</span>,</span>
+<span id="cb102-15"><a href="#cb102-15" aria-hidden="true" tabindex="-1"></a>              <span class="at">values_from =</span> sales) <span class="sc">%&gt;%</span></span>
+<span id="cb102-16"><a href="#cb102-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped">
+<thead>
+<tr class="header">
+<th style="text-align: right;">month_number</th>
+<th style="text-align: left;">month_name</th>
+<th style="text-align: right;">sales_1992</th>
+<th style="text-align: right;">sales_1993</th>
+<th style="text-align: right;">sales_1994</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">January</td>
+<td style="text-align: right;">790</td>
+<td style="text-align: right;">998</td>
+<td style="text-align: right;">1053</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2</td>
+<td style="text-align: left;">February</td>
+<td style="text-align: right;">539</td>
+<td style="text-align: right;">568</td>
+<td style="text-align: right;">635</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">3</td>
+<td style="text-align: left;">March</td>
+<td style="text-align: right;">535</td>
+<td style="text-align: right;">602</td>
+<td style="text-align: right;">634</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">4</td>
+<td style="text-align: left;">April</td>
+<td style="text-align: right;">523</td>
+<td style="text-align: right;">583</td>
+<td style="text-align: right;">610</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">5</td>
+<td style="text-align: left;">May</td>
+<td style="text-align: right;">552</td>
+<td style="text-align: right;">612</td>
+<td style="text-align: right;">684</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">6</td>
+<td style="text-align: left;">June</td>
+<td style="text-align: right;">589</td>
+<td style="text-align: right;">618</td>
+<td style="text-align: right;">724</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">7</td>
+<td style="text-align: left;">July</td>
+<td style="text-align: right;">592</td>
+<td style="text-align: right;">607</td>
+<td style="text-align: right;">678</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">8</td>
+<td style="text-align: left;">August</td>
+<td style="text-align: right;">894</td>
+<td style="text-align: right;">983</td>
+<td style="text-align: right;">1154</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">9</td>
+<td style="text-align: left;">September</td>
+<td style="text-align: right;">861</td>
+<td style="text-align: right;">903</td>
+<td style="text-align: right;">1022</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">10</td>
+<td style="text-align: left;">October</td>
+<td style="text-align: right;">645</td>
+<td style="text-align: right;">669</td>
+<td style="text-align: right;">732</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">11</td>
+<td style="text-align: left;">November</td>
+<td style="text-align: right;">642</td>
+<td style="text-align: right;">692</td>
+<td style="text-align: right;">772</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">12</td>
+<td style="text-align: left;">December</td>
+<td style="text-align: right;">1165</td>
+<td style="text-align: right;">1273</td>
+<td style="text-align: right;">1409</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb103"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb103-1"><a href="#cb103-1" aria-hidden="true" tabindex="-1"></a>sales_92_94 <span class="sc">%&gt;%</span></span>
+<span id="cb103-2"><a href="#cb103-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb103-3"><a href="#cb103-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">year =</span> <span class="fu">factor</span>(year),</span>
+<span id="cb103-4"><a href="#cb103-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">month_name =</span> <span class="fu">month</span>(month_number, <span class="at">label =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb103-5"><a href="#cb103-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> month_name, <span class="at">y =</span> sales, </span>
+<span id="cb103-6"><a href="#cb103-6" aria-hidden="true" tabindex="-1"></a>             <span class="at">group =</span> year, <span class="at">colour =</span> year)) <span class="sc">+</span></span>
+<span id="cb103-7"><a href="#cb103-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="chapter_3_files/figure-html/unnamed-chunk-76-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
 </section>
 <section id="comparing-to-multiple-prior-periods" class="level3" data-number="3.5.3">
 <h3 data-number="3.5.3" class="anchored" data-anchor-id="comparing-to-multiple-prior-periods"><span class="header-section-number">3.5.3</span> Comparing to Multiple Prior Periods</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb104"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb104-1"><a href="#cb104-1" aria-hidden="true" tabindex="-1"></a>prev_three <span class="ot">&lt;-</span></span>
+<span id="cb104-2"><a href="#cb104-2" aria-hidden="true" tabindex="-1"></a>  retail_sales <span class="sc">%&gt;%</span></span>
+<span id="cb104-3"><a href="#cb104-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(kind_of_business <span class="sc">==</span> <span class="st">'Book stores'</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb104-4"><a href="#cb104-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">month =</span> <span class="fu">month</span>(sales_month)) <span class="sc">%&gt;%</span></span>
+<span id="cb104-5"><a href="#cb104-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(month) <span class="sc">%&gt;%</span></span>
+<span id="cb104-6"><a href="#cb104-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">window_order</span>(sales_month) <span class="sc">%&gt;%</span></span>
+<span id="cb104-7"><a href="#cb104-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">prev_sales_1 =</span> <span class="fu">lag</span>(sales, <span class="dv">1</span>),</span>
+<span id="cb104-8"><a href="#cb104-8" aria-hidden="true" tabindex="-1"></a>         <span class="at">prev_sales_2 =</span> <span class="fu">lag</span>(sales, <span class="dv">2</span>),</span>
+<span id="cb104-9"><a href="#cb104-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">prev_sales_3 =</span> <span class="fu">lag</span>(sales, <span class="dv">3</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb104-10"><a href="#cb104-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
+<span id="cb104-11"><a href="#cb104-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb104-12"><a href="#cb104-12" aria-hidden="true" tabindex="-1"></a>prev_three <span class="sc">%&gt;%</span></span>
+<span id="cb104-13"><a href="#cb104-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(month <span class="sc">==</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb104-14"><a href="#cb104-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(sales_month, sales, <span class="fu">starts_with</span>(<span class="st">"prev_sales"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb104-15"><a href="#cb104-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>(<span class="at">n =</span> <span class="dv">5</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb104-16"><a href="#cb104-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped">
+<thead>
+<tr class="header">
+<th style="text-align: left;">sales_month</th>
+<th style="text-align: right;">sales</th>
+<th style="text-align: right;">prev_sales_1</th>
+<th style="text-align: right;">prev_sales_2</th>
+<th style="text-align: right;">prev_sales_3</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">1992-01-01</td>
+<td style="text-align: right;">790</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">1993-01-01</td>
+<td style="text-align: right;">998</td>
+<td style="text-align: right;">790</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">1994-01-01</td>
+<td style="text-align: right;">1053</td>
+<td style="text-align: right;">998</td>
+<td style="text-align: right;">790</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">1995-01-01</td>
+<td style="text-align: right;">1308</td>
+<td style="text-align: right;">1053</td>
+<td style="text-align: right;">998</td>
+<td style="text-align: right;">790</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">1996-01-01</td>
+<td style="text-align: right;">1373</td>
+<td style="text-align: right;">1308</td>
+<td style="text-align: right;">1053</td>
+<td style="text-align: right;">998</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb105"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb105-1"><a href="#cb105-1" aria-hidden="true" tabindex="-1"></a>prev_three <span class="sc">%&gt;%</span></span>
+<span id="cb105-2"><a href="#cb105-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">avg_prev_three =</span> (prev_sales_1 <span class="sc">+</span> </span>
+<span id="cb105-3"><a href="#cb105-3" aria-hidden="true" tabindex="-1"></a>                         prev_sales_2 <span class="sc">+</span> </span>
+<span id="cb105-4"><a href="#cb105-4" aria-hidden="true" tabindex="-1"></a>                         prev_sales_3)<span class="sc">/</span><span class="dv">3</span>,</span>
+<span id="cb105-5"><a href="#cb105-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">pct_of_prev_3 =</span> <span class="dv">100</span> <span class="sc">*</span> sales<span class="sc">/</span>avg_prev_three) <span class="sc">%&gt;%</span></span>
+<span id="cb105-6"><a href="#cb105-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(sales_month, sales, pct_of_prev_3) <span class="sc">%&gt;%</span></span>
+<span id="cb105-7"><a href="#cb105-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">month</span>(sales_month) <span class="sc">==</span> <span class="dv">1</span>,</span>
+<span id="cb105-8"><a href="#cb105-8" aria-hidden="true" tabindex="-1"></a>         <span class="fu">year</span>(sales_month) <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">1995</span><span class="sc">:</span><span class="dv">1997</span>, <span class="dv">2017</span><span class="sc">:</span><span class="dv">2019</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb105-9"><a href="#cb105-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>(<span class="at">n =</span> <span class="dv">10</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb105-10"><a href="#cb105-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped">
+<thead>
+<tr class="header">
+<th style="text-align: left;">sales_month</th>
+<th style="text-align: right;">sales</th>
+<th style="text-align: right;">pct_of_prev_3</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">1995-01-01</td>
+<td style="text-align: right;">1308</td>
+<td style="text-align: right;">138.12</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">1996-01-01</td>
+<td style="text-align: right;">1373</td>
+<td style="text-align: right;">122.63</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">1997-01-01</td>
+<td style="text-align: right;">1558</td>
+<td style="text-align: right;">125.17</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2017-01-01</td>
+<td style="text-align: right;">1386</td>
+<td style="text-align: right;">94.63</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2018-01-01</td>
+<td style="text-align: right;">1217</td>
+<td style="text-align: right;">84.95</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2019-01-01</td>
+<td style="text-align: right;">1004</td>
+<td style="text-align: right;">74.74</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb106"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb106-1"><a href="#cb106-1" aria-hidden="true" tabindex="-1"></a>prev_three_win <span class="ot">&lt;-</span></span>
+<span id="cb106-2"><a href="#cb106-2" aria-hidden="true" tabindex="-1"></a>  retail_sales <span class="sc">%&gt;%</span></span>
+<span id="cb106-3"><a href="#cb106-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(kind_of_business <span class="sc">==</span> <span class="st">'Book stores'</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb106-4"><a href="#cb106-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">month =</span> <span class="fu">month</span>(sales_month)) <span class="sc">%&gt;%</span></span>
+<span id="cb106-5"><a href="#cb106-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(month) <span class="sc">%&gt;%</span></span>
+<span id="cb106-6"><a href="#cb106-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">window_order</span>(sales_month) <span class="sc">%&gt;%</span></span>
+<span id="cb106-7"><a href="#cb106-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">window_frame</span>(<span class="sc">-</span><span class="dv">3</span>, <span class="sc">-</span><span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb106-8"><a href="#cb106-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">avg_prev_three =</span> <span class="fu">mean</span>(sales, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb106-9"><a href="#cb106-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb106-10"><a href="#cb106-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct_of_prev_3 =</span> <span class="dv">100</span> <span class="sc">*</span> sales<span class="sc">/</span>avg_prev_three)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb107"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb107-1"><a href="#cb107-1" aria-hidden="true" tabindex="-1"></a>prev_three_win <span class="sc">%&gt;%</span></span>
+<span id="cb107-2"><a href="#cb107-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(sales_month, sales, pct_of_prev_3) <span class="sc">%&gt;%</span></span>
+<span id="cb107-3"><a href="#cb107-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">month</span>(sales_month) <span class="sc">==</span> <span class="dv">1</span>,</span>
+<span id="cb107-4"><a href="#cb107-4" aria-hidden="true" tabindex="-1"></a>         <span class="fu">year</span>(sales_month) <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">1995</span><span class="sc">:</span><span class="dv">1997</span>, <span class="dv">2017</span><span class="sc">:</span><span class="dv">2019</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb107-5"><a href="#cb107-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>(<span class="at">n =</span> <span class="dv">10</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb107-6"><a href="#cb107-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped">
+<thead>
+<tr class="header">
+<th style="text-align: left;">sales_month</th>
+<th style="text-align: right;">sales</th>
+<th style="text-align: right;">pct_of_prev_3</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">1995-01-01</td>
+<td style="text-align: right;">1308</td>
+<td style="text-align: right;">138.12</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">1996-01-01</td>
+<td style="text-align: right;">1373</td>
+<td style="text-align: right;">122.63</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">1997-01-01</td>
+<td style="text-align: right;">1558</td>
+<td style="text-align: right;">125.17</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2017-01-01</td>
+<td style="text-align: right;">1386</td>
+<td style="text-align: right;">94.63</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2018-01-01</td>
+<td style="text-align: right;">1217</td>
+<td style="text-align: right;">84.95</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2019-01-01</td>
+<td style="text-align: right;">1004</td>
+<td style="text-align: right;">74.74</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 
 
 <div id="refs" class="references csl-bib-body hanging-indent" role="doc-bibliography" style="display: none">
