@@ -334,7 +334,7 @@ Related to the previous question will be: which database to we want to move it t
 
 Taking these questions in turn, the first one is a good question.
 With `retail_sales` as a local data frame, we can run almost all the analyses below with only the slightest modifications.
-The modifications needed are to replace every instance of `window_order()` with `arrange()`.^[I requested a tweak to `dplyr` that would have avoided the need to do this, but my request was denied.
+The modifications needed are to replace every instance of `window_order()` with `arrange()`.^[I requested a tweak to `dplyr` that would have avoided the need to do this, but [my request was denied](https://github.com/tidyverse/dbplyr/issues/627).
 Given how awesome `dbplyr`/`dplyr` is, I cannot complain.]
 The "almost all" relates to the moving average, which relies on `window_frame()` from `dbplyr`, which has no exact equivalent in `dplyr`.
 
@@ -401,7 +401,8 @@ retail_sales <- copy_to(db, retail_sales_local,
 We could specify `temporary = FALSE` if we wanted the data to be there permanently.^[Obviously this would not make sense if `db` is a connection to an in-memory database.]
 
 In some cases, you will have access to a database, but no write privileges for that database.
-In such a case, `copy_inline()` can be useful.
+In such a case, `copy_inline()` can be useful.^[I [requested](https://github.com/tidyverse/dbplyr/issues/628) this function for a common use case I have.
+Thank you to the `dbplyr` team for making it happen.]
 Note that it seems you cannot interrogate a table created using `copy_inline()` using SQL, though it will behave in most respects just like a table created using `copy_to()` when using `dbplyr`.
 It is useful to note that `copy_inline()` is probably not a good solution if your data are hundreds of thousands of rows or more because the table is effectively turned into literal SQL.
 

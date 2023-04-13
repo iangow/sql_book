@@ -162,7 +162,7 @@ earthquakes %>%
 ```
 
 The `ntile()` offered by `dbplyr` works a little differently from other window functions.
-Rather than preceding the `mutate` with a `window_order()`, we need to specify an `order_by` argument.^[The reason for this is not clear and I have filed a feature request to make the handling of `ntile()` similar to that of other window functions.]
+Rather than preceding the `mutate` with a `window_order()`, we need to specify an `order_by` argument.^[The reason for this is not clear and I have filed [a feature request](https://github.com/tidyverse/dbplyr/issues/1235) to make the handling of `ntile()` similar to that of other window functions.]
 
 ```{r}
 cen_ak_quartiles <-
