@@ -860,13 +860,13 @@ ytd_sales %>%
              
 ```{sql}
 #| connection: db
-SELECT a.sales_month, a.sales
-,sum(b.sales) as sales_ytd
+SELECT a.sales_month, a.sales,
+  sum(b.sales) AS sales_ytd
 FROM retail_sales a
-JOIN retail_sales b on 
+INNER JOIN retail_sales b ON 
  date_part('year',a.sales_month) = date_part('year',b.sales_month)
- and b.sales_month <= a.sales_month
- and b.kind_of_business = 'Women''s clothing stores'
+ AND b.sales_month <= a.sales_month
+ AND b.kind_of_business = 'Women''s clothing stores'
 WHERE a.kind_of_business = 'Women''s clothing stores'
 GROUP BY 1,2;
 ```
@@ -882,13 +882,24 @@ retail_sales_yr %>%
              join_by(year, kind_of_business, sales_month >= sales_month),
              suffix = c("", "_y")) %>%
   group_by(sales_month, sales) %>%
-  summarize(sales_ytd = sum(sales_y), .groups = "drop") %>%
+  summarize(sales_ytd = sum(sales_y, narm = TRUE), .groups = "drop") %>%
   filter(month(sales_month) %in% c(1:3, 12)) %>%
   collect(n = 6) %>%
   kable()
 ```
 
 ## Analyzing with Seasonality
+
+```{r}
+retail_sales %>%
+  filter(kind_of_business %in% c("Jewelry stores",
+                                 "Book stores",
+                                 "Grocery stores")) %>%
+  ggplot(aes(x = sales_month, y = sales)) +
+  geom_line() +
+  facet_wrap(vars(kind_of_business), nrow = 3, scales = "free")
+```
+
 
 ### Period-over-Period Comparisons: YoY and MoM
 
