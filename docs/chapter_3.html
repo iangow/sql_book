@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.2.335">
+<meta name="generator" content="quarto-1.3.321">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -17,9 +17,10 @@ div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
 ul.task-list li input[type="checkbox"] {
   width: 0.8em;
-  margin: 0 0.8em 0.2em -1.6em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
 pre > code.sourceCode { white-space: pre; position: relative; }
 pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
@@ -46,48 +47,19 @@ pre.numberSource code > span > a:first-child::before
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
     padding: 0 4px; width: 4em;
-    color: #aaaaaa;
   }
-pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
 div.sourceCode
   {   }
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code span.at { color: #7d9029; } /* Attribute */
-code span.bn { color: #40a070; } /* BaseN */
-code span.bu { color: #008000; } /* BuiltIn */
-code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code span.ch { color: #4070a0; } /* Char */
-code span.cn { color: #880000; } /* Constant */
-code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code span.dt { color: #902000; } /* DataType */
-code span.dv { color: #40a070; } /* DecVal */
-code span.er { color: #ff0000; font-weight: bold; } /* Error */
-code span.ex { } /* Extension */
-code span.fl { color: #40a070; } /* Float */
-code span.fu { color: #06287e; } /* Function */
-code span.im { color: #008000; font-weight: bold; } /* Import */
-code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code span.op { color: #666666; } /* Operator */
-code span.ot { color: #007020; } /* Other */
-code span.pp { color: #bc7a00; } /* Preprocessor */
-code span.sc { color: #4070a0; } /* SpecialChar */
-code span.ss { color: #bb6688; } /* SpecialString */
-code span.st { color: #4070a0; } /* String */
-code span.va { color: #19177c; } /* Variable */
-code span.vs { color: #4070a0; } /* VerbatimString */
-code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+/* CSS for citations */
 div.csl-bib-body { }
 div.csl-entry {
   clear: both;
 }
-.hanging div.csl-entry {
+.hanging-indent div.csl-entry {
   margin-left:2em;
   text-indent:-2em;
 }
@@ -101,8 +73,7 @@ div.csl-right-inline {
 }
 div.csl-indent {
   margin-left: 2em;
-}
-</style>
+}</style>
 
 
 <script src="site_libs/quarto-nav/quarto-nav.js"></script>
@@ -150,11 +121,16 @@ div.csl-indent {
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
-  <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
-    <div class="container-fluid d-flex justify-content-between">
-      <h1 class="quarto-secondary-nav-title"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Time Series Analysis</span></h1>
-      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
-        <i class="bi bi-chevron-right"></i>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./chapter_3.html"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Time Series Analysis</span></a></li></ol></nav>
+      <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+      </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
       </button>
     </div>
   </nav>
@@ -162,109 +138,121 @@ div.csl-indent {
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation floating overflow-auto">
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation floating overflow-auto">
     <div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
       <a href="./">SQL for Data Analysis using R</a> 
     </div>
       </div>
-      <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="mt-2 flex-shrink-0 align-items-center">
         <div class="sidebar-search">
         <div id="quarto-search" class="" title="Search"></div>
         </div>
-      </div>
+        </div>
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./index.html" class="sidebar-item-text sidebar-link">Preface</a>
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./chapter_1.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Analysis with SQL</span></a>
+  <a href="./chapter_1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Analysis with SQL</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./chapter_2.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Preparing Data for Analysis</span></a>
+  <a href="./chapter_2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Preparing Data for Analysis</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./chapter_3.html" class="sidebar-item-text sidebar-link active"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Time Series Analysis</span></a>
+  <a href="./chapter_3.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Time Series Analysis</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./chapter_4.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Cohorts</span></a>
+  <a href="./chapter_4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Cohorts</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./chapter_5.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Text Analysis</span></a>
+  <a href="./chapter_5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Text Analysis</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./chapter_6.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Anomaly Detection</span></a>
+  <a href="./chapter_6.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Anomaly Detection</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./chapter_7.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Experiment Analysis</span></a>
+  <a href="./chapter_7.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Experiment Analysis</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./chapter_8.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Creating Complex Data Sets for Analysis</span></a>
+  <a href="./chapter_8.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Creating Complex Data Sets for Analysis</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./chapter_9.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Conclusion</span></a>
+  <a href="./chapter_9.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Conclusion</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./references.html" class="sidebar-item-text sidebar-link">References</a>
+  <a href="./references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
   </div>
 </li>
     </ul>
     </div>
 </nav>
+<div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         <nav id="TOC" role="doc-toc" class="toc-active">
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#date-datetime-and-time-manipulations" id="toc-date-datetime-and-time-manipulations" class="nav-link active" data-scroll-target="#date-datetime-and-time-manipulations"><span class="toc-section-number">3.1</span>  Date, Datetime, and Time Manipulations</a>
+  <li><a href="#date-datetime-and-time-manipulations" id="toc-date-datetime-and-time-manipulations" class="nav-link active" data-scroll-target="#date-datetime-and-time-manipulations"><span class="header-section-number">3.1</span> Date, Datetime, and Time Manipulations</a>
   <ul class="collapse">
-  <li><a href="#time-zone-conversions" id="toc-time-zone-conversions" class="nav-link" data-scroll-target="#time-zone-conversions"><span class="toc-section-number">3.1.1</span>  Time Zone Conversions</a></li>
-  <li><a href="#date-and-timestamp-format-conversions" id="toc-date-and-timestamp-format-conversions" class="nav-link" data-scroll-target="#date-and-timestamp-format-conversions"><span class="toc-section-number">3.1.2</span>  Date and Timestamp Format Conversions</a></li>
-  <li><a href="#date-math" id="toc-date-math" class="nav-link" data-scroll-target="#date-math"><span class="toc-section-number">3.1.3</span>  Date Math</a></li>
-  <li><a href="#time-math" id="toc-time-math" class="nav-link" data-scroll-target="#time-math"><span class="toc-section-number">3.1.4</span>  Time Math</a></li>
-  <li><a href="#joining-data-from-different-sources" id="toc-joining-data-from-different-sources" class="nav-link" data-scroll-target="#joining-data-from-different-sources"><span class="toc-section-number">3.1.5</span>  Joining Data from Different Sources</a></li>
+  <li><a href="#time-zone-conversions" id="toc-time-zone-conversions" class="nav-link" data-scroll-target="#time-zone-conversions"><span class="header-section-number">3.1.1</span> Time Zone Conversions</a></li>
+  <li><a href="#date-and-timestamp-format-conversions" id="toc-date-and-timestamp-format-conversions" class="nav-link" data-scroll-target="#date-and-timestamp-format-conversions"><span class="header-section-number">3.1.2</span> Date and Timestamp Format Conversions</a></li>
+  <li><a href="#date-math" id="toc-date-math" class="nav-link" data-scroll-target="#date-math"><span class="header-section-number">3.1.3</span> Date Math</a></li>
+  <li><a href="#time-math" id="toc-time-math" class="nav-link" data-scroll-target="#time-math"><span class="header-section-number">3.1.4</span> Time Math</a></li>
+  <li><a href="#joining-data-from-different-sources" id="toc-joining-data-from-different-sources" class="nav-link" data-scroll-target="#joining-data-from-different-sources"><span class="header-section-number">3.1.5</span> Joining Data from Different Sources</a></li>
   </ul></li>
-  <li><a href="#the-retail-sales-data-set" id="toc-the-retail-sales-data-set" class="nav-link" data-scroll-target="#the-retail-sales-data-set"><span class="toc-section-number">3.2</span>  The Retail Sales Data Set</a></li>
-  <li><a href="#trending-the-data" id="toc-trending-the-data" class="nav-link" data-scroll-target="#trending-the-data"><span class="toc-section-number">3.3</span>  Trending the Data</a>
+  <li><a href="#the-retail-sales-data-set" id="toc-the-retail-sales-data-set" class="nav-link" data-scroll-target="#the-retail-sales-data-set"><span class="header-section-number">3.2</span> The Retail Sales Data Set</a></li>
+  <li><a href="#trending-the-data" id="toc-trending-the-data" class="nav-link" data-scroll-target="#trending-the-data"><span class="header-section-number">3.3</span> Trending the Data</a>
   <ul class="collapse">
-  <li><a href="#simple-trends" id="toc-simple-trends" class="nav-link" data-scroll-target="#simple-trends"><span class="toc-section-number">3.3.1</span>  Simple Trends</a></li>
-  <li><a href="#comparing-components" id="toc-comparing-components" class="nav-link" data-scroll-target="#comparing-components"><span class="toc-section-number">3.3.2</span>  Comparing Components</a></li>
-  <li><a href="#percent-of-total-calculations" id="toc-percent-of-total-calculations" class="nav-link" data-scroll-target="#percent-of-total-calculations"><span class="toc-section-number">3.3.3</span>  Percent of Total Calculations</a></li>
-  <li><a href="#indexing-to-see-percent-change-over-time" id="toc-indexing-to-see-percent-change-over-time" class="nav-link" data-scroll-target="#indexing-to-see-percent-change-over-time"><span class="toc-section-number">3.3.4</span>  Indexing to See Percent Change over Time</a></li>
+  <li><a href="#simple-trends" id="toc-simple-trends" class="nav-link" data-scroll-target="#simple-trends"><span class="header-section-number">3.3.1</span> Simple Trends</a></li>
+  <li><a href="#comparing-components" id="toc-comparing-components" class="nav-link" data-scroll-target="#comparing-components"><span class="header-section-number">3.3.2</span> Comparing Components</a></li>
+  <li><a href="#percent-of-total-calculations" id="toc-percent-of-total-calculations" class="nav-link" data-scroll-target="#percent-of-total-calculations"><span class="header-section-number">3.3.3</span> Percent of Total Calculations</a></li>
+  <li><a href="#indexing-to-see-percent-change-over-time" id="toc-indexing-to-see-percent-change-over-time" class="nav-link" data-scroll-target="#indexing-to-see-percent-change-over-time"><span class="header-section-number">3.3.4</span> Indexing to See Percent Change over Time</a></li>
   </ul></li>
-  <li><a href="#rolling-time-windows" id="toc-rolling-time-windows" class="nav-link" data-scroll-target="#rolling-time-windows"><span class="toc-section-number">3.4</span>  Rolling Time Windows</a>
+  <li><a href="#rolling-time-windows" id="toc-rolling-time-windows" class="nav-link" data-scroll-target="#rolling-time-windows"><span class="header-section-number">3.4</span> Rolling Time Windows</a>
   <ul class="collapse">
-  <li><a href="#calculating-rolling-time-windows" id="toc-calculating-rolling-time-windows" class="nav-link" data-scroll-target="#calculating-rolling-time-windows"><span class="toc-section-number">3.4.1</span>  Calculating Rolling Time Windows</a></li>
-  <li><a href="#calculating-cumulative-values" id="toc-calculating-cumulative-values" class="nav-link" data-scroll-target="#calculating-cumulative-values"><span class="toc-section-number">3.4.2</span>  Calculating Cumulative Values</a></li>
+  <li><a href="#calculating-rolling-time-windows" id="toc-calculating-rolling-time-windows" class="nav-link" data-scroll-target="#calculating-rolling-time-windows"><span class="header-section-number">3.4.1</span> Calculating Rolling Time Windows</a></li>
+  <li><a href="#calculating-cumulative-values" id="toc-calculating-cumulative-values" class="nav-link" data-scroll-target="#calculating-cumulative-values"><span class="header-section-number">3.4.2</span> Calculating Cumulative Values</a></li>
   </ul></li>
-  <li><a href="#analyzing-with-seasonality" id="toc-analyzing-with-seasonality" class="nav-link" data-scroll-target="#analyzing-with-seasonality"><span class="toc-section-number">3.5</span>  Analyzing with Seasonality</a>
+  <li><a href="#analyzing-with-seasonality" id="toc-analyzing-with-seasonality" class="nav-link" data-scroll-target="#analyzing-with-seasonality"><span class="header-section-number">3.5</span> Analyzing with Seasonality</a>
   <ul class="collapse">
-  <li><a href="#period-over-period-comparisons-yoy-and-mom" id="toc-period-over-period-comparisons-yoy-and-mom" class="nav-link" data-scroll-target="#period-over-period-comparisons-yoy-and-mom"><span class="toc-section-number">3.5.1</span>  Period-over-Period Comparisons: YoY and MoM</a></li>
-  <li><a href="#period-over-period-comparisons-same-month-versus-last-year" id="toc-period-over-period-comparisons-same-month-versus-last-year" class="nav-link" data-scroll-target="#period-over-period-comparisons-same-month-versus-last-year"><span class="toc-section-number">3.5.2</span>  Period-over-Period Comparisons: Same Month Versus Last Year</a></li>
-  <li><a href="#comparing-to-multiple-prior-periods" id="toc-comparing-to-multiple-prior-periods" class="nav-link" data-scroll-target="#comparing-to-multiple-prior-periods"><span class="toc-section-number">3.5.3</span>  Comparing to Multiple Prior Periods</a></li>
+  <li><a href="#period-over-period-comparisons-yoy-and-mom" id="toc-period-over-period-comparisons-yoy-and-mom" class="nav-link" data-scroll-target="#period-over-period-comparisons-yoy-and-mom"><span class="header-section-number">3.5.1</span> Period-over-Period Comparisons: YoY and MoM</a></li>
+  <li><a href="#period-over-period-comparisons-same-month-versus-last-year" id="toc-period-over-period-comparisons-same-month-versus-last-year" class="nav-link" data-scroll-target="#period-over-period-comparisons-same-month-versus-last-year"><span class="header-section-number">3.5.2</span> Period-over-Period Comparisons: Same Month Versus Last Year</a></li>
+  <li><a href="#comparing-to-multiple-prior-periods" id="toc-comparing-to-multiple-prior-periods" class="nav-link" data-scroll-target="#comparing-to-multiple-prior-periods"><span class="header-section-number">3.5.3</span> Comparing to Multiple Prior Periods</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -274,7 +262,7 @@ div.csl-indent {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title"><span id="sec-time-series" class="quarto-section-identifier d-none d-lg-block"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Time Series Analysis</span></span></h1>
+<h1 class="title"><span id="sec-time-series" class="quarto-section-identifier"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Time Series Analysis</span></span></h1>
 </div>
 
 
@@ -311,7 +299,7 @@ div.csl-indent {
 <div class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> timestamptz <span class="st">'2020-09-01 00:00:00 -0'</span> <span class="kw">AT</span> <span class="dt">TIME</span> <span class="dt">ZONE</span> <span class="st">'PST'</span> <span class="kw">AS</span> <span class="dt">time</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="knitsql-table">
-<table class="table table-sm table-striped">
+<table class="table table-sm table-striped small">
 <caption>1 records</caption>
 <thead>
 <tr class="header">
@@ -330,7 +318,7 @@ div.csl-indent {
 <div class="cell">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> timestamptz <span class="st">'2020-09-01 00:00:00 -0'</span> <span class="kw">AT</span> <span class="dt">TIME</span> <span class="dt">ZONE</span> <span class="st">'PDT'</span> <span class="kw">AS</span> <span class="dt">time</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="knitsql-table">
-<table class="table table-sm table-striped">
+<table class="table table-sm table-striped small">
 <caption>1 records</caption>
 <thead>
 <tr class="header">
@@ -353,7 +341,7 @@ div.csl-indent {
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> regexp_matches(name, <span class="st">'^US/'</span>);</span>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co">-- use WHERE name ~ '^US/'; in PostgreSQL</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="knitsql-table">
-<table class="table table-sm table-striped">
+<table class="table table-sm table-striped small">
 <caption>Displaying records 1 - 10</caption>
 <thead>
 <tr class="header">
@@ -411,7 +399,7 @@ div.csl-indent {
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="st">'2020-09-01 17:00:01 US/Pacific'</span>:<span class="ch">:timestamptz</span> <span class="kw">AS</span> t1,</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>       <span class="st">'2020-09-02 10:00:01 Australia/Melbourne'</span>:<span class="ch">:timestamptz</span>  <span class="kw">AS</span> t2;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="knitsql-table">
-<table class="table table-sm table-striped">
+<table class="table table-sm table-striped small">
 <caption>1 records</caption>
 <thead>
 <tr class="header">
@@ -432,7 +420,7 @@ div.csl-indent {
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="st">'2020-12-01 16:00:01 US/Pacific'</span>:<span class="ch">:timestamptz</span> <span class="kw">AS</span> t1,</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>       <span class="st">'2020-12-02 11:00:01 Australia/Melbourne'</span>:<span class="ch">:timestamptz</span>  <span class="kw">AS</span> t2;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="knitsql-table">
-<table class="table table-sm table-striped">
+<table class="table table-sm table-striped small">
 <caption>1 records</caption>
 <thead>
 <tr class="header">
@@ -458,7 +446,7 @@ div.csl-indent {
 <span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>a_time <span class="sc">%&gt;%</span></span>
 <span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<table class="table table-sm table-striped">
+<table class="table table-sm table-striped small">
 <thead>
 <tr class="header">
 <th style="text-align: left;">t1</th>
@@ -514,7 +502,7 @@ div.csl-indent {
 <span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>  typeof(t2)</span>
 <span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> q1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="knitsql-table">
-<table class="table table-sm table-striped">
+<table class="table table-sm table-striped small">
 <caption>1 records</caption>
 <colgroup>
 <col style="width: 17%">
@@ -557,7 +545,7 @@ div.csl-indent {
 <span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>  typeof(t1)</span>
 <span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> q1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="knitsql-table">
-<table class="table table-sm table-striped">
+<table class="table table-sm table-striped small">
 <caption>1 records</caption>
 <thead>
 <tr class="header">
@@ -586,7 +574,7 @@ div.csl-indent {
 <span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>two_times_notz <span class="ot">&lt;-</span> <span class="fu">tbl</span>(db, <span class="fu">sql</span>(sql))</span>
 <span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>two_times_notz <span class="sc">%&gt;%</span> <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<table class="table table-sm table-striped">
+<table class="table table-sm table-striped small">
 <thead>
 <tr class="header">
 <th style="text-align: left;">t1</th>
@@ -640,7 +628,7 @@ div.csl-indent {
 <div class="cell">
 <div class="sourceCode cell-code" id="cb33"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> date_trunc(<span class="st">'month'</span>,<span class="st">'2020-10-04 12:33:35 -00'</span>:<span class="ch">:timestamptz</span>);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="knitsql-table">
-<table class="table table-sm table-striped">
+<table class="table table-sm table-striped small">
 <caption>1 records</caption>
 <colgroup>
 <col style="width: 100%">
@@ -666,7 +654,7 @@ div.csl-indent {
 <span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">a_trunced_time =</span> <span class="fu">date_trunc</span>(<span class="st">'month'</span>, a_time))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># Source:   SQL [1 x 2]
-# Database: DuckDB 0.7.1 [root@Darwin 22.4.0:R 4.2.2/:memory:]
+# Database: DuckDB 0.7.1 [igow@Darwin 22.4.0:R 4.2.2/:memory:]
   a_time              a_trunced_time
   &lt;dttm&gt;              &lt;date&gt;        
 1 2020-10-04 12:33:35 2020-10-01    </code></pre>
@@ -701,7 +689,7 @@ FROM (SELECT '2020-10-04 12:33:35'::timestamp AS a_time)</code></pre>
 <span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">a_trunced_time =</span> <span class="fu">date_trunc</span>(<span class="st">'month'</span>, a_time)) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># Source:   SQL [1 x 2]
-# Database: DuckDB 0.7.1 [root@Darwin 22.4.0:R 4.2.2/:memory:]
+# Database: DuckDB 0.7.1 [igow@Darwin 22.4.0:R 4.2.2/:memory:]
   a_time              a_trunced_time     
   &lt;dttm&gt;              &lt;dttm&gt;             
 1 2020-10-04 19:33:35 2020-09-30 14:00:00</code></pre>
@@ -845,7 +833,7 @@ FROM (SELECT '2020-10-04 12:33:35 US/Pacific'::timestamptz AS a_time)</code></pr
 <span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> kind_of_business <span class="op">=</span> <span class="st">'Retail and food services sales, total'</span></span>
 <span id="cb55-4"><a href="#cb55-4" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> <span class="dv">1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="knitsql-table">
-<table class="table table-sm table-striped">
+<table class="table table-sm table-striped small">
 <caption>Displaying records 1 - 10</caption>
 <thead>
 <tr class="header">
@@ -916,7 +904,7 @@ FROM (SELECT '2020-10-04 12:33:35 US/Pacific'::timestamptz AS a_time)</code></pr
 <span id="cb57-5"><a href="#cb57-5" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> <span class="dv">1</span></span>
 <span id="cb57-6"><a href="#cb57-6" aria-hidden="true" tabindex="-1"></a>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="knitsql-table">
-<table class="table table-sm table-striped">
+<table class="table table-sm table-striped small">
 <caption>Displaying records 1 - 10</caption>
 <thead>
 <tr class="header">
@@ -992,7 +980,7 @@ FROM (SELECT '2020-10-04 12:33:35 US/Pacific'::timestamptz AS a_time)</code></pr
 <span id="cb59-8"><a href="#cb59-8" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> <span class="dv">1</span>,<span class="dv">2</span></span>
 <span id="cb59-9"><a href="#cb59-9" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> <span class="dv">1</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="knitsql-table">
-<table class="table table-sm table-striped">
+<table class="table table-sm table-striped small">
 <caption>Displaying records 1 - 10</caption>
 <thead>
 <tr class="header">
@@ -1081,7 +1069,7 @@ FROM (SELECT '2020-10-04 12:33:35 US/Pacific'::timestamptz AS a_time)</code></pr
 <span id="cb61-3"><a href="#cb61-3" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> kind_of_business <span class="kw">IN</span> (<span class="st">'Men</span><span class="ch">''</span><span class="st">s clothing stores'</span>,<span class="st">'Women</span><span class="ch">''</span><span class="st">s clothing stores'</span>)</span>
 <span id="cb61-4"><a href="#cb61-4" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> <span class="dv">1</span>,<span class="dv">2</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="knitsql-table">
-<table class="table table-sm table-striped">
+<table class="table table-sm table-striped small">
 <caption>Displaying records 1 - 10</caption>
 <thead>
 <tr class="header">
@@ -1167,7 +1155,7 @@ FROM (SELECT '2020-10-04 12:33:35 US/Pacific'::timestamptz AS a_time)</code></pr
 <span id="cb63-7"><a href="#cb63-7" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> <span class="dv">1</span>, <span class="dv">2</span></span>
 <span id="cb63-8"><a href="#cb63-8" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> <span class="dv">1</span>, <span class="dv">2</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="knitsql-table">
-<table class="table table-sm table-striped">
+<table class="table table-sm table-striped small">
 <caption>Displaying records 1 - 10</caption>
 <thead>
 <tr class="header">
@@ -1261,7 +1249,7 @@ FROM (SELECT '2020-10-04 12:33:35 US/Pacific'::timestamptz AS a_time)</code></pr
 <span id="cb65-12"><a href="#cb65-12" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> <span class="dv">1</span></span>
 <span id="cb65-13"><a href="#cb65-13" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> <span class="dv">1</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="knitsql-table">
-<table class="table table-sm table-striped">
+<table class="table table-sm table-striped small">
 <caption>Displaying records 1 - 10</caption>
 <thead>
 <tr class="header">
@@ -1371,7 +1359,7 @@ GROUP BY sales_year</code></pre>
 <span id="cb68-3"><a href="#cb68-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>(<span class="at">n =</span> <span class="dv">10</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb68-4"><a href="#cb68-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<table class="table table-sm table-striped">
+<table class="table table-sm table-striped small">
 <thead>
 <tr class="header">
 <th style="text-align: right;">sales_year</th>
@@ -1485,7 +1473,7 @@ GROUP BY sales_year</code></pre>
 <span id="cb72-10"><a href="#cb72-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>(<span class="at">n =</span> <span class="dv">3</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb72-11"><a href="#cb72-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<table class="table table-sm table-striped">
+<table class="table table-sm table-striped small">
 <thead>
 <tr class="header">
 <th style="text-align: left;">sales_month</th>
@@ -1564,7 +1552,7 @@ FROM (
 <span id="cb76-10"><a href="#cb76-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>(<span class="at">n =</span> <span class="dv">3</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb76-11"><a href="#cb76-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<table class="table table-sm table-striped">
+<table class="table table-sm table-striped small">
 <thead>
 <tr class="header">
 <th style="text-align: right;">sales_year</th>
@@ -1636,7 +1624,7 @@ FROM (
 <span id="cb78-12"><a href="#cb78-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>(<span class="at">n =</span> <span class="dv">3</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb78-13"><a href="#cb78-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<table class="table table-sm table-striped">
+<table class="table table-sm table-striped small">
 <thead>
 <tr class="header">
 <th style="text-align: left;">sales_month</th>
@@ -1683,7 +1671,7 @@ FROM (
 <span id="cb80-7"><a href="#cb80-7" aria-hidden="true" tabindex="-1"></a>WINDOW w <span class="kw">AS</span> (<span class="kw">order</span> <span class="kw">by</span> sales_month </span>
 <span id="cb80-8"><a href="#cb80-8" aria-hidden="true" tabindex="-1"></a>             <span class="kw">rows</span> <span class="kw">between</span> <span class="dv">11</span> <span class="kw">preceding</span> <span class="kw">and</span> <span class="kw">current</span> <span class="kw">row</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="knitsql-table">
-<table class="table table-sm table-striped">
+<table class="table table-sm table-striped small">
 <caption>Displaying records 1 - 10</caption>
 <thead>
 <tr class="header">
@@ -1778,7 +1766,7 @@ FROM (
 <span id="cb83-10"><a href="#cb83-10" aria-hidden="true" tabindex="-1"></a><span class="kw">ON</span> b.sales_month <span class="kw">BETWEEN</span> a.<span class="dt">date</span> <span class="op">-</span> <span class="dt">interval</span> <span class="st">'11 months'</span> <span class="kw">AND</span> a.<span class="dt">date</span></span>
 <span id="cb83-11"><a href="#cb83-11" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> a.<span class="dt">date</span> <span class="kw">BETWEEN</span> <span class="st">'1993-01-01'</span> <span class="kw">AND</span> <span class="st">'2020-12-01'</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="knitsql-table">
-<table class="table table-sm table-striped">
+<table class="table table-sm table-striped small">
 <caption>Displaying records 1 - 10</caption>
 <thead>
 <tr class="header">
@@ -1857,7 +1845,7 @@ FROM (
 <span id="cb84-12"><a href="#cb84-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>(<span class="at">n =</span> <span class="dv">3</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb84-13"><a href="#cb84-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<table class="table table-sm table-striped">
+<table class="table table-sm table-striped small">
 <thead>
 <tr class="header">
 <th style="text-align: left;">date</th>
@@ -1896,7 +1884,7 @@ FROM (
 <span id="cb85-8"><a href="#cb85-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>(<span class="at">n =</span> <span class="dv">3</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb85-9"><a href="#cb85-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<table class="table table-sm table-striped">
+<table class="table table-sm table-striped small">
 <thead>
 <tr class="header">
 <th style="text-align: left;">date</th>
@@ -1940,7 +1928,7 @@ FROM (
 <span id="cb86-13"><a href="#cb86-13" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> <span class="dv">1</span></span>
 <span id="cb86-14"><a href="#cb86-14" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">3</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="knitsql-table">
-<table class="table table-sm table-striped">
+<table class="table table-sm table-striped small">
 <caption>3 records</caption>
 <thead>
 <tr class="header">
@@ -1985,7 +1973,7 @@ FROM (
 <span id="cb87-17"><a href="#cb87-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>(<span class="at">n =</span> <span class="dv">3</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb87-18"><a href="#cb87-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<table class="table table-sm table-striped">
+<table class="table table-sm table-striped small">
 <thead>
 <tr class="header">
 <th style="text-align: left;">sales_month</th>
@@ -2021,7 +2009,7 @@ FROM (
 <span id="cb88-6"><a href="#cb88-6" aria-hidden="true" tabindex="-1"></a>             <span class="kw">ORDER</span> <span class="kw">BY</span> sales_month)</span>
 <span id="cb88-7"><a href="#cb88-7" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">3</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="knitsql-table">
-<table class="table table-sm table-striped">
+<table class="table table-sm table-striped small">
 <caption>3 records</caption>
 <thead>
 <tr class="header">
@@ -2066,7 +2054,7 @@ FROM (
 <span id="cb89-13"><a href="#cb89-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>(<span class="at">n =</span> <span class="dv">6</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb89-14"><a href="#cb89-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<table class="table table-sm table-striped">
+<table class="table table-sm table-striped small">
 <thead>
 <tr class="header">
 <th style="text-align: left;">sales_month</th>
@@ -2136,7 +2124,7 @@ FROM (
 <span id="cb91-8"><a href="#cb91-8" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> a.kind_of_business <span class="op">=</span> <span class="st">'Women</span><span class="ch">''</span><span class="st">s clothing stores'</span></span>
 <span id="cb91-9"><a href="#cb91-9" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> <span class="dv">1</span>,<span class="dv">2</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="knitsql-table">
-<table class="table table-sm table-striped">
+<table class="table table-sm table-striped small">
 <caption>Displaying records 1 - 10</caption>
 <thead>
 <tr class="header">
@@ -2218,7 +2206,7 @@ FROM (
 <span id="cb92-15"><a href="#cb92-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>(<span class="at">n =</span> <span class="dv">6</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb92-16"><a href="#cb92-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<table class="table table-sm table-striped">
+<table class="table table-sm table-striped small">
 <thead>
 <tr class="header">
 <th style="text-align: left;">sales_month</th>
@@ -2287,7 +2275,7 @@ FROM (
 <span id="cb94-5"><a href="#cb94-5" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> kind_of_business <span class="op">=</span> <span class="st">'Book stores'</span></span>
 <span id="cb94-6"><a href="#cb94-6" aria-hidden="true" tabindex="-1"></a>WINDOW w <span class="kw">AS</span> (<span class="kw">PARTITION</span> <span class="kw">BY</span> kind_of_business <span class="kw">ORDER</span> <span class="kw">BY</span> sales_month)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="knitsql-table">
-<table class="table table-sm table-striped">
+<table class="table table-sm table-striped small">
 <caption>Displaying records 1 - 10</caption>
 <thead>
 <tr class="header">
@@ -2389,7 +2377,7 @@ FROM (
 <span id="cb95-13"><a href="#cb95-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>(<span class="at">n =</span> <span class="dv">3</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb95-14"><a href="#cb95-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<table class="table table-sm table-striped">
+<table class="table table-sm table-striped small">
 <thead>
 <tr class="header">
 <th style="text-align: left;">kind_of_business</th>
@@ -2447,7 +2435,7 @@ FROM (
 <span id="cb97-13"><a href="#cb97-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>(<span class="at">n =</span> <span class="dv">3</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb97-14"><a href="#cb97-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<table class="table table-sm table-striped">
+<table class="table table-sm table-striped small">
 <thead>
 <tr class="header">
 <th style="text-align: right;">sales_year</th>
@@ -2510,7 +2498,7 @@ FROM (
 <span id="cb99-16"><a href="#cb99-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>(<span class="at">n =</span> <span class="dv">6</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb99-17"><a href="#cb99-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<table class="table table-sm table-striped">
+<table class="table table-sm table-striped small">
 <thead>
 <tr class="header">
 <th style="text-align: left;">sales_month</th>
@@ -2569,7 +2557,7 @@ FROM (
 <span id="cb100-6"><a href="#cb100-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>(<span class="at">n =</span> <span class="dv">3</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb100-7"><a href="#cb100-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<table class="table table-sm table-striped">
+<table class="table table-sm table-striped small">
 <thead>
 <tr class="header">
 <th style="text-align: left;">sales_month</th>
@@ -2636,7 +2624,7 @@ FROM (
 <span id="cb102-15"><a href="#cb102-15" aria-hidden="true" tabindex="-1"></a>              <span class="at">values_from =</span> sales) <span class="sc">%&gt;%</span></span>
 <span id="cb102-16"><a href="#cb102-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<table class="table table-sm table-striped">
+<table class="table table-sm table-striped small">
 <thead>
 <tr class="header">
 <th style="text-align: right;">month_number</th>
@@ -2768,7 +2756,7 @@ FROM (
 <span id="cb104-15"><a href="#cb104-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>(<span class="at">n =</span> <span class="dv">5</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb104-16"><a href="#cb104-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<table class="table table-sm table-striped">
+<table class="table table-sm table-striped small">
 <thead>
 <tr class="header">
 <th style="text-align: left;">sales_month</th>
@@ -2830,7 +2818,7 @@ FROM (
 <span id="cb105-9"><a href="#cb105-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>(<span class="at">n =</span> <span class="dv">10</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb105-10"><a href="#cb105-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<table class="table table-sm table-striped">
+<table class="table table-sm table-striped small">
 <thead>
 <tr class="header">
 <th style="text-align: left;">sales_month</th>
@@ -2893,7 +2881,7 @@ FROM (
 <span id="cb107-5"><a href="#cb107-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>(<span class="at">n =</span> <span class="dv">10</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb107-6"><a href="#cb107-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<table class="table table-sm table-striped">
+<table class="table table-sm table-striped small">
 <thead>
 <tr class="header">
 <th style="text-align: left;">sales_month</th>
@@ -2938,8 +2926,8 @@ FROM (
 </div>
 
 
-<div id="refs" class="references csl-bib-body hanging-indent" role="doc-bibliography" style="display: none">
-<div id="ref-tanimura2021sql" class="csl-entry" role="doc-biblioentry">
+<div id="refs" class="references csl-bib-body hanging-indent" role="list" style="display: none">
+<div id="ref-tanimura2021sql" class="csl-entry" role="listitem">
 Tanimura, C. 2021. <em>SQL for Data Analysis</em>. O’Reilly Media. <a href="https://books.google.com.au/books?id=ojhCEAAAQBAJ">https://books.google.com.au/books?id=ojhCEAAAQBAJ</a>.
 </div>
 </div>
@@ -2982,9 +2970,23 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     icon: icon
   };
   anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
   const clipboard = new window.ClipboardJS('.code-copy-button', {
-    target: function(trigger) {
-      return trigger.previousElementSibling;
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
     }
   });
   clipboard.on('success', function(e) {
@@ -3049,6 +3051,92 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       return note.innerHTML;
     });
   }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
   const findCites = (el) => {
     const parentEl = el.parentElement;
     if (parentEl) {

@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.2.335">
+<meta name="generator" content="quarto-1.3.321">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -17,9 +17,10 @@ div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
 ul.task-list li input[type="checkbox"] {
   width: 0.8em;
-  margin: 0 0.8em 0.2em -1.6em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
 pre > code.sourceCode { white-space: pre; position: relative; }
 pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
@@ -46,48 +47,19 @@ pre.numberSource code > span > a:first-child::before
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
     padding: 0 4px; width: 4em;
-    color: #aaaaaa;
   }
-pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
 div.sourceCode
   {   }
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code span.at { color: #7d9029; } /* Attribute */
-code span.bn { color: #40a070; } /* BaseN */
-code span.bu { color: #008000; } /* BuiltIn */
-code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code span.ch { color: #4070a0; } /* Char */
-code span.cn { color: #880000; } /* Constant */
-code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code span.dt { color: #902000; } /* DataType */
-code span.dv { color: #40a070; } /* DecVal */
-code span.er { color: #ff0000; font-weight: bold; } /* Error */
-code span.ex { } /* Extension */
-code span.fl { color: #40a070; } /* Float */
-code span.fu { color: #06287e; } /* Function */
-code span.im { color: #008000; font-weight: bold; } /* Import */
-code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code span.op { color: #666666; } /* Operator */
-code span.ot { color: #007020; } /* Other */
-code span.pp { color: #bc7a00; } /* Preprocessor */
-code span.sc { color: #4070a0; } /* SpecialChar */
-code span.ss { color: #bb6688; } /* SpecialString */
-code span.st { color: #4070a0; } /* String */
-code span.va { color: #19177c; } /* Variable */
-code span.vs { color: #4070a0; } /* VerbatimString */
-code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+/* CSS for citations */
 div.csl-bib-body { }
 div.csl-entry {
   clear: both;
 }
-.hanging div.csl-entry {
+.hanging-indent div.csl-entry {
   margin-left:2em;
   text-indent:-2em;
 }
@@ -101,8 +73,7 @@ div.csl-right-inline {
 }
 div.csl-indent {
   margin-left: 2em;
-}
-</style>
+}</style>
 
 
 <script src="site_libs/quarto-nav/quarto-nav.js"></script>
@@ -145,6 +116,7 @@ div.csl-indent {
 <link href="site_libs/tabwid-1.1.3/tabwid.css" rel="stylesheet">
 <script src="site_libs/tabwid-1.1.3/tabwid.js"></script>
 
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
 </head>
@@ -153,11 +125,16 @@ div.csl-indent {
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
-  <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
-    <div class="container-fluid d-flex justify-content-between">
-      <h1 class="quarto-secondary-nav-title"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Experiment Analysis</span></h1>
-      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
-        <i class="bi bi-chevron-right"></i>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./chapter_7.html"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Experiment Analysis</span></a></li></ol></nav>
+      <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+      </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
       </button>
     </div>
   </nav>
@@ -165,97 +142,109 @@ div.csl-indent {
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation floating overflow-auto">
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation floating overflow-auto">
     <div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
       <a href="./">SQL for Data Analysis using R</a> 
     </div>
       </div>
-      <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="mt-2 flex-shrink-0 align-items-center">
         <div class="sidebar-search">
         <div id="quarto-search" class="" title="Search"></div>
         </div>
-      </div>
+        </div>
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./index.html" class="sidebar-item-text sidebar-link">Preface</a>
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./chapter_1.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Analysis with SQL</span></a>
+  <a href="./chapter_1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Analysis with SQL</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./chapter_2.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Preparing Data for Analysis</span></a>
+  <a href="./chapter_2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Preparing Data for Analysis</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./chapter_3.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Time Series Analysis</span></a>
+  <a href="./chapter_3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Time Series Analysis</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./chapter_4.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Cohorts</span></a>
+  <a href="./chapter_4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Cohorts</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./chapter_5.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Text Analysis</span></a>
+  <a href="./chapter_5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Text Analysis</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./chapter_6.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Anomaly Detection</span></a>
+  <a href="./chapter_6.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Anomaly Detection</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./chapter_7.html" class="sidebar-item-text sidebar-link active"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Experiment Analysis</span></a>
+  <a href="./chapter_7.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Experiment Analysis</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./chapter_8.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Creating Complex Data Sets for Analysis</span></a>
+  <a href="./chapter_8.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Creating Complex Data Sets for Analysis</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./chapter_9.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Conclusion</span></a>
+  <a href="./chapter_9.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Conclusion</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./references.html" class="sidebar-item-text sidebar-link">References</a>
+  <a href="./references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
   </div>
 </li>
     </ul>
     </div>
 </nav>
+<div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         <nav id="TOC" role="doc-toc" class="toc-active">
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#strengths-and-limits-of-experiment-analysis-with-sql" id="toc-strengths-and-limits-of-experiment-analysis-with-sql" class="nav-link active" data-scroll-target="#strengths-and-limits-of-experiment-analysis-with-sql"><span class="toc-section-number">7.1</span>  Strengths and Limits of Experiment Analysis with SQL</a></li>
-  <li><a href="#the-data-set" id="toc-the-data-set" class="nav-link" data-scroll-target="#the-data-set"><span class="toc-section-number">7.2</span>  The Data Set</a></li>
-  <li><a href="#types-of-experiments" id="toc-types-of-experiments" class="nav-link" data-scroll-target="#types-of-experiments"><span class="toc-section-number">7.3</span>  Types of Experiments</a>
+  <li><a href="#strengths-and-limits-of-experiment-analysis-with-sql" id="toc-strengths-and-limits-of-experiment-analysis-with-sql" class="nav-link active" data-scroll-target="#strengths-and-limits-of-experiment-analysis-with-sql"><span class="header-section-number">7.1</span> Strengths and Limits of Experiment Analysis with SQL</a></li>
+  <li><a href="#the-data-set" id="toc-the-data-set" class="nav-link" data-scroll-target="#the-data-set"><span class="header-section-number">7.2</span> The Data Set</a></li>
+  <li><a href="#types-of-experiments" id="toc-types-of-experiments" class="nav-link" data-scroll-target="#types-of-experiments"><span class="header-section-number">7.3</span> Types of Experiments</a>
   <ul class="collapse">
-  <li><a href="#experiments-wtih-binary-outcomes-the-chi-squared-test" id="toc-experiments-wtih-binary-outcomes-the-chi-squared-test" class="nav-link" data-scroll-target="#experiments-wtih-binary-outcomes-the-chi-squared-test"><span class="toc-section-number">7.3.1</span>  Experiments wtih Binary Outcomes: The Chi-Squared Test</a></li>
-  <li><a href="#experiments-with-continuous-outcomes-the-t-test" id="toc-experiments-with-continuous-outcomes-the-t-test" class="nav-link" data-scroll-target="#experiments-with-continuous-outcomes-the-t-test"><span class="toc-section-number">7.3.2</span>  Experiments with Continuous Outcomes: The t-Test</a></li>
+  <li><a href="#experiments-wtih-binary-outcomes-the-chi-squared-test" id="toc-experiments-wtih-binary-outcomes-the-chi-squared-test" class="nav-link" data-scroll-target="#experiments-wtih-binary-outcomes-the-chi-squared-test"><span class="header-section-number">7.3.1</span> Experiments wtih Binary Outcomes: The Chi-Squared Test</a></li>
+  <li><a href="#experiments-with-continuous-outcomes-the-t-test" id="toc-experiments-with-continuous-outcomes-the-t-test" class="nav-link" data-scroll-target="#experiments-with-continuous-outcomes-the-t-test"><span class="header-section-number">7.3.2</span> Experiments with Continuous Outcomes: The t-Test</a></li>
   </ul></li>
-  <li><a href="#challenges-with-experiments-and-options-for-rescuing-flawed-experiments" id="toc-challenges-with-experiments-and-options-for-rescuing-flawed-experiments" class="nav-link" data-scroll-target="#challenges-with-experiments-and-options-for-rescuing-flawed-experiments"><span class="toc-section-number">7.4</span>  Challenges with Experiments and Options for Rescuing Flawed Experiments</a>
+  <li><a href="#challenges-with-experiments-and-options-for-rescuing-flawed-experiments" id="toc-challenges-with-experiments-and-options-for-rescuing-flawed-experiments" class="nav-link" data-scroll-target="#challenges-with-experiments-and-options-for-rescuing-flawed-experiments"><span class="header-section-number">7.4</span> Challenges with Experiments and Options for Rescuing Flawed Experiments</a>
   <ul class="collapse">
-  <li><a href="#variant-assignment" id="toc-variant-assignment" class="nav-link" data-scroll-target="#variant-assignment"><span class="toc-section-number">7.4.1</span>  Variant Assignment</a></li>
-  <li><a href="#outliers" id="toc-outliers" class="nav-link" data-scroll-target="#outliers"><span class="toc-section-number">7.4.2</span>  Outliers</a></li>
-  <li><a href="#time-boxing" id="toc-time-boxing" class="nav-link" data-scroll-target="#time-boxing"><span class="toc-section-number">7.4.3</span>  Time Boxing</a></li>
-  <li><a href="#pre-post-analysis" id="toc-pre-post-analysis" class="nav-link" data-scroll-target="#pre-post-analysis"><span class="toc-section-number">7.4.4</span>  Pre-Post Analysis</a></li>
-  <li><a href="#natural-experiment-analysis" id="toc-natural-experiment-analysis" class="nav-link" data-scroll-target="#natural-experiment-analysis"><span class="toc-section-number">7.4.5</span>  Natural experiment analysis</a></li>
+  <li><a href="#variant-assignment" id="toc-variant-assignment" class="nav-link" data-scroll-target="#variant-assignment"><span class="header-section-number">7.4.1</span> Variant Assignment</a></li>
+  <li><a href="#outliers" id="toc-outliers" class="nav-link" data-scroll-target="#outliers"><span class="header-section-number">7.4.2</span> Outliers</a></li>
+  <li><a href="#time-boxing" id="toc-time-boxing" class="nav-link" data-scroll-target="#time-boxing"><span class="header-section-number">7.4.3</span> Time Boxing</a></li>
+  <li><a href="#pre-post-analysis" id="toc-pre-post-analysis" class="nav-link" data-scroll-target="#pre-post-analysis"><span class="header-section-number">7.4.4</span> Pre-Post Analysis</a></li>
+  <li><a href="#natural-experiment-analysis" id="toc-natural-experiment-analysis" class="nav-link" data-scroll-target="#natural-experiment-analysis"><span class="header-section-number">7.4.5</span> Natural experiment analysis</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -265,7 +254,7 @@ div.csl-indent {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title"><span id="sec-experiments" class="quarto-section-identifier d-none d-lg-block"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Experiment Analysis</span></span></h1>
+<h1 class="title"><span id="sec-experiments" class="quarto-section-identifier"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Experiment Analysis</span></span></h1>
 </div>
 
 
@@ -343,7 +332,7 @@ div.csl-indent {
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>                 <span class="at">colwidths =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">2</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 
-<div class="tabwid"><style>.cl-526a6082{}.cl-52668890{font-family:'Helvetica';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-52684400{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-5268440a{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-52684f36{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-52684f37{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-52684f40{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-52684f41{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-52684f4a{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-52684f4b{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table data-quarto-disable-processing="true" class="cl-526a6082"><thead><tr style="overflow-wrap:break-word;"><th class="cl-52684f36"><p class="cl-52684400"><span class="cl-52668890"></span></p></th><th colspan="2" class="cl-52684f37"><p class="cl-5268440a"><span class="cl-52668890">Completed onboarding</span></p></th><th colspan="2" class="cl-52684f37"><p class="cl-5268440a"><span class="cl-52668890"></span></p></th></tr><tr style="overflow-wrap:break-word;"><th class="cl-52684f36"><p class="cl-52684400"><span class="cl-52668890">variant</span></p></th><th class="cl-52684f37"><p class="cl-5268440a"><span class="cl-52668890">No</span></p></th><th class="cl-52684f37"><p class="cl-5268440a"><span class="cl-52668890">Yes</span></p></th><th class="cl-52684f37"><p class="cl-5268440a"><span class="cl-52668890">Total</span></p></th><th class="cl-52684f36"><p class="cl-52684400"><span class="cl-52668890">% Complete</span></p></th></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-52684f40"><p class="cl-52684400"><span class="cl-52668890">control</span></p></td><td class="cl-52684f41"><p class="cl-5268440a"><span class="cl-52668890">13,629</span></p></td><td class="cl-52684f41"><p class="cl-5268440a"><span class="cl-52668890">36,268</span></p></td><td class="cl-52684f41"><p class="cl-5268440a"><span class="cl-52668890">49,897</span></p></td><td class="cl-52684f40"><p class="cl-52684400"><span class="cl-52668890">72.69</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-52684f40"><p class="cl-52684400"><span class="cl-52668890">variant 1</span></p></td><td class="cl-52684f41"><p class="cl-5268440a"><span class="cl-52668890">11,995</span></p></td><td class="cl-52684f41"><p class="cl-5268440a"><span class="cl-52668890">38,280</span></p></td><td class="cl-52684f41"><p class="cl-5268440a"><span class="cl-52668890">50,275</span></p></td><td class="cl-52684f40"><p class="cl-52684400"><span class="cl-52668890">76.14</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-52684f4a"><p class="cl-52684400"><span class="cl-52668890">Total</span></p></td><td class="cl-52684f4b"><p class="cl-5268440a"><span class="cl-52668890">25,624</span></p></td><td class="cl-52684f4b"><p class="cl-5268440a"><span class="cl-52668890">74,548</span></p></td><td class="cl-52684f4b"><p class="cl-5268440a"><span class="cl-52668890">100,172</span></p></td><td class="cl-52684f4a"><p class="cl-52684400"><span class="cl-52668890">74.42</span></p></td></tr></tbody></table></div>
+<div class="tabwid"><style>.cl-1f184034{}.cl-1f14f244{font-family:'Helvetica';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-1f1661f6{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-1f1661f7{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-1f166b4c{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-1f166b56{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-1f166b57{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-1f166b58{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-1f166b59{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-1f166b5a{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table data-quarto-disable-processing="true" class="cl-1f184034"><thead><tr style="overflow-wrap:break-word;"><th class="cl-1f166b4c"><p class="cl-1f1661f6"><span class="cl-1f14f244"></span></p></th><th colspan="2" class="cl-1f166b56"><p class="cl-1f1661f7"><span class="cl-1f14f244">Completed onboarding</span></p></th><th colspan="2" class="cl-1f166b56"><p class="cl-1f1661f7"><span class="cl-1f14f244"></span></p></th></tr><tr style="overflow-wrap:break-word;"><th class="cl-1f166b4c"><p class="cl-1f1661f6"><span class="cl-1f14f244">variant</span></p></th><th class="cl-1f166b56"><p class="cl-1f1661f7"><span class="cl-1f14f244">No</span></p></th><th class="cl-1f166b56"><p class="cl-1f1661f7"><span class="cl-1f14f244">Yes</span></p></th><th class="cl-1f166b56"><p class="cl-1f1661f7"><span class="cl-1f14f244">Total</span></p></th><th class="cl-1f166b4c"><p class="cl-1f1661f6"><span class="cl-1f14f244">% Complete</span></p></th></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-1f166b57"><p class="cl-1f1661f6"><span class="cl-1f14f244">control</span></p></td><td class="cl-1f166b58"><p class="cl-1f1661f7"><span class="cl-1f14f244">13,629</span></p></td><td class="cl-1f166b58"><p class="cl-1f1661f7"><span class="cl-1f14f244">36,268</span></p></td><td class="cl-1f166b58"><p class="cl-1f1661f7"><span class="cl-1f14f244">49,897</span></p></td><td class="cl-1f166b57"><p class="cl-1f1661f6"><span class="cl-1f14f244">72.69</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-1f166b57"><p class="cl-1f1661f6"><span class="cl-1f14f244">variant 1</span></p></td><td class="cl-1f166b58"><p class="cl-1f1661f7"><span class="cl-1f14f244">11,995</span></p></td><td class="cl-1f166b58"><p class="cl-1f1661f7"><span class="cl-1f14f244">38,280</span></p></td><td class="cl-1f166b58"><p class="cl-1f1661f7"><span class="cl-1f14f244">50,275</span></p></td><td class="cl-1f166b57"><p class="cl-1f1661f6"><span class="cl-1f14f244">76.14</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-1f166b59"><p class="cl-1f1661f6"><span class="cl-1f14f244">Total</span></p></td><td class="cl-1f166b5a"><p class="cl-1f1661f7"><span class="cl-1f14f244">25,624</span></p></td><td class="cl-1f166b5a"><p class="cl-1f1661f7"><span class="cl-1f14f244">74,548</span></p></td><td class="cl-1f166b5a"><p class="cl-1f1661f7"><span class="cl-1f14f244">100,172</span></p></td><td class="cl-1f166b59"><p class="cl-1f1661f6"><span class="cl-1f14f244">74.42</span></p></td></tr></tbody></table></div>
 </div>
 </div>
 <p>Now I can do the Chi-squared test. I need to turn <code>variant</code> into the row names of the contingency table so that we want a simple <span class="math inline">\(2 \times 2\)</span> numeric table as the input to our statistical test and I use <code>column_to_rownames()</code> to this end. I then pipe the result into the base R function <code>chisq.test()</code>. I specified <code>correct = FALSE</code> so that my result matched what I got from the <a href="https://www.socscistatistics.com/tests/chisquare/default.aspx">online calculator</a> I found. I then display the Chi-squared statistic and the <span class="math inline">\(p\)</span>-value.</p>
@@ -386,7 +375,7 @@ div.csl-indent {
 <span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>t_test_stats <span class="sc">%&gt;%</span></span>
 <span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<table class="table table-sm table-striped">
+<table class="table table-sm table-striped small">
 <thead>
 <tr class="header">
 <th style="text-align: left;">variant</th>
@@ -469,7 +458,7 @@ sample estimates:
 <span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>t_test_stats_2 <span class="sc">%&gt;%</span></span>
 <span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<table class="table table-sm table-striped">
+<table class="table table-sm table-striped small">
 <thead>
 <tr class="header">
 <th style="text-align: left;">variant</th>
@@ -528,7 +517,7 @@ $`p-value`
 <span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct_purchased =</span> purchasers <span class="sc">*</span> <span class="fl">100.0</span> <span class="sc">/</span> total_cohorted) <span class="sc">%&gt;%</span></span>
 <span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<table class="table table-sm table-striped">
+<table class="table table-sm table-striped small">
 <thead>
 <tr class="header">
 <th style="text-align: left;">variant</th>
@@ -580,7 +569,7 @@ $`p-value`
 <span id="cb19-20"><a href="#cb19-20" aria-hidden="true" tabindex="-1"></a>t_test_stats_boxed <span class="sc">%&gt;%</span></span>
 <span id="cb19-21"><a href="#cb19-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<table class="table table-sm table-striped">
+<table class="table table-sm table-striped small">
 <thead>
 <tr class="header">
 <th style="text-align: left;">variant</th>
@@ -635,7 +624,7 @@ $`p-value`
 <span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> <span class="dv">1</span></span>
 <span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="knitsql-table">
-<table class="table table-sm table-striped">
+<table class="table table-sm table-striped small">
 <caption>2 records</caption>
 <thead>
 <tr class="header">
@@ -693,7 +682,7 @@ $`p-value`
 <span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>                 <span class="at">colwidths =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">2</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 
-<div class="tabwid"><style>.cl-5304f016{}.cl-5301caa8{font-family:'Helvetica';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-53031bec{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-53031bf6{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-530323d0{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-530323d1{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-530323da{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-530323db{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-530323dc{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-530323e4{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table data-quarto-disable-processing="true" class="cl-5304f016"><thead><tr style="overflow-wrap:break-word;"><th colspan="2" class="cl-530323d0"><p class="cl-53031bec"><span class="cl-5301caa8"></span></p></th><th colspan="2" class="cl-530323d1"><p class="cl-53031bf6"><span class="cl-5301caa8">Opted in</span></p></th><th colspan="2" class="cl-530323d1"><p class="cl-53031bf6"><span class="cl-5301caa8"></span></p></th></tr><tr style="overflow-wrap:break-word;"><th class="cl-530323d0"><p class="cl-53031bec"><span class="cl-5301caa8">variant</span></p></th><th class="cl-530323d1"><p class="cl-53031bf6"><span class="cl-5301caa8">days</span></p></th><th class="cl-530323d1"><p class="cl-53031bf6"><span class="cl-5301caa8">Yes</span></p></th><th class="cl-530323d1"><p class="cl-53031bf6"><span class="cl-5301caa8">No</span></p></th><th class="cl-530323d1"><p class="cl-53031bf6"><span class="cl-5301caa8">Total</span></p></th><th class="cl-530323d0"><p class="cl-53031bec"><span class="cl-5301caa8">% opted in</span></p></th></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-530323da"><p class="cl-53031bec"><span class="cl-5301caa8">post</span></p></td><td class="cl-530323db"><p class="cl-53031bf6"><span class="cl-5301caa8">14</span></p></td><td class="cl-530323db"><p class="cl-53031bf6"><span class="cl-5301caa8">11,220</span></p></td><td class="cl-530323db"><p class="cl-53031bf6"><span class="cl-5301caa8">16,397</span></p></td><td class="cl-530323db"><p class="cl-53031bf6"><span class="cl-5301caa8">27,617</span></p></td><td class="cl-530323da"><p class="cl-53031bec"><span class="cl-5301caa8">40.63</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-530323da"><p class="cl-53031bec"><span class="cl-5301caa8">pre</span></p></td><td class="cl-530323db"><p class="cl-53031bf6"><span class="cl-5301caa8">14</span></p></td><td class="cl-530323db"><p class="cl-53031bf6"><span class="cl-5301caa8">14,489</span></p></td><td class="cl-530323db"><p class="cl-53031bf6"><span class="cl-5301caa8">10,173</span></p></td><td class="cl-530323db"><p class="cl-53031bf6"><span class="cl-5301caa8">24,662</span></p></td><td class="cl-530323da"><p class="cl-53031bec"><span class="cl-5301caa8">58.75</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-530323dc"><p class="cl-53031bec"><span class="cl-5301caa8">Total</span></p></td><td class="cl-530323e4"><p class="cl-53031bf6"><span class="cl-5301caa8">28</span></p></td><td class="cl-530323e4"><p class="cl-53031bf6"><span class="cl-5301caa8">25,709</span></p></td><td class="cl-530323e4"><p class="cl-53031bf6"><span class="cl-5301caa8">26,570</span></p></td><td class="cl-530323e4"><p class="cl-53031bf6"><span class="cl-5301caa8">52,279</span></p></td><td class="cl-530323dc"><p class="cl-53031bec"><span class="cl-5301caa8">49.18</span></p></td></tr></tbody></table></div>
+<div class="tabwid"><style>.cl-1faf2a3a{}.cl-1fac5a94{font-family:'Helvetica';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-1fad8e00{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-1fad8e0a{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-1fad9580{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-1fad9581{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-1fad958a{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-1fad958b{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-1fad958c{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-1fad958d{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table data-quarto-disable-processing="true" class="cl-1faf2a3a"><thead><tr style="overflow-wrap:break-word;"><th colspan="2" class="cl-1fad9580"><p class="cl-1fad8e00"><span class="cl-1fac5a94"></span></p></th><th colspan="2" class="cl-1fad9581"><p class="cl-1fad8e0a"><span class="cl-1fac5a94">Opted in</span></p></th><th colspan="2" class="cl-1fad9581"><p class="cl-1fad8e0a"><span class="cl-1fac5a94"></span></p></th></tr><tr style="overflow-wrap:break-word;"><th class="cl-1fad9580"><p class="cl-1fad8e00"><span class="cl-1fac5a94">variant</span></p></th><th class="cl-1fad9581"><p class="cl-1fad8e0a"><span class="cl-1fac5a94">days</span></p></th><th class="cl-1fad9581"><p class="cl-1fad8e0a"><span class="cl-1fac5a94">Yes</span></p></th><th class="cl-1fad9581"><p class="cl-1fad8e0a"><span class="cl-1fac5a94">No</span></p></th><th class="cl-1fad9581"><p class="cl-1fad8e0a"><span class="cl-1fac5a94">Total</span></p></th><th class="cl-1fad9580"><p class="cl-1fad8e00"><span class="cl-1fac5a94">% opted in</span></p></th></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-1fad958a"><p class="cl-1fad8e00"><span class="cl-1fac5a94">post</span></p></td><td class="cl-1fad958b"><p class="cl-1fad8e0a"><span class="cl-1fac5a94">14</span></p></td><td class="cl-1fad958b"><p class="cl-1fad8e0a"><span class="cl-1fac5a94">11,220</span></p></td><td class="cl-1fad958b"><p class="cl-1fad8e0a"><span class="cl-1fac5a94">16,397</span></p></td><td class="cl-1fad958b"><p class="cl-1fad8e0a"><span class="cl-1fac5a94">27,617</span></p></td><td class="cl-1fad958a"><p class="cl-1fad8e00"><span class="cl-1fac5a94">40.63</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-1fad958a"><p class="cl-1fad8e00"><span class="cl-1fac5a94">pre</span></p></td><td class="cl-1fad958b"><p class="cl-1fad8e0a"><span class="cl-1fac5a94">14</span></p></td><td class="cl-1fad958b"><p class="cl-1fad8e0a"><span class="cl-1fac5a94">14,489</span></p></td><td class="cl-1fad958b"><p class="cl-1fad8e0a"><span class="cl-1fac5a94">10,173</span></p></td><td class="cl-1fad958b"><p class="cl-1fad8e0a"><span class="cl-1fac5a94">24,662</span></p></td><td class="cl-1fad958a"><p class="cl-1fad8e00"><span class="cl-1fac5a94">58.75</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-1fad958c"><p class="cl-1fad8e00"><span class="cl-1fac5a94">Total</span></p></td><td class="cl-1fad958d"><p class="cl-1fad8e0a"><span class="cl-1fac5a94">28</span></p></td><td class="cl-1fad958d"><p class="cl-1fad8e0a"><span class="cl-1fac5a94">25,709</span></p></td><td class="cl-1fad958d"><p class="cl-1fad8e0a"><span class="cl-1fac5a94">26,570</span></p></td><td class="cl-1fad958d"><p class="cl-1fad8e0a"><span class="cl-1fac5a94">52,279</span></p></td><td class="cl-1fad958c"><p class="cl-1fad8e00"><span class="cl-1fac5a94">49.18</span></p></td></tr></tbody></table></div>
 </div>
 </div>
 <div class="cell">
@@ -732,7 +721,7 @@ $`p-value`
 <span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a>by_country <span class="sc">%&gt;%</span> <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<table class="table table-sm table-striped">
+<table class="table table-sm table-striped small">
 <thead>
 <tr class="header">
 <th style="text-align: left;">country</th>
@@ -777,8 +766,8 @@ $`p-value`
 </div>
 
 
-<div id="refs" class="references csl-bib-body hanging-indent" role="doc-bibliography" style="display: none">
-<div id="ref-tanimura2021sql" class="csl-entry" role="doc-biblioentry">
+<div id="refs" class="references csl-bib-body hanging-indent" role="list" style="display: none">
+<div id="ref-tanimura2021sql" class="csl-entry" role="listitem">
 Tanimura, C. 2021. <em>SQL for Data Analysis</em>. O’Reilly Media. <a href="https://books.google.com.au/books?id=ojhCEAAAQBAJ">https://books.google.com.au/books?id=ojhCEAAAQBAJ</a>.
 </div>
 </div>
@@ -819,9 +808,23 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     icon: icon
   };
   anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
   const clipboard = new window.ClipboardJS('.code-copy-button', {
-    target: function(trigger) {
-      return trigger.previousElementSibling;
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
     }
   });
   clipboard.on('success', function(e) {
@@ -886,6 +889,92 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       return note.innerHTML;
     });
   }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
   const findCites = (el) => {
     const parentEl = el.parentElement;
     if (parentEl) {
