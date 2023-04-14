@@ -50,8 +50,8 @@ dbDisconnect(db, shutdown = TRUE)
 csv_to_db <- function(file) {
   db <- dbConnect(duckdb::duckdb(), "earthquakes.duckdb")
   df <- read_csv(file, show_col_types = FALSE)
-  copy_to(db, df, name = "earthquakes",
-          append = TRUE, temporary = FALSE)
+  dbWriteTable(db, df, name = "earthquakes",
+          append = TRUE)
   dbDisconnect(db, shutdown = TRUE)
 }
 
@@ -409,13 +409,6 @@ SELECT EXTRACT(year FROM time) AS earthquake_year,
 FROM earthquakes
 GROUP BY 1
 ORDER BY 1;
-```
-
-```{sql}
-#| connection: db
-SELECT *
-FROM earthquakes
-LIMIT 10;
 ```
 
 ```{r}
