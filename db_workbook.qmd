@@ -1,0 +1,28 @@
+---
+title: "Untitled"
+editor: visual
+---
+
+```{r}
+#| message: false
+library(DBI)
+library(tidyverse)
+library(dbplyr)
+library(knitr)
+library(duckdb)
+```
+
+```{r}
+db <- dbConnect(duckdb::duckdb(), "earthquakes.duckdb",
+                read_only = TRUE)
+earthquakes <- tbl(db, "earthquakes")
+```
+
+```{sql}
+#| connection: db
+SELECT * EXCLUDE (column_path, segment_id, start, stats, 
+                  persistent, block_id, block_offset, has_updates)
+FROM pragma_storage_info('earthquakes')
+USING SAMPLE 10 ROWS
+ORDER BY row_group_id;
+```
