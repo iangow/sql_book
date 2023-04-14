@@ -299,8 +299,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>csv_to_db <span class="ot">&lt;-</span> <span class="cf">function</span>(file) {</span>
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  db <span class="ot">&lt;-</span> <span class="fu">dbConnect</span>(duckdb<span class="sc">::</span><span class="fu">duckdb</span>(), <span class="st">"earthquakes.duckdb"</span>)</span>
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  df <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(file, <span class="at">show_col_types =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">copy_to</span>(db, df, <span class="at">name =</span> <span class="st">"earthquakes"</span>,</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>          <span class="at">append =</span> <span class="cn">TRUE</span>, <span class="at">temporary =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">dbWriteTable</span>(db, df, <span class="at">name =</span> <span class="st">"earthquakes"</span>,</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>          <span class="at">append =</span> <span class="cn">TRUE</span>)</span>
 <span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">dbDisconnect</span>(db, <span class="at">shutdown =</span> <span class="cn">TRUE</span>)</span>
 <span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>}</span>
 <span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a></span>
@@ -338,29 +338,29 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </thead>
 <tbody>
 <tr class="odd">
+<td style="text-align: right;">9.1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">7.0e-07</td>
+</tr>
+<tr class="even">
 <td style="text-align: right;">8.8</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">1.00e-05</td>
-</tr>
-<tr class="even">
-<td style="text-align: right;">7.8</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">1.00e-05</td>
+<td style="text-align: right;">7.0e-07</td>
 </tr>
 <tr class="odd">
-<td style="text-align: right;">7.6</td>
+<td style="text-align: right;">8.6</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">1.00e-05</td>
+<td style="text-align: right;">7.0e-07</td>
 </tr>
 <tr class="even">
-<td style="text-align: right;">7.5</td>
+<td style="text-align: right;">8.3</td>
 <td style="text-align: right;">2</td>
-<td style="text-align: right;">2.01e-05</td>
+<td style="text-align: right;">1.3e-06</td>
 </tr>
 <tr class="odd">
-<td style="text-align: right;">7.4</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">1.00e-05</td>
+<td style="text-align: right;">8.2</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">2.7e-06</td>
 </tr>
 </tbody>
 </table>
@@ -388,27 +388,27 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <tbody>
 <tr class="odd">
 <td style="text-align: right;">-9.99</td>
-<td style="text-align: right;">17</td>
+<td style="text-align: right;">258</td>
 <td style="text-align: right;">0</td>
 </tr>
 <tr class="even">
-<td style="text-align: right;">-1.60</td>
+<td style="text-align: right;">-9.00</td>
+<td style="text-align: right;">29</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">-5.00</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">-2.60</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">-2.50</td>
 <td style="text-align: right;">3</td>
-<td style="text-align: right;">0</td>
-</tr>
-<tr class="odd">
-<td style="text-align: right;">-1.30</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">0</td>
-</tr>
-<tr class="even">
-<td style="text-align: right;">-1.10</td>
-<td style="text-align: right;">17</td>
-<td style="text-align: right;">0</td>
-</tr>
-<tr class="odd">
-<td style="text-align: right;">-1.00</td>
-<td style="text-align: right;">2</td>
 <td style="text-align: right;">0</td>
 </tr>
 </tbody>
@@ -438,17 +438,17 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <tbody>
 <tr class="odd">
 <td style="text-align: left;">Northern California</td>
-<td style="text-align: right;">4.12</td>
+<td style="text-align: right;">5.60</td>
 <td style="text-align: right;">1</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Northern California</td>
-<td style="text-align: right;">3.95</td>
+<td style="text-align: right;">4.73</td>
 <td style="text-align: right;">1</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Northern California</td>
-<td style="text-align: right;">3.81</td>
+<td style="text-align: right;">4.51</td>
 <td style="text-align: right;">1</td>
 </tr>
 </tbody>
@@ -470,18 +470,18 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <tbody>
 <tr class="odd">
 <td style="text-align: left;">Northern California</td>
-<td style="text-align: right;">-0.70</td>
+<td style="text-align: right;">-1.6</td>
 <td style="text-align: right;">1</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Northern California</td>
-<td style="text-align: right;">-0.63</td>
-<td style="text-align: right;">1</td>
+<td style="text-align: right;">-1.2</td>
+<td style="text-align: right;">2</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Northern California</td>
-<td style="text-align: right;">-0.61</td>
-<td style="text-align: right;">1</td>
+<td style="text-align: right;">-1.1</td>
+<td style="text-align: right;">7</td>
 </tr>
 </tbody>
 </table>
@@ -511,38 +511,38 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <tbody>
 <tr class="odd">
 <td style="text-align: left;">Northern California</td>
-<td style="text-align: right;">4.12</td>
+<td style="text-align: right;">5.60</td>
 <td style="text-align: right;">1.0000000</td>
 <td style="text-align: right;">1</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Northern California</td>
-<td style="text-align: right;">3.95</td>
-<td style="text-align: right;">0.9999241</td>
+<td style="text-align: right;">4.73</td>
+<td style="text-align: right;">0.9999871</td>
 <td style="text-align: right;">1</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Northern California</td>
-<td style="text-align: right;">3.81</td>
-<td style="text-align: right;">0.9998482</td>
+<td style="text-align: right;">4.51</td>
+<td style="text-align: right;">0.9999741</td>
 <td style="text-align: right;">1</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Northern California</td>
-<td style="text-align: right;">3.71</td>
-<td style="text-align: right;">0.9996963</td>
+<td style="text-align: right;">4.43</td>
+<td style="text-align: right;">0.9999482</td>
 <td style="text-align: right;">2</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Northern California</td>
-<td style="text-align: right;">3.66</td>
-<td style="text-align: right;">0.9996204</td>
+<td style="text-align: right;">4.29</td>
+<td style="text-align: right;">0.9999353</td>
 <td style="text-align: right;">1</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Northern California</td>
-<td style="text-align: right;">3.65</td>
-<td style="text-align: right;">0.9995445</td>
+<td style="text-align: right;">4.28</td>
+<td style="text-align: right;">0.9999224</td>
 <td style="text-align: right;">1</td>
 </tr>
 </tbody>
@@ -574,22 +574,22 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </tr>
 <tr class="even">
 <td style="text-align: left;">Central Alaska</td>
-<td style="text-align: right;">4.4</td>
+<td style="text-align: right;">5.3</td>
 <td style="text-align: right;">100</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Central Alaska</td>
-<td style="text-align: right;">4.4</td>
+<td style="text-align: right;">5.2</td>
 <td style="text-align: right;">100</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Central Alaska</td>
-<td style="text-align: right;">4.3</td>
+<td style="text-align: right;">4.8</td>
 <td style="text-align: right;">100</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Central Alaska</td>
-<td style="text-align: right;">4.3</td>
+<td style="text-align: right;">4.6</td>
 <td style="text-align: right;">100</td>
 </tr>
 </tbody>
@@ -647,25 +647,25 @@ ORDER BY place, mag DESC</code></pre>
 <td style="text-align: left;">Central Alaska</td>
 <td style="text-align: right;">4</td>
 <td style="text-align: right;">5.4</td>
-<td style="text-align: right;">1.5</td>
+<td style="text-align: right;">1.4</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Central Alaska</td>
 <td style="text-align: right;">3</td>
-<td style="text-align: right;">1.5</td>
-<td style="text-align: right;">1.2</td>
+<td style="text-align: right;">1.4</td>
+<td style="text-align: right;">1.1</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Central Alaska</td>
 <td style="text-align: right;">2</td>
-<td style="text-align: right;">1.2</td>
-<td style="text-align: right;">0.9</td>
+<td style="text-align: right;">1.1</td>
+<td style="text-align: right;">0.8</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Central Alaska</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.9</td>
-<td style="text-align: right;">-0.2</td>
+<td style="text-align: right;">0.8</td>
+<td style="text-align: right;">-0.5</td>
 </tr>
 </tbody>
 </table>
@@ -693,9 +693,9 @@ ORDER BY place, mag DESC</code></pre>
 <tbody>
 <tr class="odd">
 <td style="text-align: left;">Central Alaska</td>
-<td style="text-align: right;">0.9</td>
-<td style="text-align: right;">1.2</td>
-<td style="text-align: right;">1.5</td>
+<td style="text-align: right;">0.8</td>
+<td style="text-align: right;">1.1</td>
+<td style="text-align: right;">1.4</td>
 </tr>
 </tbody>
 </table>
@@ -717,8 +717,8 @@ ORDER BY place, mag DESC</code></pre>
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: right;">0.9</td>
-<td style="text-align: right;">6.4</td>
+<td style="text-align: right;">0.8</td>
+<td style="text-align: right;">7.1</td>
 </tr>
 </tbody>
 </table>
@@ -744,13 +744,13 @@ ORDER BY place, mag DESC</code></pre>
 <tbody>
 <tr class="odd">
 <td style="text-align: left;">Central Alaska</td>
-<td style="text-align: right;">0.9</td>
-<td style="text-align: right;">6.4</td>
+<td style="text-align: right;">0.8</td>
+<td style="text-align: right;">7.1</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Southern Alaska</td>
 <td style="text-align: right;">1.2</td>
-<td style="text-align: right;">11.4</td>
+<td style="text-align: right;">10.1</td>
 </tr>
 </tbody>
 </table>
@@ -778,11 +778,11 @@ ORDER BY place, mag DESC</code></pre>
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: right;">1.200681</td>
-<td style="text-align: right;">1.200681</td>
-<td style="text-align: right;">1.200675</td>
+<td style="text-align: right;">1.273606</td>
+<td style="text-align: right;">1.273606</td>
+<td style="text-align: right;">1.273606</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">6e-06</td>
+<td style="text-align: right;">4e-07</td>
 </tr>
 </tbody>
 </table>
@@ -822,52 +822,12 @@ ORDER BY place, mag DESC</code></pre>
 <span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped">
-<thead>
-<tr class="header">
-<th style="text-align: left;">place</th>
-<th style="text-align: right;">mag</th>
-<th style="text-align: right;">avg_mag</th>
-<th style="text-align: right;">std_dev</th>
-<th style="text-align: right;">z_score</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">offshore Bio-Bio, Chile</td>
-<td style="text-align: right;">8.8</td>
-<td style="text-align: right;">1.711903</td>
-<td style="text-align: right;">1.200675</td>
-<td style="text-align: right;">5.903425</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">northern Sumatra, Indonesia</td>
-<td style="text-align: right;">7.8</td>
-<td style="text-align: right;">1.711903</td>
-<td style="text-align: right;">1.200675</td>
-<td style="text-align: right;">5.070560</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Moro Gulf, Mindanao, Philippines</td>
-<td style="text-align: right;">7.6</td>
-<td style="text-align: right;">1.711903</td>
-<td style="text-align: right;">1.200675</td>
-<td style="text-align: right;">4.903987</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>z_scores <span class="sc">%&gt;%</span></span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(mag) <span class="sc">%&gt;%</span></span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>(<span class="at">n =</span> <span class="dv">3</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<table class="table table-sm table-striped">
 <colgroup>
-<col style="width: 50%">
-<col style="width: 7%">
-<col style="width: 13%">
-<col style="width: 13%">
-<col style="width: 14%">
+<col style="width: 55%">
+<col style="width: 5%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -880,25 +840,65 @@ ORDER BY place, mag DESC</code></pre>
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">Nevada</td>
-<td style="text-align: right;">-1.6</td>
-<td style="text-align: right;">1.711903</td>
-<td style="text-align: right;">1.200675</td>
-<td style="text-align: right;">-2.758367</td>
+<td style="text-align: left;">2011 Great Tohoku Earthquake, Japan</td>
+<td style="text-align: right;">9.1</td>
+<td style="text-align: right;">1.625101</td>
+<td style="text-align: right;">1.273606</td>
+<td style="text-align: right;">5.869083</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">Mount St.&nbsp;Helens area, Washington</td>
-<td style="text-align: right;">-1.6</td>
-<td style="text-align: right;">1.711903</td>
-<td style="text-align: right;">1.200675</td>
-<td style="text-align: right;">-2.758367</td>
+<td style="text-align: left;">offshore Bio-Bio, Chile</td>
+<td style="text-align: right;">8.8</td>
+<td style="text-align: right;">1.625101</td>
+<td style="text-align: right;">1.273606</td>
+<td style="text-align: right;">5.633532</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">Mount St.&nbsp;Helens area, Washington</td>
-<td style="text-align: right;">-1.6</td>
-<td style="text-align: right;">1.711903</td>
-<td style="text-align: right;">1.200675</td>
-<td style="text-align: right;">-2.758367</td>
+<td style="text-align: left;">off the west coast of northern Sumatra</td>
+<td style="text-align: right;">8.6</td>
+<td style="text-align: right;">1.625101</td>
+<td style="text-align: right;">1.273606</td>
+<td style="text-align: right;">5.476497</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>z_scores <span class="sc">%&gt;%</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(mag) <span class="sc">%&gt;%</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>(<span class="at">n =</span> <span class="dv">3</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped">
+<thead>
+<tr class="header">
+<th style="text-align: left;">place</th>
+<th style="text-align: right;">mag</th>
+<th style="text-align: right;">avg_mag</th>
+<th style="text-align: right;">std_dev</th>
+<th style="text-align: right;">z_score</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">20 km SSW of Pa‘auilo, Hawaii</td>
+<td style="text-align: right;">-5.0</td>
+<td style="text-align: right;">1.625101</td>
+<td style="text-align: right;">1.273606</td>
+<td style="text-align: right;">-5.201846</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Nevada</td>
+<td style="text-align: right;">-2.6</td>
+<td style="text-align: right;">1.625101</td>
+<td style="text-align: right;">1.273606</td>
+<td style="text-align: right;">-3.317433</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Nevada</td>
+<td style="text-align: right;">-2.6</td>
+<td style="text-align: right;">1.625101</td>
+<td style="text-align: right;">1.273606</td>
+<td style="text-align: right;">-3.317433</td>
 </tr>
 </tbody>
 </table>
@@ -992,12 +992,12 @@ ORDER BY place, mag DESC</code></pre>
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: right;">4.2</td>
-<td style="text-align: right;">4.4</td>
-<td style="text-align: right;">4.6</td>
+<td style="text-align: right;">4.3</td>
+<td style="text-align: right;">4.5</td>
+<td style="text-align: right;">4.7</td>
 <td style="text-align: right;">0.6</td>
-<td style="text-align: right;">3.6</td>
-<td style="text-align: right;">5.2</td>
+<td style="text-align: right;">3.7</td>
+<td style="text-align: right;">5.3</td>
 </tr>
 </tbody>
 </table>
@@ -1038,23 +1038,23 @@ ORDER BY place, mag DESC</code></pre>
 <tbody>
 <tr class="odd">
 <td style="text-align: right;">1.08</td>
-<td style="text-align: right;">319</td>
+<td style="text-align: right;">3863</td>
 </tr>
 <tr class="even">
+<td style="text-align: right;">1.08</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
 <td style="text-align: right;">1.09</td>
-<td style="text-align: right;">318</td>
-</tr>
-<tr class="odd">
-<td style="text-align: right;">1.10</td>
-<td style="text-align: right;">1918</td>
+<td style="text-align: right;">3712</td>
 </tr>
 <tr class="even">
-<td style="text-align: right;">1.11</td>
-<td style="text-align: right;">314</td>
+<td style="text-align: right;">1.10</td>
+<td style="text-align: right;">39728</td>
 </tr>
 <tr class="odd">
-<td style="text-align: right;">1.12</td>
-<td style="text-align: right;">358</td>
+<td style="text-align: right;">1.11</td>
+<td style="text-align: right;">3674</td>
 </tr>
 </tbody>
 </table>
@@ -1079,7 +1079,7 @@ ORDER BY place, mag DESC</code></pre>
 <tbody>
 <tr class="odd">
 <td style="text-align: left;">us</td>
-<td style="text-align: right;">44</td>
+<td style="text-align: right;">1215</td>
 </tr>
 </tbody>
 </table>
@@ -1103,23 +1103,23 @@ ORDER BY place, mag DESC</code></pre>
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">Banda Sea</td>
+<td style="text-align: left;">100km NW of Ndoi Island, Fiji</td>
 <td style="text-align: right;">1</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">Fiji region</td>
-<td style="text-align: right;">10</td>
+<td style="text-align: left;">100km SSW of Ndoi Island, Fiji</td>
+<td style="text-align: right;">1</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">Mindanao, Philippines</td>
+<td style="text-align: left;">100km SW of Ndoi Island, Fiji</td>
 <td style="text-align: right;">1</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">Moro Gulf, Mindanao, Philippines</td>
-<td style="text-align: right;">24</td>
+<td style="text-align: left;">101km ENE of Suva, Fiji</td>
+<td style="text-align: right;">1</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">New Britain region, Papua New Guinea</td>
+<td style="text-align: left;">101km NNE of Ndoi Island, Fiji</td>
 <td style="text-align: right;">1</td>
 </tr>
 </tbody>
@@ -1147,16 +1147,16 @@ ORDER BY place, mag DESC</code></pre>
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">Moro Gulf, Mindanao, Philippines</td>
-<td style="text-align: right;">24</td>
+<td style="text-align: left;">Ndoi Island, Fiji</td>
+<td style="text-align: right;">487</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Fiji region</td>
-<td style="text-align: right;">10</td>
+<td style="text-align: right;">186</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">the Fiji Islands</td>
-<td style="text-align: right;">4</td>
+<td style="text-align: left;">Lambasa, Fiji</td>
+<td style="text-align: right;">140</td>
 </tr>
 </tbody>
 </table>
@@ -1177,8 +1177,8 @@ ORDER BY place, mag DESC</code></pre>
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: right;">9</td>
-<td style="text-align: right;">9</td>
+<td style="text-align: right;">25</td>
+<td style="text-align: right;">24</td>
 </tr>
 </tbody>
 </table>
@@ -1196,374 +1196,108 @@ ORDER BY place, mag DESC</code></pre>
 <span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> <span class="dv">1</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="knitsql-table">
 <table class="table table-sm table-striped">
-<caption>1 records</caption>
+<caption>Displaying records 1 - 10</caption>
 <thead>
 <tr class="header">
-<th style="text-align: right;">earthquake_year</th>
+<th style="text-align: left;">earthquake_year</th>
 <th style="text-align: right;">earthquakes</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: right;">2010</td>
-<td style="text-align: right;">1e+05</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<div class="cell" data-connection="db">
-<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span></span>
-<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> earthquakes</span>
-<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">10</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="knitsql-table">
-<table class="table table-sm table-striped">
-<caption>Displaying records 1 - 10</caption>
-<colgroup>
-<col style="width: 8%">
-<col style="width: 3%">
-<col style="width: 4%">
-<col style="width: 3%">
-<col style="width: 2%">
-<col style="width: 3%">
-<col style="width: 1%">
-<col style="width: 1%">
-<col style="width: 3%">
-<col style="width: 2%">
-<col style="width: 1%">
-<col style="width: 5%">
-<col style="width: 8%">
-<col style="width: 12%">
-<col style="width: 4%">
-<col style="width: 6%">
-<col style="width: 4%">
-<col style="width: 3%">
-<col style="width: 3%">
-<col style="width: 3%">
-<col style="width: 6%">
-<col style="width: 4%">
-</colgroup>
-<thead>
-<tr class="header">
-<th style="text-align: left;">time</th>
-<th style="text-align: right;">latitude</th>
-<th style="text-align: right;">longitude</th>
-<th style="text-align: right;">depth</th>
-<th style="text-align: right;">mag</th>
-<th style="text-align: left;">magtype</th>
-<th style="text-align: right;">nst</th>
-<th style="text-align: right;">gap</th>
-<th style="text-align: right;">dmin</th>
-<th style="text-align: right;">rms</th>
-<th style="text-align: left;">net</th>
-<th style="text-align: left;">id</th>
-<th style="text-align: left;">updated</th>
-<th style="text-align: left;">place</th>
-<th style="text-align: left;">type</th>
-<th style="text-align: right;">horizontalerror</th>
-<th style="text-align: right;">deptherror</th>
-<th style="text-align: right;">magerror</th>
-<th style="text-align: right;">magnst</th>
-<th style="text-align: left;">status</th>
-<th style="text-align: left;">locationsource</th>
-<th style="text-align: left;">magsource</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">2010-01-01 00:10:43</td>
-<td style="text-align: right;">61.03220</td>
-<td style="text-align: right;">-151.6587</td>
-<td style="text-align: right;">88.400</td>
-<td style="text-align: right;">1.60</td>
-<td style="text-align: left;">ml</td>
-<td style="text-align: right;">NA</td>
-<td style="text-align: right;">NA</td>
-<td style="text-align: right;">NA</td>
-<td style="text-align: right;">0.77</td>
-<td style="text-align: left;">ak</td>
-<td style="text-align: left;">ak0101nll17</td>
-<td style="text-align: left;">2018-07-06 19:44:32</td>
-<td style="text-align: left;">Southern Alaska</td>
-<td style="text-align: left;">earthquake</td>
-<td style="text-align: right;">NA</td>
-<td style="text-align: right;">0.00</td>
-<td style="text-align: right;">NA</td>
-<td style="text-align: right;">NA</td>
-<td style="text-align: left;">reviewed</td>
-<td style="text-align: left;">ak</td>
-<td style="text-align: left;">ak</td>
+<td style="text-align: left;">2010</td>
+<td style="text-align: right;">122322</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">2010-01-01 00:16:49</td>
-<td style="text-align: right;">48.20317</td>
-<td style="text-align: right;">-121.6768</td>
-<td style="text-align: right;">2.948</td>
-<td style="text-align: right;">2.20</td>
-<td style="text-align: left;">md</td>
-<td style="text-align: right;">16</td>
-<td style="text-align: right;">79</td>
-<td style="text-align: right;">0.16790</td>
-<td style="text-align: right;">0.22</td>
-<td style="text-align: left;">uw</td>
-<td style="text-align: left;">uw10782553</td>
-<td style="text-align: left;">2016-09-01 18:42:22</td>
-<td style="text-align: left;">Washington</td>
-<td style="text-align: left;">earthquake</td>
-<td style="text-align: right;">1.004</td>
-<td style="text-align: right;">12.60</td>
-<td style="text-align: right;">0.070</td>
-<td style="text-align: right;">9</td>
-<td style="text-align: left;">reviewed</td>
-<td style="text-align: left;">uw</td>
-<td style="text-align: left;">uw</td>
+<td style="text-align: left;">2011</td>
+<td style="text-align: right;">107397</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">2010-01-01 00:16:54</td>
-<td style="text-align: right;">36.03200</td>
-<td style="text-align: right;">-117.7822</td>
-<td style="text-align: right;">1.103</td>
-<td style="text-align: right;">1.10</td>
-<td style="text-align: left;">ml</td>
-<td style="text-align: right;">19</td>
-<td style="text-align: right;">71</td>
-<td style="text-align: right;">0.01280</td>
-<td style="text-align: right;">0.22</td>
-<td style="text-align: left;">ci</td>
-<td style="text-align: left;">ci14566836</td>
-<td style="text-align: left;">2016-03-10 22:55:21</td>
-<td style="text-align: left;">15km E of Coso Junction, CA</td>
-<td style="text-align: left;">earthquake</td>
-<td style="text-align: right;">0.400</td>
-<td style="text-align: right;">0.62</td>
-<td style="text-align: right;">0.164</td>
-<td style="text-align: right;">15</td>
-<td style="text-align: left;">reviewed</td>
-<td style="text-align: left;">ci</td>
-<td style="text-align: left;">ci</td>
+<td style="text-align: left;">2012</td>
+<td style="text-align: right;">105693</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">2010-01-01 00:29:29</td>
-<td style="text-align: right;">60.14700</td>
-<td style="text-align: right;">-141.0550</td>
-<td style="text-align: right;">0.000</td>
-<td style="text-align: right;">1.40</td>
-<td style="text-align: left;">ml</td>
-<td style="text-align: right;">NA</td>
-<td style="text-align: right;">NA</td>
-<td style="text-align: right;">NA</td>
-<td style="text-align: right;">0.51</td>
-<td style="text-align: left;">ak</td>
-<td style="text-align: left;">ak0101npmji</td>
-<td style="text-align: left;">2018-07-06 19:44:32</td>
-<td style="text-align: left;">Southern Alaska</td>
-<td style="text-align: left;">ice quake</td>
-<td style="text-align: right;">NA</td>
-<td style="text-align: right;">0.00</td>
-<td style="text-align: right;">NA</td>
-<td style="text-align: right;">NA</td>
-<td style="text-align: left;">reviewed</td>
-<td style="text-align: left;">ak</td>
-<td style="text-align: left;">ak</td>
+<td style="text-align: left;">2013</td>
+<td style="text-align: right;">114368</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">2010-01-01 00:30:16</td>
-<td style="text-align: right;">33.47467</td>
-<td style="text-align: right;">-116.4268</td>
-<td style="text-align: right;">4.375</td>
-<td style="text-align: right;">0.75</td>
-<td style="text-align: left;">ml</td>
-<td style="text-align: right;">13</td>
-<td style="text-align: right;">210</td>
-<td style="text-align: right;">0.12000</td>
-<td style="text-align: right;">0.11</td>
-<td style="text-align: left;">ci</td>
-<td style="text-align: left;">ci14566844</td>
-<td style="text-align: left;">2016-03-10 11:39:44</td>
-<td style="text-align: left;">24km SSW of La Quinta, CA</td>
-<td style="text-align: left;">earthquake</td>
-<td style="text-align: right;">0.560</td>
-<td style="text-align: right;">31.61</td>
-<td style="text-align: right;">0.146</td>
-<td style="text-align: right;">19</td>
-<td style="text-align: left;">reviewed</td>
-<td style="text-align: left;">ci</td>
-<td style="text-align: left;">ci</td>
+<td style="text-align: left;">2014</td>
+<td style="text-align: right;">135247</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">2010-01-01 00:31:40</td>
-<td style="text-align: right;">63.19860</td>
-<td style="text-align: right;">-149.6839</td>
-<td style="text-align: right;">86.700</td>
-<td style="text-align: right;">1.00</td>
-<td style="text-align: left;">ml</td>
-<td style="text-align: right;">NA</td>
-<td style="text-align: right;">NA</td>
-<td style="text-align: right;">NA</td>
-<td style="text-align: right;">0.36</td>
-<td style="text-align: left;">ak</td>
-<td style="text-align: left;">ak0101nq2s7</td>
-<td style="text-align: left;">2018-07-06 19:44:42</td>
-<td style="text-align: left;">Central Alaska</td>
-<td style="text-align: left;">earthquake</td>
-<td style="text-align: right;">NA</td>
-<td style="text-align: right;">0.20</td>
-<td style="text-align: right;">NA</td>
-<td style="text-align: right;">NA</td>
-<td style="text-align: left;">reviewed</td>
-<td style="text-align: left;">ak</td>
-<td style="text-align: left;">ak</td>
+<td style="text-align: left;">2015</td>
+<td style="text-align: right;">122914</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">2010-01-01 00:34:29</td>
-<td style="text-align: right;">36.00400</td>
-<td style="text-align: right;">-117.7892</td>
-<td style="text-align: right;">1.991</td>
-<td style="text-align: right;">0.46</td>
-<td style="text-align: left;">ml</td>
-<td style="text-align: right;">8</td>
-<td style="text-align: right;">118</td>
-<td style="text-align: right;">0.02675</td>
-<td style="text-align: right;">0.11</td>
-<td style="text-align: left;">ci</td>
-<td style="text-align: left;">ci14566852</td>
-<td style="text-align: left;">2016-03-10 05:47:44</td>
-<td style="text-align: left;">13km NE of Little Lake, CA</td>
-<td style="text-align: left;">earthquake</td>
-<td style="text-align: right;">0.490</td>
-<td style="text-align: right;">1.12</td>
-<td style="text-align: right;">0.201</td>
-<td style="text-align: right;">6</td>
-<td style="text-align: left;">reviewed</td>
-<td style="text-align: left;">ci</td>
-<td style="text-align: left;">ci</td>
+<td style="text-align: left;">2016</td>
+<td style="text-align: right;">122420</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">2010-01-01 00:55:05</td>
-<td style="text-align: right;">53.92600</td>
-<td style="text-align: right;">-163.9887</td>
-<td style="text-align: right;">22.400</td>
-<td style="text-align: right;">2.40</td>
-<td style="text-align: left;">ml</td>
-<td style="text-align: right;">NA</td>
-<td style="text-align: right;">NA</td>
-<td style="text-align: right;">NA</td>
-<td style="text-align: right;">0.31</td>
-<td style="text-align: left;">ak</td>
-<td style="text-align: left;">ak0101nv5aw</td>
-<td style="text-align: left;">2018-07-06 19:44:32</td>
-<td style="text-align: left;">Unimak Island region, Alaska</td>
-<td style="text-align: left;">earthquake</td>
-<td style="text-align: right;">NA</td>
-<td style="text-align: right;">0.10</td>
-<td style="text-align: right;">NA</td>
-<td style="text-align: right;">NA</td>
-<td style="text-align: left;">reviewed</td>
-<td style="text-align: left;">ak</td>
-<td style="text-align: left;">ak</td>
+<td style="text-align: left;">2017</td>
+<td style="text-align: right;">130622</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">2010-01-01 00:57:31</td>
-<td style="text-align: right;">63.25890</td>
-<td style="text-align: right;">-151.1658</td>
-<td style="text-align: right;">6.200</td>
-<td style="text-align: right;">0.60</td>
-<td style="text-align: left;">ml</td>
-<td style="text-align: right;">NA</td>
-<td style="text-align: right;">NA</td>
-<td style="text-align: right;">NA</td>
-<td style="text-align: right;">0.19</td>
-<td style="text-align: left;">ak</td>
-<td style="text-align: left;">ak0101nvmrg</td>
-<td style="text-align: left;">2018-07-06 19:44:43</td>
-<td style="text-align: left;">Central Alaska</td>
-<td style="text-align: left;">earthquake</td>
-<td style="text-align: right;">NA</td>
-<td style="text-align: right;">0.20</td>
-<td style="text-align: right;">NA</td>
-<td style="text-align: right;">NA</td>
-<td style="text-align: left;">reviewed</td>
-<td style="text-align: left;">ak</td>
-<td style="text-align: left;">ak</td>
+<td style="text-align: left;">2018</td>
+<td style="text-align: right;">179304</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">2010-01-01 01:09:53</td>
-<td style="text-align: right;">38.75517</td>
-<td style="text-align: right;">-122.7172</td>
-<td style="text-align: right;">1.604</td>
-<td style="text-align: right;">0.20</td>
-<td style="text-align: left;">md</td>
-<td style="text-align: right;">9</td>
-<td style="text-align: right;">67</td>
-<td style="text-align: right;">0.01532</td>
-<td style="text-align: right;">0.08</td>
-<td style="text-align: left;">nc</td>
-<td style="text-align: left;">nc71328690</td>
-<td style="text-align: left;">2017-01-21 16:40:03</td>
-<td style="text-align: left;">Northern California</td>
-<td style="text-align: left;">earthquake</td>
-<td style="text-align: right;">0.500</td>
-<td style="text-align: right;">1.19</td>
-<td style="text-align: right;">0.175</td>
-<td style="text-align: right;">4</td>
-<td style="text-align: left;">reviewed</td>
-<td style="text-align: left;">nc</td>
-<td style="text-align: left;">nc</td>
+<td style="text-align: left;">2019</td>
+<td style="text-align: right;">171116</td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>earthquakes <span class="sc">%&gt;%</span></span>
-<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">earthquake_year =</span> <span class="fu">as.character</span>(<span class="fu">year</span>(time))) <span class="sc">%&gt;%</span></span>
-<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(earthquake_year) <span class="sc">%&gt;%</span></span>
-<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">earthquakes =</span> <span class="fu">n</span>()) <span class="sc">%&gt;%</span></span>
-<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> earthquake_year, <span class="at">y =</span> earthquakes)) <span class="sc">+</span></span>
-<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>earthquakes <span class="sc">%&gt;%</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">earthquake_year =</span> <span class="fu">as.character</span>(<span class="fu">year</span>(time))) <span class="sc">%&gt;%</span></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(earthquake_year) <span class="sc">%&gt;%</span></span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">earthquakes =</span> <span class="fu">n</span>()) <span class="sc">%&gt;%</span></span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> earthquake_year, <span class="at">y =</span> earthquakes)) <span class="sc">+</span></span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="chapter_6_files/figure-html/unnamed-chunk-37-1.png" class="img-fluid" width="672"></p>
+<p><img src="chapter_6_files/figure-html/unnamed-chunk-36-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <p><a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a></p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>earthquakes <span class="sc">%&gt;%</span></span>
-<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">earthquake_year =</span> <span class="fu">as.character</span>(<span class="fu">year</span>(time))) <span class="sc">%&gt;%</span></span>
-<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(earthquake_year) <span class="sc">%&gt;%</span></span>
-<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> earthquake_year)) <span class="sc">+</span></span>
-<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>earthquakes <span class="sc">%&gt;%</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">earthquake_year =</span> <span class="fu">as.character</span>(<span class="fu">year</span>(time))) <span class="sc">%&gt;%</span></span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(earthquake_year) <span class="sc">%&gt;%</span></span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> earthquake_year)) <span class="sc">+</span></span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>earthquakes <span class="sc">%&gt;%</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">earthquake_month =</span> <span class="fu">floor_date</span>(time, <span class="st">"month"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(earthquake_month) <span class="sc">%&gt;%</span></span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">earthquakes =</span> <span class="fu">n</span>(), <span class="at">.groups =</span> <span class="st">"drop"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> earthquake_month, <span class="at">y =</span> earthquakes)) <span class="sc">+</span></span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="chapter_6_files/figure-html/unnamed-chunk-38-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>From the book, “it turns out that the increase in earthquakes starting in 2017 can be at least partially explained by the status field. The status indicates whether the event has been reviewed by a human (‘reviewed’) or was directly posted by a system without review (‘automatic’).” This can be seen in the following plot.<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a></p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>earthquakes <span class="sc">%&gt;%</span></span>
 <span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">earthquake_month =</span> <span class="fu">floor_date</span>(time, <span class="st">"month"</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(earthquake_month) <span class="sc">%&gt;%</span></span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(earthquake_month, status) <span class="sc">%&gt;%</span></span>
 <span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">earthquakes =</span> <span class="fu">n</span>(), <span class="at">.groups =</span> <span class="st">"drop"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> earthquake_month, <span class="at">y =</span> earthquakes)) <span class="sc">+</span></span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> earthquake_month, <span class="at">y =</span> earthquakes, <span class="at">color =</span> status)) <span class="sc">+</span></span>
 <span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="chapter_6_files/figure-html/unnamed-chunk-39-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<p>From the book, “it turns out that the increase in earthquakes starting in 2017 can be at least partially explained by the status field. The status indicates whether the event has been reviewed by a human (‘reviewed’) or was directly posted by a system without review (‘automatic’).” This can be seen in the following plot.<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a></p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>earthquakes <span class="sc">%&gt;%</span></span>
-<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">earthquake_month =</span> <span class="fu">floor_date</span>(time, <span class="st">"month"</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(earthquake_month, status) <span class="sc">%&gt;%</span></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(mag <span class="sc">&gt;=</span> <span class="dv">6</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(place) <span class="sc">%&gt;%</span></span>
 <span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">earthquakes =</span> <span class="fu">n</span>(), <span class="at">.groups =</span> <span class="st">"drop"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> earthquake_month, <span class="at">y =</span> earthquakes, <span class="at">color =</span> status)) <span class="sc">+</span></span>
-<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<p><img src="chapter_6_files/figure-html/unnamed-chunk-40-1.png" class="img-fluid" width="672"></p>
-</div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>earthquakes <span class="sc">%&gt;%</span></span>
-<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(mag <span class="sc">&gt;=</span> <span class="dv">6</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(place) <span class="sc">%&gt;%</span></span>
-<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">earthquakes =</span> <span class="fu">n</span>(), <span class="at">.groups =</span> <span class="st">"drop"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(earthquakes)) <span class="sc">%&gt;%</span></span>
-<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>(<span class="at">n =</span> <span class="dv">3</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(earthquakes)) <span class="sc">%&gt;%</span></span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>(<span class="at">n =</span> <span class="dv">3</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped">
 <thead>
@@ -1574,16 +1308,16 @@ ORDER BY place, mag DESC</code></pre>
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">offshore Bio-Bio, Chile</td>
-<td style="text-align: right;">9</td>
+<td style="text-align: left;">near the east coast of Honshu, Japan</td>
+<td style="text-align: right;">52</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">Vanuatu</td>
-<td style="text-align: right;">8</td>
+<td style="text-align: left;">off the east coast of Honshu, Japan</td>
+<td style="text-align: right;">34</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">Solomon Islands</td>
-<td style="text-align: right;">7</td>
+<td style="text-align: left;">Vanuatu</td>
+<td style="text-align: right;">28</td>
 </tr>
 </tbody>
 </table>
@@ -1591,19 +1325,19 @@ ORDER BY place, mag DESC</code></pre>
 </div>
 <p>For the next query, it seems easy enough to just put the result in a plot.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>earthquakes <span class="sc">%&gt;%</span></span>
-<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(mag <span class="sc">&gt;=</span> <span class="dv">6</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">place =</span> <span class="fu">if_else</span>(<span class="fu">grepl</span>(<span class="st">' of '</span>, place),</span>
-<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>                         <span class="fu">split_part</span>(place, <span class="st">' of '</span>, 2L), </span>
-<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>                         place)) <span class="sc">%&gt;%</span></span>
-<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(place, <span class="at">name =</span> <span class="st">"earthquakes"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(earthquakes)) <span class="sc">%&gt;%</span></span>
-<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>(<span class="at">n =</span> <span class="dv">10</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb43-9"><a href="#cb43-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">y =</span> <span class="fu">fct_inorder</span>(place), </span>
-<span id="cb43-10"><a href="#cb43-10" aria-hidden="true" tabindex="-1"></a>             <span class="at">x =</span> earthquakes)) <span class="sc">+</span></span>
-<span id="cb43-11"><a href="#cb43-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>earthquakes <span class="sc">%&gt;%</span></span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(mag <span class="sc">&gt;=</span> <span class="dv">6</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">place =</span> <span class="fu">if_else</span>(<span class="fu">grepl</span>(<span class="st">' of '</span>, place),</span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>                         <span class="fu">split_part</span>(place, <span class="st">' of '</span>, 2L), </span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>                         place)) <span class="sc">%&gt;%</span></span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(place, <span class="at">name =</span> <span class="st">"earthquakes"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(earthquakes)) <span class="sc">%&gt;%</span></span>
+<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>(<span class="at">n =</span> <span class="dv">10</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">y =</span> <span class="fu">fct_inorder</span>(place), </span>
+<span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a>             <span class="at">x =</span> earthquakes)) <span class="sc">+</span></span>
+<span id="cb42-11"><a href="#cb42-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="chapter_6_files/figure-html/unnamed-chunk-42-1.png" class="img-fluid" width="672"></p>
+<p><img src="chapter_6_files/figure-html/unnamed-chunk-41-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section>
@@ -1619,11 +1353,11 @@ ORDER BY place, mag DESC</code></pre>
 <section id="removal" class="level3" data-number="6.3.2">
 <h3 data-number="6.3.2" class="anchored" data-anchor-id="removal"><span class="header-section-number">6.3.2</span> Removal</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>earthquakes <span class="sc">%&gt;%</span></span>
-<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span>mag <span class="sc">%in%</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">9</span>,<span class="sc">-</span><span class="fl">9.99</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(time, mag, type) <span class="sc">%&gt;%</span></span>
-<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>(<span class="at">n =</span> <span class="dv">10</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>earthquakes <span class="sc">%&gt;%</span></span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span>mag <span class="sc">%in%</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">9</span>,<span class="sc">-</span><span class="fl">9.99</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(time, mag, type) <span class="sc">%&gt;%</span></span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>(<span class="at">n =</span> <span class="dv">10</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped">
 <thead>
@@ -1689,10 +1423,10 @@ ORDER BY place, mag DESC</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>earthquakes <span class="sc">%&gt;%</span></span>
-<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">avg_mag =</span> <span class="fu">avg</span>(mag),</span>
-<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>            <span class="at">avg_mag_adjusted =</span> <span class="fu">avg</span>(<span class="fu">if_else</span>(mag <span class="sc">&gt;</span> <span class="sc">-</span><span class="dv">9</span>, mag, <span class="cn">NA</span>))) <span class="sc">%&gt;%</span></span>
-<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>earthquakes <span class="sc">%&gt;%</span></span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">avg_mag =</span> <span class="fu">avg</span>(mag),</span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>            <span class="at">avg_mag_adjusted =</span> <span class="fu">avg</span>(<span class="fu">if_else</span>(mag <span class="sc">&gt;</span> <span class="sc">-</span><span class="dv">9</span>, mag, <span class="cn">NA</span>))) <span class="sc">%&gt;%</span></span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped">
 <thead>
@@ -1703,19 +1437,19 @@ ORDER BY place, mag DESC</code></pre>
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: right;">1.711903</td>
-<td style="text-align: right;">1.713898</td>
+<td style="text-align: right;">1.625101</td>
+<td style="text-align: right;">1.627323</td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>earthquakes <span class="sc">%&gt;%</span></span>
-<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(place <span class="sc">==</span> <span class="st">'Yellowstone National Park, Wyoming'</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">avg_mag =</span> <span class="fu">avg</span>(mag),</span>
-<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>            <span class="at">avg_mag_adjusted =</span> <span class="fu">avg</span>(<span class="fu">if_else</span>(mag <span class="sc">&gt;</span> <span class="sc">-</span><span class="dv">9</span>, mag, <span class="cn">NA</span>))) <span class="sc">%&gt;%</span></span>
-<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>earthquakes <span class="sc">%&gt;%</span></span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(place <span class="sc">==</span> <span class="st">'Yellowstone National Park, Wyoming'</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">avg_mag =</span> <span class="fu">avg</span>(mag),</span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>            <span class="at">avg_mag_adjusted =</span> <span class="fu">avg</span>(<span class="fu">if_else</span>(mag <span class="sc">&gt;</span> <span class="sc">-</span><span class="dv">9</span>, mag, <span class="cn">NA</span>))) <span class="sc">%&gt;%</span></span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped">
 <thead>
@@ -1726,8 +1460,8 @@ ORDER BY place, mag DESC</code></pre>
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: right;">0.8140104</td>
-<td style="text-align: right;">0.8740535</td>
+<td style="text-align: right;">0.4063935</td>
+<td style="text-align: right;">0.9233279</td>
 </tr>
 </tbody>
 </table>
@@ -1737,10 +1471,10 @@ ORDER BY place, mag DESC</code></pre>
 <section id="replacement-with-alternate-values" class="level3" data-number="6.3.3">
 <h3 data-number="6.3.3" class="anchored" data-anchor-id="replacement-with-alternate-values"><span class="header-section-number">6.3.3</span> Replacement with Alternate Values</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>earthquakes <span class="sc">%&gt;%</span></span>
-<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">event_type =</span> <span class="fu">if_else</span>(type <span class="sc">==</span> <span class="st">'earthquake'</span>, type, <span class="st">'Other'</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(event_type) <span class="sc">%&gt;%</span></span>
-<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>earthquakes <span class="sc">%&gt;%</span></span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">event_type =</span> <span class="fu">if_else</span>(type <span class="sc">==</span> <span class="st">'earthquake'</span>, type, <span class="st">'Other'</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(event_type) <span class="sc">%&gt;%</span></span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped">
 <thead>
@@ -1752,23 +1486,23 @@ ORDER BY place, mag DESC</code></pre>
 <tbody>
 <tr class="odd">
 <td style="text-align: left;">earthquake</td>
-<td style="text-align: right;">98375</td>
+<td style="text-align: right;">1461750</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Other</td>
-<td style="text-align: right;">1625</td>
+<td style="text-align: right;">34176</td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>extremes <span class="ot">&lt;-</span></span>
-<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>  earthquakes <span class="sc">%&gt;%</span></span>
-<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">p95 =</span> <span class="fu">quantile</span>(mag, <span class="at">probs =</span> <span class="fl">0.95</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a>            <span class="at">p05 =</span> <span class="fu">quantile</span>(mag, <span class="at">probs =</span> <span class="fl">0.05</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>))</span>
-<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb48-6"><a href="#cb48-6" aria-hidden="true" tabindex="-1"></a>extremes <span class="sc">%&gt;%</span> <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>extremes <span class="ot">&lt;-</span></span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>  earthquakes <span class="sc">%&gt;%</span></span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">p95 =</span> <span class="fu">quantile</span>(mag, <span class="at">probs =</span> <span class="fl">0.95</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>            <span class="at">p05 =</span> <span class="fu">quantile</span>(mag, <span class="at">probs =</span> <span class="fl">0.05</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-6"><a href="#cb47-6" aria-hidden="true" tabindex="-1"></a>extremes <span class="sc">%&gt;%</span> <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped">
 <thead>
@@ -1780,7 +1514,7 @@ ORDER BY place, mag DESC</code></pre>
 <tbody>
 <tr class="odd">
 <td style="text-align: right;">4.5</td>
-<td style="text-align: right;">0.31</td>
+<td style="text-align: right;">0.12</td>
 </tr>
 </tbody>
 </table>
@@ -1788,37 +1522,37 @@ ORDER BY place, mag DESC</code></pre>
 </div>
 <p>Note that this SQL from the book<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a></p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="cf">CASE</span> </span>
-<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">WHEN</span> mag <span class="op">&gt;</span> p95 <span class="cf">THEN</span> p95</span>
-<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">WHEN</span> mag <span class="op">&lt;</span> p05 <span class="cf">THEN</span> p05</span>
-<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">ELSE</span> mag</span>
-<span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a><span class="cf">END</span> <span class="kw">AS</span> mag_winsorized</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="cf">CASE</span> </span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">WHEN</span> mag <span class="op">&gt;</span> p95 <span class="cf">THEN</span> p95</span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">WHEN</span> mag <span class="op">&lt;</span> p05 <span class="cf">THEN</span> p05</span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">ELSE</span> mag</span>
+<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a><span class="cf">END</span> <span class="kw">AS</span> mag_winsorized</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>can be replaced with a single line:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="fu">LEAST</span>(<span class="fu">GREATEST</span>(mag, p05), p95) <span class="kw">AS</span> mag_winsorized</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="fu">LEAST</span>(<span class="fu">GREATEST</span>(mag, p05), p95) <span class="kw">AS</span> mag_winsorized</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The R equivalents of <code>LEAST</code> and <code>GREATEST</code> are <code>pmin</code> and <code>pmax</code>, respectively. And <code>dbplyr</code> will translate <code>pmin</code> and <code>pmax</code> for us, so we can get winsorized data as follows.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>earthquakes_wins <span class="ot">&lt;-</span></span>
-<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a>  earthquakes <span class="sc">%&gt;%</span></span>
-<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">mag =</span> <span class="fu">if_else</span>(mag <span class="sc">%in%</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">9.99</span>, <span class="sc">-</span><span class="dv">9</span>), <span class="cn">NA</span>, mag)) <span class="sc">%&gt;%</span></span>
-<span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(mag)) <span class="sc">%&gt;%</span></span>
-<span id="cb51-5"><a href="#cb51-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cross_join</span>(extremes) <span class="sc">%&gt;%</span></span>
-<span id="cb51-6"><a href="#cb51-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">mag_winsorized =</span> <span class="fu">pmin</span>(<span class="fu">pmax</span>(mag, p05), p95)) <span class="sc">%&gt;%</span></span>
-<span id="cb51-7"><a href="#cb51-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(time, place, mag, mag_winsorized) </span>
-<span id="cb51-8"><a href="#cb51-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb51-9"><a href="#cb51-9" aria-hidden="true" tabindex="-1"></a>earthquakes_wins <span class="sc">%&gt;%</span></span>
-<span id="cb51-10"><a href="#cb51-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(mag)) <span class="sc">%&gt;%</span></span>
-<span id="cb51-11"><a href="#cb51-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>(<span class="at">n =</span> <span class="dv">3</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb51-12"><a href="#cb51-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>earthquakes_wins <span class="ot">&lt;-</span></span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>  earthquakes <span class="sc">%&gt;%</span></span>
+<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">mag =</span> <span class="fu">if_else</span>(mag <span class="sc">%in%</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">9.99</span>, <span class="sc">-</span><span class="dv">9</span>), <span class="cn">NA</span>, mag)) <span class="sc">%&gt;%</span></span>
+<span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(mag)) <span class="sc">%&gt;%</span></span>
+<span id="cb50-5"><a href="#cb50-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cross_join</span>(extremes) <span class="sc">%&gt;%</span></span>
+<span id="cb50-6"><a href="#cb50-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">mag_winsorized =</span> <span class="fu">pmin</span>(<span class="fu">pmax</span>(mag, p05), p95)) <span class="sc">%&gt;%</span></span>
+<span id="cb50-7"><a href="#cb50-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(time, place, mag, mag_winsorized) </span>
+<span id="cb50-8"><a href="#cb50-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-9"><a href="#cb50-9" aria-hidden="true" tabindex="-1"></a>earthquakes_wins <span class="sc">%&gt;%</span></span>
+<span id="cb50-10"><a href="#cb50-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(mag)) <span class="sc">%&gt;%</span></span>
+<span id="cb50-11"><a href="#cb50-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>(<span class="at">n =</span> <span class="dv">3</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb50-12"><a href="#cb50-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped">
 <colgroup>
-<col style="width: 27%">
-<col style="width: 45%">
+<col style="width: 25%">
+<col style="width: 50%">
 <col style="width: 5%">
-<col style="width: 20%">
+<col style="width: 19%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -1830,30 +1564,30 @@ ORDER BY place, mag DESC</code></pre>
 </thead>
 <tbody>
 <tr class="odd">
+<td style="text-align: left;">2011-03-11 05:46:24</td>
+<td style="text-align: left;">2011 Great Tohoku Earthquake, Japan</td>
+<td style="text-align: right;">9.1</td>
+<td style="text-align: right;">4.5</td>
+</tr>
+<tr class="even">
 <td style="text-align: left;">2010-02-27 06:34:11</td>
 <td style="text-align: left;">offshore Bio-Bio, Chile</td>
 <td style="text-align: right;">8.8</td>
 <td style="text-align: right;">4.5</td>
 </tr>
-<tr class="even">
-<td style="text-align: left;">2010-04-06 22:15:01</td>
-<td style="text-align: left;">northern Sumatra, Indonesia</td>
-<td style="text-align: right;">7.8</td>
-<td style="text-align: right;">4.5</td>
-</tr>
 <tr class="odd">
-<td style="text-align: left;">2010-07-23 22:51:11</td>
-<td style="text-align: left;">Moro Gulf, Mindanao, Philippines</td>
-<td style="text-align: right;">7.6</td>
+<td style="text-align: left;">2012-04-11 08:38:36</td>
+<td style="text-align: left;">off the west coast of northern Sumatra</td>
+<td style="text-align: right;">8.6</td>
 <td style="text-align: right;">4.5</td>
 </tr>
 </tbody>
 </table>
 </div>
-<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>earthquakes_wins <span class="sc">%&gt;%</span></span>
-<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(mag <span class="sc">==</span> mag_winsorized) <span class="sc">%&gt;%</span></span>
-<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>(<span class="at">n =</span> <span class="dv">3</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>earthquakes_wins <span class="sc">%&gt;%</span></span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(mag <span class="sc">==</span> mag_winsorized) <span class="sc">%&gt;%</span></span>
+<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>(<span class="at">n =</span> <span class="dv">3</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped">
 <thead>
@@ -1886,17 +1620,17 @@ ORDER BY place, mag DESC</code></pre>
 </tbody>
 </table>
 </div>
-<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a>earthquakes_wins <span class="sc">%&gt;%</span></span>
-<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(mag) <span class="sc">%&gt;%</span></span>
-<span id="cb53-3"><a href="#cb53-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>(<span class="at">n =</span> <span class="dv">3</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb53-4"><a href="#cb53-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>earthquakes_wins <span class="sc">%&gt;%</span></span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(mag) <span class="sc">%&gt;%</span></span>
+<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>(<span class="at">n =</span> <span class="dv">3</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped">
 <colgroup>
-<col style="width: 27%">
-<col style="width: 45%">
-<col style="width: 6%">
-<col style="width: 20%">
+<col style="width: 28%">
+<col style="width: 42%">
+<col style="width: 7%">
+<col style="width: 21%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -1908,22 +1642,22 @@ ORDER BY place, mag DESC</code></pre>
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">2010-01-24 19:16:52</td>
-<td style="text-align: left;">Nevada</td>
-<td style="text-align: right;">-1.6</td>
-<td style="text-align: right;">0.31</td>
+<td style="text-align: left;">2016-06-20 22:16:25</td>
+<td style="text-align: left;">20 km SSW of Pa‘auilo, Hawaii</td>
+<td style="text-align: right;">-5.0</td>
+<td style="text-align: right;">0.12</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">2010-06-07 14:18:32</td>
-<td style="text-align: left;">Mount St.&nbsp;Helens area, Washington</td>
-<td style="text-align: right;">-1.6</td>
-<td style="text-align: right;">0.31</td>
+<td style="text-align: left;">2012-06-11 01:59:01</td>
+<td style="text-align: left;">Nevada</td>
+<td style="text-align: right;">-2.6</td>
+<td style="text-align: right;">0.12</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">2010-06-21 14:29:38</td>
-<td style="text-align: left;">Mount St.&nbsp;Helens area, Washington</td>
-<td style="text-align: right;">-1.6</td>
-<td style="text-align: right;">0.31</td>
+<td style="text-align: left;">2012-06-27 01:14:37</td>
+<td style="text-align: left;">Nevada</td>
+<td style="text-align: right;">-2.6</td>
+<td style="text-align: right;">0.12</td>
 </tr>
 </tbody>
 </table>
@@ -1934,18 +1668,18 @@ ORDER BY place, mag DESC</code></pre>
 <h3 data-number="6.3.4" class="anchored" data-anchor-id="rescaling"><span class="header-section-number">6.3.4</span> Rescaling</h3>
 <p>In the book, it says <code>WHERE depth &gt;= 0.05</code>, but I need to use <code>WHERE depth &gt; 0.05</code> to match the results there.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a>quake_depths <span class="ot">&lt;-</span></span>
-<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>  earthquakes <span class="sc">%&gt;%</span></span>
-<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(depth <span class="sc">&gt;</span> <span class="fl">0.05</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb54-4"><a href="#cb54-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">depth =</span> <span class="fu">round</span>(depth, <span class="dv">1</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb54-5"><a href="#cb54-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(depth)</span>
-<span id="cb54-6"><a href="#cb54-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-7"><a href="#cb54-7" aria-hidden="true" tabindex="-1"></a>quake_depths <span class="sc">%&gt;%</span></span>
-<span id="cb54-8"><a href="#cb54-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">log_depth =</span> <span class="fu">log</span>(depth, <span class="at">base =</span> <span class="dv">10</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb54-9"><a href="#cb54-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(depth, log_depth) <span class="sc">%&gt;%</span></span>
-<span id="cb54-10"><a href="#cb54-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(depth) <span class="sc">%&gt;%</span></span>
-<span id="cb54-11"><a href="#cb54-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>(<span class="at">n =</span> <span class="dv">3</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb54-12"><a href="#cb54-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a>quake_depths <span class="ot">&lt;-</span></span>
+<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a>  earthquakes <span class="sc">%&gt;%</span></span>
+<span id="cb53-3"><a href="#cb53-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(depth <span class="sc">&gt;</span> <span class="fl">0.05</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb53-4"><a href="#cb53-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">depth =</span> <span class="fu">round</span>(depth, <span class="dv">1</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb53-5"><a href="#cb53-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(depth)</span>
+<span id="cb53-6"><a href="#cb53-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb53-7"><a href="#cb53-7" aria-hidden="true" tabindex="-1"></a>quake_depths <span class="sc">%&gt;%</span></span>
+<span id="cb53-8"><a href="#cb53-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">log_depth =</span> <span class="fu">log</span>(depth, <span class="at">base =</span> <span class="dv">10</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb53-9"><a href="#cb53-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(depth, log_depth) <span class="sc">%&gt;%</span></span>
+<span id="cb53-10"><a href="#cb53-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(depth) <span class="sc">%&gt;%</span></span>
+<span id="cb53-11"><a href="#cb53-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>(<span class="at">n =</span> <span class="dv">3</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb53-12"><a href="#cb53-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped">
 <thead>
@@ -1959,34 +1693,34 @@ ORDER BY place, mag DESC</code></pre>
 <tr class="odd">
 <td style="text-align: right;">0.1</td>
 <td style="text-align: right;">-1.0000000</td>
-<td style="text-align: right;">610</td>
+<td style="text-align: right;">6994</td>
 </tr>
 <tr class="even">
 <td style="text-align: right;">0.2</td>
 <td style="text-align: right;">-0.6989700</td>
-<td style="text-align: right;">467</td>
+<td style="text-align: right;">6876</td>
 </tr>
 <tr class="odd">
 <td style="text-align: right;">0.3</td>
 <td style="text-align: right;">-0.5228787</td>
-<td style="text-align: right;">398</td>
+<td style="text-align: right;">7269</td>
 </tr>
 </tbody>
 </table>
 </div>
-<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a>quake_depths <span class="sc">%&gt;%</span></span>
-<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> depth)) <span class="sc">+</span></span>
-<span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">binwidth =</span> <span class="fl">0.1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a>quake_depths <span class="sc">%&gt;%</span></span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> depth)) <span class="sc">+</span></span>
+<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">binwidth =</span> <span class="fl">0.1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="chapter_6_files/figure-html/unnamed-chunk-51-1.png" class="img-fluid" width="672"></p>
+<p><img src="chapter_6_files/figure-html/unnamed-chunk-50-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a>quake_depths <span class="sc">%&gt;%</span></span>
-<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">log</span>(depth, <span class="at">base =</span> <span class="dv">10</span>))) <span class="sc">+</span></span>
-<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">binwidth =</span> <span class="fl">0.1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a>quake_depths <span class="sc">%&gt;%</span></span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">log</span>(depth, <span class="at">base =</span> <span class="dv">10</span>))) <span class="sc">+</span></span>
+<span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">binwidth =</span> <span class="fl">0.1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="chapter_6_files/figure-html/unnamed-chunk-52-1.png" class="img-fluid" width="672"></p>
+<p><img src="chapter_6_files/figure-html/unnamed-chunk-51-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 
