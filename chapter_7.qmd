@@ -120,6 +120,7 @@ However, this means bring more data into R and doing more calculation in R.
 If the experiment is very large or you would rather the database server do more of the work, then the approach below may be preferred.
 
 ```{r}
+#| label: cont_tbl
 cont_tbl <-
   exp_assignment %>%
   left_join(game_actions, by = "user_id") %>%
