@@ -393,8 +393,8 @@ WITH first_terms AS (
   GROUP BY 1)
   
 SELECT date_part('year', a.first_term) AS first_year,
-  coalesce(date_part('year', age(c.date, a.first_term)), 0) AS period,
-  count(distinct a.id_bioguide) AS cohort_retained
+  COALESCE(date_part('year', age(c.date, a.first_term)), 0) AS period,
+  COUNT(DISTINCT a.id_bioguide) AS cohort_retained
 FROM first_terms a
 INNER JOIN legislators_terms b 
 USING (id_bioguide)
@@ -503,6 +503,102 @@ cen_pct_retaineds %>%
              group = first_century)) + 
   geom_line()
 ```
+
+```{sql}
+#| connection: db
+SELECT DISTINCT id_bioguide,
+  min(term_start) OVER w AS first_term,
+  first_value(state) OVER w AS first_state
+FROM legislators_terms 
+WINDOW w AS (PARTITION BY id_bioguide ORDER BY term_start)
+ORDER BY id_bioguide
+```
+```{r}
+first_states <-
+  first_terms <- 
+  legislators_terms %>%
+  group_by(id_bioguide) %>%
+  window_order(term_start) %>%
+  mutate(first_term = min(term_start, na.rm = TRUE),
+         first_state = first(state)) %>%
+  ungroup() %>%
+  select(id_bioguide, first_term, first_state) %>%
+  distinct()
+```
+
+
+```{sql}
+#| connection: db
+WITH first_states AS (
+  SELECT DISTINCT id_bioguide,
+    min(term_start) OVER w AS first_term,
+    first_value(state) OVER w AS first_state
+  FROM legislators_terms 
+  WINDOW w AS (PARTITION BY id_bioguide ORDER BY term_start)),
+
+state_first_periods AS (
+  SELECT 
+    first_state,
+    coalesce(date_part('year', age(c.date, a.first_term)), 0) AS period,
+    COUNT(DISTINCT a.id_bioguide) AS cohort_retained
+  FROM first_states AS a
+  INNER JOIN legislators_terms b 
+  USING (id_bioguide)
+  LEFT JOIN year_ends c 
+  ON c.date BETWEEN b.term_start AND b.term_end 
+  GROUP BY 1, 2)
+
+SELECT first_state, period,
+  first_value(cohort_retained) OVER w AS cohort_size,
+  cohort_retained,
+  cohort_retained * 1.0 / first_value(cohort_retained) OVER w AS prop_retained
+FROM state_first_periods
+WINDOW w AS (PARTITION BY first_state ORDER BY period)
+ORDER BY 1, 2
+LIMIT 3;
+```
+
+```{r}
+state_first_periods <-
+  first_states %>%
+  inner_join(legislators_terms, by = "id_bioguide") %>%
+  left_join(year_ends, 
+            join_by(between(y$date, x$term_start, x$term_end))) %>%
+  mutate(period = coalesce(year(age(date, first_term)), 0)) %>%
+  group_by(first_state, period) %>%
+  summarize(cohort_retained = n_distinct(id_bioguide),
+            .groups = "drop")
+```
+
+```{r}
+state_pct_retaineds <- 
+  state_first_periods %>%
+  select(first_state, period, cohort_retained) %>%
+  group_by(first_state) %>%
+  window_order(period) %>%
+  mutate(cohort_size = first(cohort_retained),
+         prop_retained = cohort_retained * 1.0 / cohort_size) %>%
+  ungroup()
+
+state_pct_retaineds %>%
+  arrange(first_state, period) %>%
+  collect(n = 3) %>%
+  kable()
+```
+
+```{r}
+top_5_states <- c("NY", "PA", "OH", "IL", "MA")
+
+state_pct_retaineds %>%
+  filter(first_state %in% top_5_states) %>%
+  ggplot(aes(x = period, 
+             y = prop_retained,
+             color = first_state,
+             linetype = first_state,
+             group = first_state)) + 
+  geom_line()
+```
+### Defining the Cohort from a Separate Table
 
 ## Related Cohort Analyses
 
