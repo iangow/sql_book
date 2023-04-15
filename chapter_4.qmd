@@ -114,6 +114,8 @@ legislators_terms <-
   copy_to(db, legislators_terms_df, name = "legislators_terms")
 ```
 
+## Retention
+
 ```{sql}
 #| connection: db
 SELECT id_bioguide, min(term_start) AS first_term
@@ -137,7 +139,7 @@ INNER JOIN legislators_terms b
 USING (id_bioguide)
 GROUP BY 1
 ORDER BY 1
-LIMIT 10;
+LIMIT 3;
 ```
 
 ```{r}
@@ -149,12 +151,13 @@ first_terms <-
 cohorts <-
   legislators_terms %>%
   inner_join(first_terms, by = "id_bioguide") %>%
-  mutate(period = date_part('year', age(term_start, first_term))) %>%
+  mutate(period = year(age(term_start, first_term))) %>%
   group_by(period) %>%
   summarize(cohort_retained = sql("count(distinct id_bioguide)")) 
 
 cohorts %>%
-  collect(n = 10) %>%
+  arrange(period) %>%
+  collect(n = 3) %>%
   kable()
 ```
 
@@ -192,7 +195,7 @@ retained_data <-
   select(period, cohort_size, cohort_retained, pct_retained) 
 
 retained_data %>%
-  collect(n = 10) %>%
+  collect(n = 3) %>%
   kable()
 ```
 
@@ -212,24 +215,25 @@ first_terms AS (
 
 cohorts AS (
   SELECT date_part('year', age(b.term_start, a.first_term)) AS period,
-      count(distinct a.id_bioguide) as cohort_retained
+      COUNT(DISTINCT a.id_bioguide) AS cohort_retained
   FROM first_terms a
   JOIN legislators_terms b on a.id_bioguide = b.id_bioguide 
   GROUP BY 1),
   
 retained_data AS (
   SELECT period,
-    first_value(cohort_retained) OVER (ORDER BY period) AS cohort_size,
+    first_value(cohort_retained) OVER w AS cohort_size,
     cohort_retained,
-    cohort_retained * 1.0 / first_value(cohort_retained) OVER (ORDER BY period) AS pct_retained
-  FROM cohorts)
+    cohort_retained * 1.0 / first_value(cohort_retained) OVER w AS pct_retained
+  FROM cohorts
+  WINDOW w AS (ORDER BY period))
 
 SELECT cohort_size,
-  max(case when period = 0 then pct_retained end) as yr0,
-  max(case when period = 1 then pct_retained end) as yr1,
-  max(case when period = 2 then pct_retained end) as yr2,
-  max(case when period = 3 then pct_retained end) as yr3,
-  max(case when period = 4 then pct_retained end) as yr4
+  max(CASE WHEN period = 0 THEN pct_retained END) AS yr0,
+  max(CASE WHEN period = 1 THEN pct_retained END) AS yr1,
+  max(CASE WHEN period = 2 THEN pct_retained END) AS yr2,
+  max(CASE WHEN period = 3 THEN pct_retained END) AS yr3,
+  max(CASE WHEN period = 4 THEN pct_retained END) AS yr4
 FROM retained_data
 GROUP BY 1;
 ```
@@ -272,7 +276,8 @@ SELECT a.id_bioguide, a.first_term, b.term_start, b.term_end,
   date_part('year', age(c.date, a.first_term)) AS period
 FROM first_terms a
 JOIN legislators_terms b USING (id_bioguide)
-LEFT JOIN date_dim c ON c.date BETWEEN b.term_start and b.term_end;
+LEFT JOIN date_dim c ON c.date BETWEEN b.term_start and b.term_end
+ORDER BY id_bioguide;
 ```
 
 ```{r}
