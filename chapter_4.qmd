@@ -140,7 +140,7 @@ INNER JOIN legislators_terms b
 USING (id_bioguide)
 GROUP BY 1
 ORDER BY 1
-LIMIT 3;
+LIMIT 4;
 ```
 
 ```{r}
@@ -600,6 +600,134 @@ state_pct_retaineds %>%
 ```
 ### Defining the Cohort from a Separate Table
 
+```{sql}
+#| connection: db
+WITH first_terms AS (
+  SELECT id_bioguide, min(term_start) AS first_term
+  FROM legislators_terms 
+  GROUP BY 1)
+  
+SELECT d.gender,
+  coalesce(date_part('year',age(c.date,a.first_term)),0) AS period,
+  count(distinct a.id_bioguide) AS cohort_retained
+FROM first_terms a
+JOIN legislators_terms b ON a.id_bioguide = b.id_bioguide 
+LEFT JOIN year_ends c ON c.date BETWEEN b.term_start AND b.term_end 
+INNER JOIN legislators d ON a.id_bioguide = d.id_bioguide
+GROUP BY 1,2
+ORDER BY 2,1
+LIMIT 4;
+```
+
+```{r}
+cohorts <-
+  first_terms %>%
+  inner_join(legislators_terms, by = "id_bioguide") %>%
+  left_join(year_ends, join_by(between(y$date, x$term_start, x$term_end))) %>%
+  inner_join(legislators, by = "id_bioguide") %>%
+  mutate(period = coalesce(year(age(date, first_term)), 0)) %>%
+  group_by(gender, period) %>%
+  summarize(cohort_retained = n_distinct(id_bioguide),
+            .groups = "drop")
+
+cohorts %>%
+  arrange(period, gender) %>%
+  collect(n = 4) %>%
+  kable()
+```
+
+```{sql}
+#| connection: db
+WITH first_terms AS (
+  SELECT id_bioguide, min(term_start) AS first_term
+  FROM legislators_terms 
+  GROUP BY 1),
+  
+cohorts AS (
+  SELECT d.gender,
+    coalesce(date_part('year',age(c.date,a.first_term)),0) as period,
+    count(distinct a.id_bioguide) as cohort_retained
+  FROM first_terms a
+  JOIN legislators_terms b on a.id_bioguide = b.id_bioguide 
+  LEFT JOIN year_ends c on c.date between b.term_start and b.term_end 
+  JOIN legislators d on a.id_bioguide = d.id_bioguide
+  GROUP BY 1, 2)
+  
+SELECT gender, period,
+  cohort_retained,
+  first_value(cohort_retained) OVER w AS cohort_size,
+  cohort_retained * 1.0 / 
+  first_value(cohort_retained) OVER w AS pct_retained
+FROM cohorts aa
+WINDOW w AS (partition by gender order by period)
+ORDER BY 2, 1
+LIMIT 4;
+```
+
+```{r}
+cohorts %>%
+  group_by(gender) %>%
+  window_order(period) %>%
+  mutate(cohort_size = first(cohort_retained)) %>%
+  ungroup() %>%
+  mutate(pct_retained = 1.0 * cohort_retained / cohort_size) %>%
+    arrange(period, gender) %>%
+  collect(n = 4) %>%
+  kable()
+```
+
+```{sql}
+#| connection: db
+WITH first_terms AS (
+  SELECT id_bioguide, min(term_start) AS first_term
+  FROM legislators_terms 
+  GROUP BY 1),
+  
+cohorts AS (
+  SELECT d.gender,
+    coalesce(date_part('year',age(c.date, a.first_term)),0) as period,
+    count(distinct a.id_bioguide) as cohort_retained
+  FROM first_terms a
+  JOIN legislators_terms b on a.id_bioguide = b.id_bioguide 
+  LEFT JOIN year_ends c on c.date between b.term_start and b.term_end 
+  JOIN legislators d on a.id_bioguide = d.id_bioguide
+  WHERE first_term BETWEEN '1917-01-01' AND '1999-12-31'
+  GROUP BY 1, 2)
+  
+SELECT gender, period,
+  cohort_retained,
+  first_value(cohort_retained) OVER w AS cohort_size,
+  cohort_retained * 1.0 / 
+  first_value(cohort_retained) OVER w AS pct_retained
+FROM cohorts aa
+WINDOW w AS (partition by gender order by period)
+ORDER BY 2, 1
+LIMIT 4;
+```
+
+
+```{r}
+cohorts <-
+  first_terms %>%
+  filter(between(first_term, '1917-01-01', '1999-12-31')) %>%
+  inner_join(legislators_terms, by = "id_bioguide") %>%
+  left_join(year_ends, join_by(between(y$date, x$term_start, x$term_end))) %>%
+  inner_join(legislators, by = "id_bioguide") %>%
+  mutate(period = coalesce(year(age(date, first_term)), 0)) %>%
+  group_by(gender, period) %>%
+  summarize(cohort_retained = n_distinct(id_bioguide),
+            .groups = "drop") 
+
+cohorts %>%
+  group_by(gender) %>%
+  window_order(period) %>%
+  mutate(cohort_size = first(cohort_retained)) %>%
+  ungroup() %>%
+  mutate(pct_retained = 1.0 * cohort_retained / cohort_size) %>%
+  arrange(period, gender) %>%
+  collect(n = 4) %>%
+  kable()
+```
 
 ### Dealing with Sparse Cohorts
 
