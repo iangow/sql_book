@@ -600,6 +600,11 @@ state_pct_retaineds %>%
 ```
 ### Defining the Cohort from a Separate Table
 
+
+### Dealing with Sparse Cohorts
+
+### Defining Cohorts from Dates other than the First Date
+
 ## Related Cohort Analyses
 
 ```{r}
