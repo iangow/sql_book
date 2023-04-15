@@ -84,8 +84,8 @@ exp_assignment <- copy_to(db, exp_assignment, "exp_assignment")
 ```
 
 ```{r}
-#| eval: true 
-#| include: true 
+#| eval: false
+#| include: false 
 db <- dbConnect(RPostgres::Postgres(), bigint = "integer")
 game_users <- copy_to(db, game_users, "game_users")
 game_actions <- copy_to(db, game_actions, "game_actions")
