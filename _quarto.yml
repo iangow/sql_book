@@ -1,7 +1,7 @@
 project:
   type: book
   output-dir: docs
-
+  
 book:
   title: "SQL for Data Analysis using R"
   author: "Ian Gow"
@@ -26,3 +26,4 @@ bibliography: references.bib
 format:
   html:
     theme: cosmo
+    include-after-body: statcounter.html
