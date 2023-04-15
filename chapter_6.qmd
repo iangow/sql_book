@@ -64,7 +64,6 @@ res <- lapply(files, csv_to_db)
 ```{r}
 db <- dbConnect(duckdb::duckdb(), "earthquakes.duckdb",
                 read_only = TRUE)
-earthquakes <- tbl(db, "earthquakes")
 ```
 
 ```{r}
