@@ -76,17 +76,6 @@ library(knitr)
 library(duckdb)
 ```
 
-If you have the tables `legislators` and `legislators_terms` in a PostgreSQL database, then you could connect to that database.
-
-```{r}
-#| output: false
-#| include: true
-#| eval: false
-db <- dbConnect(RPostgres::Postgres(), 
-                bigint = "integer",
-                check_interrupts = TRUE)
-```
-
 ```{r}
 #| include: false
 #| eval: false
@@ -109,21 +98,35 @@ legislators_terms_df <- read_csv(paste0(url, "legislators_terms.csv"),
 
 ```{r}
 #| warning: false
-#| cache: true
-url <- "data/" 
-legislators_df <- read_csv(paste0(url, "legislators.csv.gz"),
+legislators_df <- read_csv("data/legislators.csv.gz",
                            show_col_types = FALSE)
-legislators_terms_df <- read_csv(paste0(url, "legislators_terms.csv.gz"),
+legislators_terms_df <- read_csv("data/legislators_terms.csv.gz",
                                  show_col_types = FALSE)
 ```
 
+```{r}
+#| include: false
+knit_print.tbl_sql <- function(x, ...) {
+  knit_print(kable(collect(x, n = 3)))
+}
+
+registerS3method("knit_print", "tbl_sql", knit_print.tbl_sql)
+```
 
 ```{r}
-db <- dbConnect(duckdb())
-legislators <- 
-  copy_to(db, legislators_df, name = "legislators")
-legislators_terms <- 
-  copy_to(db, legislators_terms_df, name = "legislators_terms")
+#| include: false
+knit_print.data.frame <- function(x, ...) {
+  knit_print(kable(x))
+}
+
+registerS3method("knit_print", "data.frame", knit_print.data.frame)
+```
+
+```{r}
+db <- dbConnect(duckdb::duckdb())
+legislators <- copy_to(db, legislators_df, "legislators")
+legislators_terms <- copy_to(db, legislators_terms_df, 
+                             "legislators_terms")
 ```
 
 ## Retention
@@ -170,9 +173,7 @@ cohorts <-
   summarize(cohort_retained = sql("count(distinct id_bioguide)")) 
 
 cohorts %>%
-  arrange(period) %>%
-  collect(n = 3) %>%
-  kable()
+  arrange(period)
 ```
 
 ```{sql}
@@ -209,9 +210,7 @@ retained_data <-
   mutate(pct_retained = cohort_retained * 1.0/cohort_size) %>%
   select(period, cohort_size, cohort_retained, pct_retained) 
 
-retained_data %>%
-  collect(n = 3) %>%
-  kable()
+retained_data
 ```
 
 ```{r}
@@ -261,9 +260,7 @@ retained_data %>%
   arrange(period) %>%
   pivot_wider(names_from = period, 
               names_prefix = "yr",
-              values_from = pct_retained) %>%
-  collect() %>%
-  kable()
+              values_from = pct_retained)
 ```
 
 ### Adjusting Time Series to Increase Retention Accuracy
@@ -307,9 +304,7 @@ cohorts <-
   mutate(period = date_part('year', age(date, first_term))) %>%
   select(id_bioguide, first_term, term_start, term_end, date, period) 
 
-cohorts %>%
-  collect(n = 3) %>%
-  kable()
+cohorts
 ```
 
 ```{sql}
@@ -355,9 +350,7 @@ pct_retained <-
          pct_retained = cohort_retained/cohort_size) 
 
 pct_retained %>%
-  arrange(period) %>%
-  collect(n = 3) %>%
-  kable()
+  arrange(period)
 ```
 
 ```{r}
@@ -388,9 +381,7 @@ first_terms %>%
   mutate(term_end = 
            case_when(term_type == 'rep' ~ term_start + years(2),
                      term_type == 'sen' ~ term_start + years(6))) %>%
-  select(id_bioguide, first_term, term_start, term_end)  %>%
-  collect(n = 3) %>%
-  kable()
+  select(id_bioguide, first_term, term_start, term_end)
 ```
 
 For now, I have omitted the query after the paragraph starting "A second option ...".
@@ -430,9 +421,7 @@ yr_cohort_retaineds <-
             .groups = "drop") 
 
 yr_cohort_retaineds %>%
-  arrange(first_year, period) %>%
-  collect(n = 3) %>%
-  kable()
+  arrange(first_year, period)
 ```
 
 ```{r}
@@ -442,9 +431,7 @@ yr_cohort_retaineds %>%
   mutate(cohort_size = first(cohort_retained),
          pct_retained = 1.0 * cohort_retained/cohort_size) %>%
   select(first_year, period, cohort_size, cohort_retained, pct_retained) %>%
-  arrange(first_year, period) %>%
-  collect(n = 3) %>%
-  kable()
+  arrange(first_year, period)
 ```
 
 ```{sql}
@@ -500,9 +487,7 @@ cen_pct_retaineds <-
   select(first_century, period, cohort_size, cohort_retained, pct_retained) 
 
 cen_pct_retaineds %>%
-  arrange(first_century, period) %>%
-  collect(n = 3) %>%
-  kable()
+  arrange(first_century, period)
 ```
 
 ```{r}
@@ -593,9 +578,7 @@ state_pct_retaineds <-
   ungroup()
 
 state_pct_retaineds %>%
-  arrange(first_state, period) %>%
-  collect(n = 3) %>%
-  kable()
+  arrange(first_state, period) 
 ```
 
 ```{r}
@@ -644,8 +627,7 @@ cohorts <-
 
 cohorts %>%
   arrange(period, gender) %>%
-  collect(n = 4) %>%
-  kable()
+  collect(n = 4) 
 ```
 
 ```{sql}
@@ -684,8 +666,7 @@ cohorts %>%
   ungroup() %>%
   mutate(pct_retained = 1.0 * cohort_retained / cohort_size) %>%
     arrange(period, gender) %>%
-  collect(n = 4) %>%
-  kable()
+  collect(n = 4)
 ```
 
 ```{sql}
@@ -737,8 +718,7 @@ cohorts %>%
   ungroup() %>%
   mutate(pct_retained = 1.0 * cohort_retained / cohort_size) %>%
   arrange(period, gender) %>%
-  collect(n = 4) %>%
-  kable()
+  collect(n = 4)
 ```
 
 ### Dealing with Sparse Cohorts
@@ -844,8 +824,7 @@ cohorts %>%
   filter(first_state == "AR", gender == "F") %>% 
   select(period, cohort_retained) %>%
   arrange(period) %>%
-  collect(n = 8) %>%
-  kable()
+  collect(n = 8)
 ```
 
 Does this mean something is wrong with our query?
@@ -874,8 +853,7 @@ legislators %>%
   inner_join(legislators_terms, by = "id_bioguide") %>%
   select(id_bioguide, full_name, term_type, term_start, term_end) %>%
   arrange(id_bioguide, term_start) %>%
-  collect() %>%
-  kable()
+  collect()
 ```
 
 From the above, it seems that Blanche Lambert Lincoln would have dropped out of the cohort in periods 4 and 5, then returned in 6 and 7.
@@ -903,8 +881,7 @@ cohorts %>%
   mutate(cohort_ids = as.character(cohort_ids)) %>%
   select(period, cohort_retained, cohort_ids) %>%
   arrange(period) %>%
-  collect() %>%
-  kable()
+  collect()
 ```
 
 ```{r}
@@ -941,9 +918,7 @@ pct_retaineds %>%
   pivot_wider(names_from = "period",
               names_prefix = "yr",
               values_from = "pct_retained") %>%
-  arrange(gender, first_state) %>%
-  collect(n = 3) %>%
-  kable()
+  arrange(gender, first_state)
 ```
 
 ```{r}
@@ -1037,8 +1012,7 @@ pct_retained_2000 <-
 
 pct_retained_2000 %>%
   arrange(period, term_type) %>%
-  collect(n = 4) %>%
-  kable()
+  collect(n = 4)
 ```
 
 ```{r}
@@ -1143,9 +1117,7 @@ first_centuries %>%
             cohort_survived = n_distinct(survived_id), 
             .groups = "drop") %>%
   mutate(pct_survived = 1.0 * cohort_survived / cohort) %>%
-  arrange(first_century, terms) %>%
-  collect(n = 3) %>%
-  kable()
+  arrange(first_century, terms)
 ```
 
 ### Returnship, or Repeat Purchase Behaviour
@@ -1289,7 +1261,7 @@ FROM reps
 LEFT JOIN gap_indicators
 USING (cohort_century)
 ORDER BY cohort_century
-````
+```
 
 ### Cumulative Calculations
 
@@ -1468,20 +1440,20 @@ GROUP BY 1,2
 ```{sql}
 #| connection: db
 WITH aa AS (
-  SELECT distinct a.id_bioguide, b.date
+  SELECT DISTINCT a.id_bioguide, b.date
   FROM legislators_terms a
   JOIN year_ends b 
-    on b.date between a.term_start and a.term_end and b.date <= '2020-01-01'
+    on b.date BETWEEN a.term_start AND a.term_end AND b.date <= '2020-01-01'
   GROUP BY 1,2),
   
 aaa AS (
   SELECT id_bioguide, date,
-    count(date) over (partition by id_bioguide order by date rows between unbounded preceding and current row) as cume_years
+    count(date) OVER (PARTITION BY id_bioguide ORDER BY date) AS cume_years
   FROM aa),
   
 aaaa AS (
   SELECT date, cume_years,
-    count(distinct id_bioguide) as legislators
+    COUNT(DISTINCT id_bioguide) as legislators
   FROM aaa
   GROUP BY 1,2)
 SELECT date, count(*) as tenures
@@ -1518,6 +1490,7 @@ FROM cum_term_bands
 WINDOW w AS (partition by date)
 ORDER BY date DESC;
 ```
+
 ```{r}
 term_dates <-
   legislators_terms %>%
@@ -1562,7 +1535,8 @@ cum_term_bands %>%
   inner_join(total_legs, by = "date") %>%
   mutate(pct_legislators = legislators * 100.0 / num_legs) %>%
   select(date, tenure, pct_legislators) %>%
-  arrange(desc(date))
+  arrange(desc(date)) %>%
+  collect(n = 8)
 ```
 
 ```{r}
