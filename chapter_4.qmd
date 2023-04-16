@@ -801,9 +801,7 @@ first_terms <-
   group_by(id_bioguide) %>%
   summarize(term_start = min(term_start, na.rm = TRUE),
             .groups = "drop")
-```
 
-```{r}
 first_states <-
   first_terms %>%
   inner_join(legislators_terms, join_by(id_bioguide, term_start)) %>%
@@ -824,6 +822,77 @@ cohorts <-
   group_by(first_state, gender, period) %>%
   summarize(cohort_retained = n_distinct(id_bioguide), 
             .groups = "drop")
+```
+
+From the query below, it seems we're having an issue whereby legislators are "returning from the dead" in a sense.
+
+
+```{r}
+cohorts %>% 
+  filter(first_state == "AR", gender == "F") %>% 
+  select(period, cohort_retained) %>%
+  arrange(period) %>%
+  collect(n = 8) %>%
+  kable()
+```
+
+Does this mean something is wrong with our query?
+Let's check.
+
+Of course, unlike cohorts of living people, dropping out of the cohort of legislators does not prevent you from returning later on.
+We can pull out a portion of the query creating `cohorts` and take a closer look.
+We first get the `id_bioguide` values for the female representatives from Arkansas (`AR`) who are around in `period == 4`.
+We then look at some data from `legislators` and `legislators_terms` for these two representatives.
+
+```{r}
+weird_id_bioguides <-
+  first_states %>% 
+  filter(first_state == "AR", gender == "F") %>%
+  inner_join(legislators_terms, by = "id_bioguide") %>%
+  left_join(year_ends, 
+            join_by(between(y$date, x$term_start, x$term_end))) %>%
+  mutate(period = coalesce(year(age(date, first_term)), 0)) %>%
+  filter(period >= 4) %>%
+  select(id_bioguide) %>%
+  distinct() %>%
+  pull()
+
+legislators %>%
+  filter(id_bioguide %in% weird_id_bioguides) %>%
+  inner_join(legislators_terms, by = "id_bioguide") %>%
+  select(id_bioguide, full_name, term_type, term_start, term_end) %>%
+  arrange(id_bioguide, term_start) %>%
+  collect() %>%
+  kable()
+```
+
+From the above, it seems that Blanche Lambert Lincoln would have dropped out of the cohort in periods 4 and 5, then returned in 6 and 7.
+
+To aid this kind of "debugging" of our queries, we could easily have retained some underlying data in `cohorts`.
+For example, by added `cohort_ids = array_agg(id_bioguide)` to the query, we can easily interrogate `cohorts` for the underlying legislator IDs.
+
+```{r}
+cohorts <-
+  first_states %>% 
+  inner_join(legislators_terms, by = "id_bioguide") %>%
+  left_join(year_ends, 
+            join_by(between(y$date, x$term_start, x$term_end))) %>%
+  mutate(period = coalesce(year(age(date, first_term)), 0)) %>%
+  group_by(first_state, gender, period) %>%
+  summarize(cohort_retained = n_distinct(id_bioguide),
+            cohort_ids = array_agg(id_bioguide),
+            .groups = "drop")
+```
+
+```{r}
+cohorts %>%
+  filter(first_state == "AR", gender == "F", 
+         between(period, 3, 8)) %>%
+  mutate(cohort_ids = as.character(cohort_ids)) %>%
+  select(period, cohort_retained, cohort_ids) %>%
+  arrange(period) %>%
+  collect() %>%
+  kable()
 ```
 
 ```{r}
