@@ -213,6 +213,12 @@ div.csl-indent {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="./appendix.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Appendix</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="./references.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">References</span></a>
   </div>
@@ -275,7 +281,7 @@ div.csl-indent {
 
 </header>
 
-<p>Chapter 3 of <span class="citation" data-cites="tanimura2021sql">Tanimura (<a href="references.html#ref-tanimura2021sql" role="doc-biblioref">2021</a>)</span> is really two chapters. The first part of the chapter discusses some finer details of dates, date-times, and time stamps. This material is important, but a little technical and bewildering without some concrete use cases. This complexity is compounded by the use of DuckDB here and PostgreSQL in <span class="citation" data-cites="tanimura2021sql">Tanimura (<a href="references.html#ref-tanimura2021sql" role="doc-biblioref">2021</a>)</span>, as some details work a little differently from one backend to the other. Finally, while there are some interesting issues in using <code>dbplyr</code> with timestamp data, there probably need data and settings to fully comprehend. As such, I have put the code related to this part of Chapter 3 of <span class="citation" data-cites="tanimura2021sql">Tanimura (<a href="references.html#ref-tanimura2021sql" role="doc-biblioref">2021</a>)</span> in <span class="quarto-unresolved-ref">?sec-dates</span>, part of the appendix.</p>
+<p>Chapter 3 of <span class="citation" data-cites="tanimura2021sql">Tanimura (<a href="references.html#ref-tanimura2021sql" role="doc-biblioref">2021</a>)</span> is really two chapters. The first part of the chapter discusses some finer details of dates, date-times, and time stamps. This material is important, but a little technical and bewildering without some concrete use cases. This complexity is compounded by the use of DuckDB here and PostgreSQL in <span class="citation" data-cites="tanimura2021sql">Tanimura (<a href="references.html#ref-tanimura2021sql" role="doc-biblioref">2021</a>)</span>, as some details work a little differently from one backend to the other. Finally, while there are some interesting issues in using <code>dbplyr</code> with timestamp data, there probably need data and settings to fully comprehend. As such, I have put the code related to this part of Chapter 3 of <span class="citation" data-cites="tanimura2021sql">Tanimura (<a href="references.html#ref-tanimura2021sql" role="doc-biblioref">2021</a>)</span> in <a href="appendix.html#sec-dates"><span>Section&nbsp;1</span></a>, part of the appendix.</p>
 <p>The second part of the chapter is where <span class="citation" data-cites="tanimura2021sql">Tanimura (<a href="references.html#ref-tanimura2021sql" role="doc-biblioref">2021</a>)</span> really starts to take off. This is where it starts playing around with real data.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(DBI)</span>
