@@ -19,6 +19,7 @@ book:
     - chapter_7.qmd
     - chapter_8.qmd
     - chapter_9.qmd
+    - appendix.qmd
     - references.qmd
 
 bibliography: references.bib
