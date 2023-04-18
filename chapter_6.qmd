@@ -6,79 +6,30 @@ library(DBI)
 library(tidyverse)
 library(dbplyr)
 library(knitr)
-library(duckdb)
-```
-
-```{r}
-#| eval: false
-weeks <- 
-  tibble(start_date = seq(as.Date("2010-01-01"), 
-                          as.Date("2020-12-01"),
-                          by = 7)) %>%
-  mutate(end_date = start_date + days(7))
-  
-get_quake_data <- function(start, end) {
-  db <- dbConnect(duckdb::duckdb(), "earthquakes_new.duckdb")
-  url <- paste0("https://earthquake.usgs.gov/fdsnws/event/1/",
-                "query?format=csv&starttime=", as.character(start), 
-                "&endtime=", as.character(end))
-  df <- read_csv(url, show_col_types = FALSE)
-  dbWriteTable(db, "earthquakes_new2", df,
-               append = TRUE, row.names = FALSE)
-  dbDisconnect(db, shutdown = TRUE)
-  return(TRUE)
-}
-
-db <- dbConnect(duckdb::duckdb(), "earthquakes_new.duckdb")
-dbExecute(db, "DROP TABLE IF EXISTS earthquakes")
-dbDisconnect(db, shutdown = TRUE)
-
-res <- map2(weeks$start_date,
-            weeks$end_date, 
-            get_quake_data,
-            .progress = TRUE)
 ```
 
 
 ```{r}
 #| warning: false
-#| eval: false
-db <- dbConnect(duckdb::duckdb(), "earthquakes.duckdb")
-dbExecute(db, "DROP TABLE IF EXISTS earthquakes")
-dbDisconnect(db, shutdown = TRUE)
+#| eval: true 
+db <- dbConnect(duckdb::duckdb(), read_only = TRUE)
 
 csv_to_db <- function(file) {
-  db <- dbConnect(duckdb::duckdb(), "earthquakes.duckdb")
   df <- read_csv(file, show_col_types = FALSE)
-  dbWriteTable(db, df, name = "earthquakes",
-          append = TRUE)
-  dbDisconnect(db, shutdown = TRUE)
+  dbWriteTable(db, df, name = "earthquakes", append = TRUE)
 }
 
-files <- list.files("data", "earthquakes.*",
+files <- list.files("data", "earthquakes.*gz",
                     full.names = TRUE)
-
 res <- lapply(files, csv_to_db)
 ```
 
 ```{r}
-db <- dbConnect(duckdb::duckdb(), "earthquakes.duckdb",
+#| eval: false
+#| include: false
+db <- dbConnect(duckdb::duckdb(), 
+                dbdir = "earthquakes.duckdb",
                 read_only = TRUE)
-```
-
-```{r}
-#| output: false
-#| eval: false
-#| include: false
-db <- dbConnect(RPostgres::Postgres(), 
-                bigint = "integer",
-                check_interrupts = TRUE)
-```
-
-```{r}
-#| include: false
-#| eval: false
-dbExecute(db, "SET search_path TO sql_book")
 ```
 
 ```{r}

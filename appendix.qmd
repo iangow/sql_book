@@ -1,0 +1,329 @@
+# Appendix {-}
+
+```{r}
+#| message: false
+library(DBI)
+library(tidyverse)
+library(dbplyr)
+library(knitr)
+library(duckdb)
+```
+
+```{r}
+#| output: false
+#| include: false
+#| eval: false
+db <- dbConnect(RPostgres::Postgres(), 
+                bigint = "integer",
+                check_interrupts = TRUE)
+```
+
+```{r}
+#| include: false
+#| eval: false
+dbExecute(db, "SET search_path TO sql_book")
+```
+
+```{r}
+db <- dbConnect(duckdb::duckdb())
+```
+
+## Date, Datetime, and Time Manipulations {#sec-dates}
+
+```{sql}
+#| connection: db
+#| output: false
+#| warning  : false
+INSTALL 'icu';
+LOAD 'icu';
+```
+
+### Time Zone Conversions
+
+@tanimura2021sql points out that often "timestamps in the database are not encoded with the time zone, and you will need to consult with the source or developer to figure out how your data was stored."
+When pushing data to a PostgreSQL database, I use the `timestamp with time zone` type as much as possible.
+
+@tanimura2021sql provides the following example, which is interesting because the west coast of the United States would not be on the PST time zone at that time of year.
+Instead, it would be on PDT.
+
+```{sql}
+#| connection: db
+SELECT timestamptz '2020-09-01 00:00:00 -0' AT TIME ZONE 'PST' AS time;
+```
+In PostgreSQL, we would get a different answer with the following query, but in DuckDB it seems that `PDT` is not recognized as a time zone abbreviation at all, so we just get the original UTC timestamp back.
+
+```{sql}
+#| connection: db
+SELECT timestamptz '2020-09-01 00:00:00 -0' AT TIME ZONE 'PDT' AS time;
+```
+
+I think most people barely know the difference between PST and PDT and even fewer would know the exact dates that one switches from one to the other.
+A better approach is to use a time zone that encodes information about when PDT is used and when PST is used.
+In PostgreSQL and DuckDB, the function `pg_timezone_names()` returns a table with the information that we need.
+
+However, it seems that there are inconsistencies between PostgreSQL and DuckDB in terms of the abbreviations used.
+As such it's probably safer to use the `name` form (e.g., `US/Pacific`) whenever possible.
+Given the widespread confusion about the meaning of terms like `EST`, `EDT`, and so on, just use `US/Eastern`, etc.
+
+```{sql}
+#| connection: db
+SELECT name, abbrev
+FROM pg_timezone_names()
+WHERE regexp_matches(name, '^US/');
+-- use WHERE name ~ '^US/'; in PostgreSQL
+```
+
+The following queries demonstrate that daylight savings information is encoded in the database.
+
+```{sql}
+#| connection: db
+SELECT '2020-09-01 17:00:01 US/Pacific'::timestamptz AS t1,
+       '2020-09-02 10:00:01 Australia/Melbourne'::timestamptz  AS t2;
+```
+
+```{sql}
+#| connection: db
+SELECT '2020-12-01 16:00:01 US/Pacific'::timestamptz AS t1,
+       '2020-12-02 11:00:01 Australia/Melbourne'::timestamptz  AS t2;
+```
+
+```{r}
+sql <-
+  "(SELECT     
+    '2020-12-01 16:00:01 US/Pacific'::timestamptz AS t1)"
+
+a_time <- tbl(db, sql(sql))
+a_time %>%
+  kable()
+```
+
+```{r}
+a_time_r <-
+  a_time %>%
+  select(t1) %>%
+  pull()
+
+print(a_time_r, tz = "UTC")
+print(a_time_r, tz = "US/Pacific")
+Sys.timezone()
+print(a_time_r, tz = Sys.timezone())
+```
+The above examples illustrate a few key ideas.
+
+First, while we supply the literal form `'2020-09-01 17:00:01 US/Pacific'::timestamptz`, it seems that once a variable has been encoded as `TIMESTAMP WITH TIME ZONE`, it behaves as though it is actually being *stored* as a timestamp in the UTC time zone, just with the *displayed* time perhaps being different.
+
+Second, columns of type `TIMESTAMP WITH TIME ZONE` come into R with the associated time-zone information, which is what we want (especially if we will later put timestamp data back into PostgreSQL).
+
+Third, we can see that we can choose to *display* information in a different time zone without changing the underlying data.
+
+Some care is needed with timestamp data.
+I think the `AT TIME ZONE` queries provided in @tanimura2021sql are actually pretty dangerous, as can be seen in the following query.
+While we supply `2020-09-01 00:00:01` as UTC and then render it `AT TIME ZONE 'US/Pacific'`, it turns out that the returned value is interpreted as a `TIMESTAMP WITHOUT TIME ZONE` and subsequent queries lead to confusing behaviour.
+In the query below, the second application of `AT TIME ZONE` interprets the `TIMESTAMP WITHOUT TIME ZONE` as though it came from the stated time zone and the results seem to have `AT TIME ZONE` doing the opposite of what it did when given a `TIMESTAMP WITH TIME ZONE` (as in the initial literal `'2020-09-01 00:00:01 -0'`). 
+
+```{sql}
+#| connection: db
+WITH q1 AS
+ (SELECT timestamptz '2020-09-01 00:00:01-00' AT TIME ZONE 'US/Pacific' AS t1,
+         timestamp '2020-09-01 00:00:01' AT TIME ZONE 'US/Pacific' AS t2)
+ 
+SELECT 
+  t1,
+  t1::varchar AS t1_char,
+  t1 AT TIME ZONE 'UTC' AS t3,
+  t2 AT TIME ZONE 'UTC' AS t4,
+  typeof(t1),
+  typeof(t2)
+FROM q1
+```
+It seems that `TIMESTAMP WITHOUT TIME ZONE` values should be converted to a time zone as quickly as possible to avoid confusion and that care is needed with `AT TIME ZONE` given that it does very different (essentially opposite) things according to the supplied data type.
+
+```{sql}
+#| connection: db
+WITH q1 AS
+ (SELECT '2020-09-01 00:00:01-00'::timestamptz AS t1)
+ 
+SELECT t1,
+  t1::varchar AS t2,
+  typeof(t1)
+FROM q1
+```
+Strange behaviour can result from values stored as `TIMESTAMP WITHOUT TIME ZONE`.
+Below we see that `t1` is printed as UTC no matter what, while the behaviour of `t2` seems easier to understand.
+
+```{r}
+sql <-
+  "(SELECT     
+    '2020-12-01 00:00:01-00' AS t1,
+    '2020-12-01 00:00:01-00'::timestamptz AS t2)"
+
+two_times_notz <- tbl(db, sql(sql))
+two_times_notz %>% kable()
+```
+
+```{r}
+two_times_notz_r <-
+  collect(two_times_notz)
+  
+print(two_times_notz_r$t1)
+Sys.timezone()
+print(two_times_notz_r$t1, tz = Sys.timezone())
+
+print(two_times_notz_r$t2)
+Sys.timezone()
+print(two_times_notz_r$t2, tz = Sys.timezone())
+```
+As pointed out by @tanimura2021sql, one drawback to storing information as UTC is that localtime information may be lost.
+But it seems it would be more prudent to store information as `TIMESTAMP WITH TIME ZONE` and keep local time zone information as a separate column to avoid confusion.
+For example, if the `orders` table is stored as `TIMESTAMP WITHOUT TIME ZONE` based on the local time of the customer, which might be `Australia/Melbourne` and the `shipping` table uses `TIMESTAMP WITH TIME ZONE`, then an analyst of time-to-ship data would be confused by orders apparently being shipped before they are made.
+If `shipping` table uses `TIMESTAMP WITH TIME ZONE` using timestamps in the time zone of the East Bay warehouse (so `US/Pacific`), things would be even worse.
+
+I think that fully fleshing out the issues here would require a separate chapter.
+In fact, nothing in the core part of Chapter 3 of @tanimura2021sql (which focuses on the `retail_sales` table) really uses timestamp information, so we can put these issues aside for now.
+
+### Date and Timestamp Format Conversions
+
+As discussed in @tanimura2021sql, PostgreSQL has a rich array of functions for converting dates and times and extracting such information as months and days of the week.
+
+```{sql}
+#| connection: db
+SELECT date_trunc('month','2020-10-04 12:33:35 -00'::timestamptz);
+```
+
+One such function 
+
+```{r}
+a_time_df <- tbl(db, sql("(SELECT '2020-10-04 12:33:35'::timestamp AS a_time)"))
+
+a_time_df %>% 
+  mutate(a_trunced_time = date_trunc('month', a_time))
+
+a_time_df %>% 
+  mutate(a_trunced_time = date_trunc('month', a_time)) %>%
+  show_query()
+
+a_time_df %>%
+  collect()
+```
+
+### Date Math
+
+### Time Math
+
+```{r}
+a_time_df <- tbl(db, sql("(SELECT '2020-10-04 12:33:35 US/Pacific'::timestamptz AS a_time)"))
+
+a_time_df %>% 
+  mutate(a_trunced_time = date_trunc('month', a_time)) 
+
+a_time_df %>% 
+  mutate(a_trunced_time = date_trunc('month', a_time)) %>%
+  show_query()
+
+a_time_df %>%
+  collect()
+```
+
+```{r}
+a_time_df %>%
+  mutate(new_time = a_time + sql("interval '3 hours'")) %>%
+  collect()
+```
+
+```{r}
+#| include: false
+dbDisconnect(db, shutdown=TRUE)
+```
+
+### The Retail Sales Data Set {#sec-retail-data}
+
+As discussed in @tanimura2021sql, the data set used in this chapter comes from the website of the US Census Bureau.
+The data set is a little messy, but not too large, so we can easily grab it directly from the website and clean it up in much the same way that Cathy has done for us.
+
+```{r}
+#| cache: true
+#| eval: false 
+library(tidyverse)
+library(readxl)
+
+# Use tmpdir = "." or known directory if you have trouble with 
+# this part.
+mrtssales <- tempfile(fileext = ".xlsx")
+url <- paste0("https://www.census.gov/retail/mrts/www/",
+              "mrtssales92-present.xlsx")
+download.file(url, mrtssales)
+
+read_tab <- function(year) {
+  
+  # Initially we read all columns as text, as we want to process
+  # more precise than read_excel() would do unsupervised.
+  temp <- read_excel(mrtssales,
+                     range = "A4:N71", 
+                     sheet = as.character(year),
+                     col_types = "text",
+                     col_names = paste0("v", 1:14))
+  
+  # The third row has the dates for columns 3:14
+  names(temp) <- c("naics_code", "kind_of_business",
+                   as.character(temp[2, 3:14]))
+  
+  # The actual data are found after row 3
+  temp <- temp[-1:-3, ]
+  
+  # Now pivot the data and convert sales to numeric values.
+  # Also convert sales_month to dates (start of respective month).
+  df <-
+    temp %>%
+    pivot_longer(names_to = "sales_month",
+                 values_to = "sales",
+                 cols = -1:-2) %>%
+    mutate(sales_month = paste("01", str_remove(sales_month, "\\.")),
+           sales_month = as.Date(sales_month, "%d %b %Y")) %>%
+    mutate(reason_for_null = case_when(sales == "(NA)" ~ "Not Available",
+                                       sales == "(S)" ~ "Supressed",
+                                       TRUE ~ NA),
+           sales = case_when(sales == "(NA)" ~ NA,
+                             sales == "(S)" ~ NA,
+                             TRUE ~ sales)) %>%
+    mutate(sales = as.double(sales)) %>%
+    select(sales_month, naics_code, kind_of_business,
+           reason_for_null, sales)
+  df
+}
+
+retail_sales_local <- bind_rows(lapply(1992:2020, read_tab)) 
+```
+
+Note that there are differences between the `retail_sales_local` above and the data set we used in , as US Census economic data is continually being revised even after being released.
+
+### Earthquake data
+
+```{r}
+#| eval: false
+weeks <- 
+  tibble(start_date = seq(as.Date("2010-01-01"), 
+                          as.Date("2020-12-01"),
+                          by = 7)) %>%
+  mutate(end_date = start_date + days(7))
+  
+get_quake_data <- function(start, end) {
+  db <- dbConnect(duckdb::duckdb(), "earthquakes_new.duckdb")
+  url <- paste0("https://earthquake.usgs.gov/fdsnws/event/1/",
+                "query?format=csv&starttime=", as.character(start), 
+                "&endtime=", as.character(end))
+  df <- read_csv(url, show_col_types = FALSE)
+  dbWriteTable(db, "earthquakes_new2", df,
+               append = TRUE, row.names = FALSE)
+  dbDisconnect(db, shutdown = TRUE)
+  return(TRUE)
+}
+
+db <- dbConnect(duckdb::duckdb(), "earthquakes_new.duckdb")
+dbExecute(db, "DROP TABLE IF EXISTS earthquakes")
+dbDisconnect(db, shutdown = TRUE)
+
+res <- map2(weeks$start_date,
+            weeks$end_date, 
+            get_quake_data,
+            .progress = TRUE)
+```

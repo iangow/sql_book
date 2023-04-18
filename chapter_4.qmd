@@ -76,12 +76,6 @@ library(knitr)
 library(duckdb)
 ```
 
-```{r}
-#| include: false
-#| eval: false
-dbExecute(db, "SET search_path TO sql_book")
-```
-
 Otherwise, the easiest way to get the *legislators* data set is to get the data from the GitHub site provided with @tanimura2021sql.
 
 ```{r}
@@ -98,9 +92,9 @@ legislators_terms_df <- read_csv(paste0(url, "legislators_terms.csv"),
 
 ```{r}
 #| warning: false
-legislators_df <- read_csv("data/legislators.csv.gz",
+legislators_df <- read_csv("data/legislators.csv",
                            show_col_types = FALSE)
-legislators_terms_df <- read_csv("data/legislators_terms.csv.gz",
+legislators_terms_df <- read_csv("data/legislators_terms.csv",
                                  show_col_types = FALSE)
 ```
 
