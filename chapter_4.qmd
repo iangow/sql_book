@@ -62,21 +62,22 @@ Are these the equivalent life expectancies calculated using data available aroun
 Or are these the observed lifespans of people born in 1891--1900?
 If the latter, how accurate were the former as estimates of these values?
 
-## The Legislators Data Set
-
-Now that we understand cohorts, let's move onto the *legislators* data set.
-
 ```{r}
 #| warning: false
 library(DBI)
 library(tidyverse)
 library(dbplyr)
 library(ggplot2)
-library(knitr)
 library(duckdb)
 ```
 
-Otherwise, the easiest way to get the *legislators* data set is to get the data from the GitHub site provided with @tanimura2021sql.
+## The Legislators Data Set
+
+### Reading the data
+
+Let's move onto the *legislators* data set.
+
+The easiest way to get the *legislators* data set is import it from the GitHub site provided with @tanimura2021sql.
 
 ```{r}
 #| warning: false
@@ -100,8 +101,9 @@ legislators_terms_df <- read_csv("data/legislators_terms.csv",
 
 ```{r}
 #| include: false
+library(knitr)
 knit_print.tbl_sql <- function(x, ...) {
-  knit_print(kable(collect(x, n = 3)))
+  knitr::knit_print(knitr::kable(collect(x, n = 3)))
 }
 
 registerS3method("knit_print", "tbl_sql", knit_print.tbl_sql)
@@ -110,7 +112,7 @@ registerS3method("knit_print", "tbl_sql", knit_print.tbl_sql)
 ```{r}
 #| include: false
 knit_print.data.frame <- function(x, ...) {
-  knit_print(kable(x))
+  knitr::knit_print(knitr::kable(x))
 }
 
 registerS3method("knit_print", "data.frame", knit_print.data.frame)
@@ -122,6 +124,82 @@ legislators <- copy_to(db, legislators_df, "legislators")
 legislators_terms <- copy_to(db, legislators_terms_df, 
                              "legislators_terms")
 ```
+
+### Exploring the data
+
+There are two tables in the *legislators* data set.
+The `legislators` data looks to have `id_bioguide` as a primary key.
+
+```{sql}
+#| connection: db
+WITH
+
+id_rows AS (
+  SELECT id_bioguide, count(*) AS rows_per_id
+  FROM legislators
+  GROUP BY 1)
+
+SELECT rows_per_id, count(*) AS num_ids
+FROM id_rows
+GROUP BY 1;
+```
+```{sql}
+#| connection: db
+SELECT COUNT(*) AS num_missing_ids
+FROM legislators
+WHERE id_bioguide IS NULL
+```
+```{sql}
+#| connection: db
+WITH id_rows AS (
+  SELECT id_bioguide, term_start,
+    count(*) AS rows_per_id
+  FROM legislators_terms
+  GROUP BY 1, 2)
+
+SELECT rows_per_id, count(*) AS num_ids
+FROM id_rows
+GROUP BY 1;
+```
+```{sql}
+#| connection: db
+SELECT COUNT(*) AS num_missing_ids
+FROM legislators_terms
+WHERE id_bioguide IS NULL OR term_start IS NULL
+```
+```{sql}
+#| connection: db
+WITH id_rows AS (
+  SELECT id_bioguide, term_number,
+    count(*) AS rows_per_id
+  FROM legislators_terms
+  GROUP BY 1, 2)
+
+SELECT rows_per_id, count(*) AS num_ids
+FROM id_rows
+GROUP BY 1;
+```
+
+```{sql}
+#| connection: db
+SELECT COUNT(*) AS num_missing_ids
+FROM legislators_terms
+WHERE term_end IS NULL
+```
+```{sql}
+#| connection: db
+SELECT max(term_start) AS max_term_start,
+  max(term_end) AS max_term_end
+FROM legislators_terms
+```
+```{r}
+legislators_terms %>%
+  filter(term_end > '2020-05-19') %>%
+  count(term_end, term_type)
+```
+  
+Clearly we have `term_end` dates that are anticipated based on 
+
 
 ## Retention
 
