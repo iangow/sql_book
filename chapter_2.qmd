@@ -109,13 +109,13 @@ Second, I pivot the local data frame using `pivot_longer`.
 
 ```{r}
 ctry_pops_long <-
-  ctry_pops %>%
+  ctry_pops |>
   pivot_longer(cols = -country, 
                names_to = "year",
                names_prefix = "year_",
                values_ptypes = integer(),
                values_to = "population") 
-ctry_pops_long %>%
+ctry_pops_long |>
   kable()
 ```
 
@@ -128,7 +128,7 @@ ctry_pops_db
 
 ```{r}
 ctry_pops_db_long <-
-  ctry_pops_db %>%
+  ctry_pops_db |>
   pivot_longer(cols = -country, 
                names_to = "year",
                names_prefix = "year_",
@@ -138,25 +138,25 @@ ctry_pops_db_long <-
 From the output below, we can see that `dbplyr` has taken care of the tedious business of constructing several statements for us.
 
 ```{r}
-ctry_pops_db_long %>%
+ctry_pops_db_long |>
   show_query()
 ```
 
 And from the following, we can see that the result is the same as it was when using `dplyr` on a local data frame.
 
 ```{r}
-ctry_pops_db_long %>%
+ctry_pops_db_long |>
   kable()
 ```
 
 And we can reverse the `pivot_longer()` using `pivot_wider()`.
 
 ```{r}
-ctry_pops_db_long %>%
-  compute() %>%
+ctry_pops_db_long |>
+  compute() |>
   pivot_wider(names_from = year, 
               values_from = population, 
-              names_prefix = "year_") %>%
+              names_prefix = "year_") |>
   kable()
 ```
 

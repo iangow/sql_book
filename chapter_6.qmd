@@ -37,77 +37,77 @@ earthquakes <- tbl(db, "earthquakes")
 ```
 
 ```{r}
-earthquakes %>%
-  filter(!is.na(mag)) %>%
-  group_by(mag) %>%
-  summarize(earthquakes = n()) %>%
+earthquakes |>
+  filter(!is.na(mag)) |>
+  group_by(mag) |>
+  summarize(earthquakes = n()) |>
   mutate(pct_earthquakes = 1.0 * earthquakes / 
-           sum(earthquakes, na.rm = TRUE)) %>%
-  arrange(desc(mag)) %>%
-  collect(n = 5) %>%
+           sum(earthquakes, na.rm = TRUE)) |>
+  arrange(desc(mag)) |>
+  collect(n = 5) |>
   kable()
 ```
 
 ```{r}
-earthquakes %>%
-  filter(!is.na(mag)) %>%
-  group_by(mag) %>%
-  summarize(earthquakes = n()) %>%
+earthquakes |>
+  filter(!is.na(mag)) |>
+  group_by(mag) |>
+  summarize(earthquakes = n()) |>
   mutate(pct_earthquakes = earthquakes/sum(earthquakes, 
-                                           na.rm = TRUE)) %>%
-  arrange(mag) %>%
-  collect(n = 5) %>%
+                                           na.rm = TRUE)) |>
+  arrange(mag) |>
+  collect(n = 5) |>
   kable()
 ```
 
 ```{r}
 norcal <-
-  earthquakes %>%
-  filter(!is.na(mag), place == 'Northern California') %>%
-  group_by(place, mag) %>%
+  earthquakes |>
+  filter(!is.na(mag), place == 'Northern California') |>
+  group_by(place, mag) |>
   summarize(count = n(), .groups = "drop") 
 
-norcal %>% 
-  arrange(place, desc(mag)) %>% 
-  collect(n = 3) %>%
+norcal |> 
+  arrange(place, desc(mag)) |> 
+  collect(n = 3) |>
   kable()
 
-norcal %>% 
-  arrange(place, mag) %>% 
-  collect(n = 3) %>%
+norcal |> 
+  arrange(place, mag) |> 
+  collect(n = 3) |>
   kable()
 ```
 
 ```{r}
-earthquakes %>%
-  filter(!is.na(mag), place == 'Northern California') %>%
-  group_by(place) %>%
-  window_order(mag) %>%
-  mutate(percentile = percent_rank()) %>%
-  group_by(place, mag, percentile) %>%
-  summarize(count = n(), .groups = "drop") %>%
-  arrange(place, desc(mag)) %>%
-  collect(n = 6) %>%
+earthquakes |>
+  filter(!is.na(mag), place == 'Northern California') |>
+  group_by(place) |>
+  window_order(mag) |>
+  mutate(percentile = percent_rank()) |>
+  group_by(place, mag, percentile) |>
+  summarize(count = n(), .groups = "drop") |>
+  arrange(place, desc(mag)) |>
+  collect(n = 6) |>
   kable()
 ```
 ```{r}
-earthquakes %>%
-  filter(!is.na(mag), place == 'Central Alaska') %>%
-  select(place, mag) %>%
-  mutate(percentile = ntile(100, order_by = "mag")) %>%
-  arrange(place, desc(mag)) %>%
-  collect(n = 5) %>%
+earthquakes |>
+  filter(!is.na(mag), place == 'Central Alaska') |>
+  select(place, mag) |>
+  mutate(percentile = ntile(100, order_by = "mag")) |>
+  arrange(place, desc(mag)) |>
+  collect(n = 5) |>
   kable()
 ```
 
 ```{r}
-earthquakes %>%
-  filter(!is.na(mag), place == 'Central Alaska') %>%
-  select(place, mag) %>%
-  group_by(place) %>%
-  window_order(mag) %>%
-  mutate(percentile = round(percent_rank() * 100, 0)) %>%
-  arrange(place, desc(mag)) %>%
+earthquakes |>
+  filter(!is.na(mag), place == 'Central Alaska') |>
+  select(place, mag) |>
+  group_by(place) |>
+  window_order(mag) |>
+  mutate(percentile = round(percent_rank() * 100, 0)) |>
+  arrange(place, desc(mag)) |>
   show_query()
 ```
 
@@ -116,58 +116,58 @@ Rather than preceding the `mutate` with a `window_order()`, we need to specify a
 
 ```{r}
 cen_ak_quartiles <-
-  earthquakes %>%
-  filter(!is.na(mag), place == 'Central Alaska') %>%
-  select(place, mag) %>%
-  group_by(place) %>%
+  earthquakes |>
+  filter(!is.na(mag), place == 'Central Alaska') |>
+  select(place, mag) |>
+  group_by(place) |>
   mutate(ntile = ntile(4, order_by = "mag"))
 
-cen_ak_quartiles %>%
-  group_by(place, ntile) %>%
+cen_ak_quartiles |>
+  group_by(place, ntile) |>
   summarize(maximum = max(mag, na.rm = TRUE),
             minimum = min(mag, na.rm = TRUE),
-            .groups = "drop") %>%
-  arrange(place, desc(ntile)) %>%
+            .groups = "drop") |>
+  arrange(place, desc(ntile)) |>
   kable()
 ```
 
 ```{r}
-earthquakes %>%
-  filter(!is.na(mag), place == 'Central Alaska') %>%
-  select(place, mag) %>%
-  group_by(place) %>%
+earthquakes |>
+  filter(!is.na(mag), place == 'Central Alaska') |>
+  select(place, mag) |>
+  group_by(place) |>
   summarize(pct_25 = quantile(mag, probs = 0.25, na.rm = TRUE),
             pct_50 = quantile(mag, probs = 0.50, na.rm = TRUE),
-            pct_75 = quantile(mag, probs = 0.75, na.rm = TRUE)) %>%
+            pct_75 = quantile(mag, probs = 0.75, na.rm = TRUE)) |>
   kable()
 ```
 
 ```{r}
-earthquakes %>%
-  filter(!is.na(mag), place == 'Central Alaska') %>%
+earthquakes |>
+  filter(!is.na(mag), place == 'Central Alaska') |>
   summarize(pct_25_mag = quantile(mag, probs = 0.25, na.rm = TRUE),
-            pct_25_depth = quantile(depth, probs = 0.25, na.rm = TRUE)) %>%
+            pct_25_depth = quantile(depth, probs = 0.25, na.rm = TRUE)) |>
   kable()
 ```
 
 ```{r}
-earthquakes %>%
+earthquakes |>
   filter(!is.na(mag), 
-         place %in% c('Central Alaska', 'Southern Alaska')) %>%
-  group_by(place) %>%
+         place %in% c('Central Alaska', 'Southern Alaska')) |>
+  group_by(place) |>
   summarize(pct_25_mag = quantile(mag, probs = 0.25, na.rm = TRUE),
-            pct_25_depth = quantile(depth, probs = 0.25, na.rm = TRUE)) %>%
+            pct_25_depth = quantile(depth, probs = 0.25, na.rm = TRUE)) |>
   kable()
 ```
 
 ```{r}
-earthquakes %>%
+earthquakes |>
   summarize(sd_mag = sd(mag, na.rm = TRUE),
             stddev_samp_mag = stddev_samp(mag),
-            stddev_pop_mag = stddev_pop(mag)) %>%
+            stddev_pop_mag = stddev_pop(mag)) |>
   mutate(diff_samp = sd_mag - stddev_samp_mag,
-         diff_pop = sd_mag - stddev_pop_mag) %>%
-  collect() %>%
+         diff_pop = sd_mag - stddev_pop_mag) |>
+  collect() |>
   kable()
 ```
 
@@ -199,98 +199,98 @@ Often I find myself moving the data processing from PosrtgreSQL to R or vice ver
 
 ```{r}
 mag_stats <-
-  earthquakes %>%
-  filter(!is.na(mag)) %>%
+  earthquakes |>
+  filter(!is.na(mag)) |>
   summarize(avg_mag = avg(mag),
             std_dev = stddev_pop(mag))
 
 z_scores <-
-  earthquakes %>%
-  filter(!is.na(mag), !(mag %in% c(-9, -9.99))) %>%
-  select(place, mag) %>%
-  cross_join(mag_stats) %>%
+  earthquakes |>
+  filter(!is.na(mag), !(mag %in% c(-9, -9.99))) |>
+  select(place, mag) |>
+  cross_join(mag_stats) |>
   mutate(z_score = (mag - avg_mag) / std_dev) 
 
-z_scores %>%
-  arrange(desc(mag)) %>%
-  collect(n = 3) %>%
+z_scores |>
+  arrange(desc(mag)) |>
+  collect(n = 3) |>
   kable()
 
-z_scores %>%
-  arrange(mag) %>%
-  collect(n = 3) %>%
+z_scores |>
+  arrange(mag) |>
+  collect(n = 3) |>
   kable()
 ```
 
 ## Graphing to find anomalies visually
 
 ```{r}
-earthquakes %>%
-  filter(!is.na(mag)) %>%
+earthquakes |>
+  filter(!is.na(mag)) |>
   ggplot(aes(x = mag)) +
   geom_histogram(breaks = seq(-10, 10, 0.1))
 ```
 
 ```{r}
-earthquakes %>%
+earthquakes |>
   filter(!is.na(mag),
-         between(mag, 7.2, 9.5)) %>%
+         between(mag, 7.2, 9.5)) |>
   ggplot(aes(x = mag)) +
   geom_histogram(binwidth = 0.1)
 ```
 
 ```{r}
-earthquakes %>%
+earthquakes |>
   filter(!is.na(mag),
-         between(mag, 7.2, 9.5)) %>%
+         between(mag, 7.2, 9.5)) |>
   ggplot(aes(x = mag)) +
   geom_bar() +
   scale_x_binned(breaks = seq(7.2, 9.5, 0.1))
 ```
 
 ```{r}
-earthquakes %>%
-  filter(!is.na(mag), !is.na(depth)) %>%
-  distinct(mag, depth) %>%
+earthquakes |>
+  filter(!is.na(mag), !is.na(depth)) |>
+  distinct(mag, depth) |>
   ggplot(aes(x = mag, y = depth)) +
   geom_point(size = 0.1, colour = "blue")
 ```
 
 ```{r}
-earthquakes %>%
-  filter(!is.na(mag), !is.na(depth)) %>%
-  filter(between(mag, 4, 7), depth <= 50) %>%
+earthquakes |>
+  filter(!is.na(mag), !is.na(depth)) |>
+  filter(between(mag, 4, 7), depth <= 50) |>
   ggplot(aes(x = mag, y = depth)) +
   geom_count(color = "blue")
 ```
 
 ```{r}
 japan_quakes <-
-  earthquakes %>%
-  filter(!is.na(mag), !is.na(depth)) %>%
+  earthquakes |>
+  filter(!is.na(mag), !is.na(depth)) |>
   filter(grepl("Japan", place)) 
 
-japan_quakes %>%
+japan_quakes |>
   ggplot(aes(y = mag)) +
   geom_boxplot(width = 0.5)
 ```
 
 ```{r}
-japan_quakes %>%
+japan_quakes |>
   summarize(p25 = quantile(mag, probs = 0.25, na.rm = TRUE),
             p50 = quantile(mag, probs = 0.50, na.rm = TRUE),
-            p75 = quantile(mag, probs = 0.75, na.rm = TRUE)) %>%
+            p75 = quantile(mag, probs = 0.75, na.rm = TRUE)) |>
   mutate(iqr = (p75 - p25) * 1.5,
          lower_whisker = p25 - (p75 - p25) * 1.5,
-         upper_whisker = p75 + (p75 - p25) * 1.5) %>%
+         upper_whisker = p75 + (p75 - p25) * 1.5) |>
   kable()
 ```
 
 ```{r}
-japan_quakes %>%
-  select(mag, time) %>%
-  collect() %>%
-  mutate(year = as.factor(year(time))) %>%
+japan_quakes |>
+  select(mag, time) |>
+  collect() |>
+  mutate(year = as.factor(year(time))) |>
   ggplot(aes(y = mag, x = year, group = year)) +
   geom_boxplot()
 ```
@@ -300,51 +300,51 @@ japan_quakes %>%
 ### Anomalous Values
 
 ```{r}
-earthquakes %>%
-  filter(mag >= 1.08) %>%
-  group_by(mag) %>%
-  summarize(count = n()) %>%
-  arrange(mag) %>%
-  collect(n = 5) %>%
+earthquakes |>
+  filter(mag >= 1.08) |>
+  group_by(mag) |>
+  summarize(count = n()) |>
+  arrange(mag) |>
+  collect(n = 5) |>
   kable()
 ```
 
 ```{r}
-earthquakes %>%
-  filter(depth > 600) %>%
-  group_by(net) %>%
-  summarize(count = n()) %>%
-  arrange(net) %>%
-  collect(n = 5) %>%
+earthquakes |>
+  filter(depth > 600) |>
+  group_by(net) |>
+  summarize(count = n()) |>
+  arrange(net) |>
+  collect(n = 5) |>
   kable()
 ```
 ```{r}
-earthquakes %>%
-  filter(depth > 600) %>%
-  group_by(place) %>%
-  summarize(count = n()) %>%
-  arrange(place) %>%
-  collect(n = 5) %>%
+earthquakes |>
+  filter(depth > 600) |>
+  group_by(place) |>
+  summarize(count = n()) |>
+  arrange(place) |>
+  collect(n = 5) |>
   kable()
 ```
 
 ```{r}
-earthquakes %>%
-  filter(depth > 600) %>%
+earthquakes |>
+  filter(depth > 600) |>
   mutate(place_name = case_when(grepl(' of ', place) ~
                                   split_part(place, ' of ', 2L),
-                                TRUE ~ place)) %>%
-  group_by(place_name) %>%
-  summarize(count = n()) %>%
-  arrange(desc(count)) %>%
-  collect(n = 3) %>%
+                                TRUE ~ place)) |>
+  group_by(place_name) |>
+  summarize(count = n()) |>
+  arrange(desc(count)) |>
+  collect(n = 3) |>
   kable()
 ```
 
 ```{r}
-earthquakes %>%
+earthquakes |>
   summarize(distinct_types = n_distinct(type),
-            distinct_lower = n_distinct(lower(type))) %>%
+            distinct_lower = n_distinct(lower(type))) |>
   kable()
 ```
 
@@ -362,10 +362,10 @@ ORDER BY 1;
 ```
 
 ```{r}
-earthquakes %>%
-  mutate(earthquake_year = as.character(year(time))) %>%
-  group_by(earthquake_year) %>%
-  summarize(earthquakes = n()) %>%
+earthquakes |>
+  mutate(earthquake_year = as.character(year(time))) |>
+  group_by(earthquake_year) |>
+  summarize(earthquakes = n()) |>
   ggplot(aes(x = earthquake_year, y = earthquakes)) +
   geom_bar(stat = "identity")
 ```
@@ -375,17 +375,17 @@ This suggests that `ggplot` is triggering a `collect()` on fields that it does n
 
 ```{r}
 #| eval: false
-earthquakes %>%
-  mutate(earthquake_year = as.character(year(time))) %>%
-  select(earthquake_year) %>%
+earthquakes |>
+  mutate(earthquake_year = as.character(year(time))) |>
+  select(earthquake_year) |>
   ggplot(aes(x = earthquake_year)) +
   geom_bar()
 ```
 ```{r}
-earthquakes %>%
-  mutate(earthquake_month = floor_date(time, "month")) %>%
-  group_by(earthquake_month) %>%
-  summarize(earthquakes = n(), .groups = "drop") %>%
+earthquakes |>
+  mutate(earthquake_month = floor_date(time, "month")) |>
+  group_by(earthquake_month) |>
+  summarize(earthquakes = n(), .groups = "drop") |>
   ggplot(aes(x = earthquake_month, y = earthquakes)) +
   geom_line()
 ```
@@ -394,36 +394,36 @@ From the book, "it turns out that the increase in earthquakes starting in 2017 c
 This can be seen in the following plot.^[Unlike the plot in the book, I leave observations with "manual" status in the plot, as they are in the SQL query.]
 
 ```{r}
-earthquakes %>%
-  mutate(earthquake_month = floor_date(time, "month")) %>%
-  group_by(earthquake_month, status) %>%
-  summarize(earthquakes = n(), .groups = "drop") %>%
+earthquakes |>
+  mutate(earthquake_month = floor_date(time, "month")) |>
+  group_by(earthquake_month, status) |>
+  summarize(earthquakes = n(), .groups = "drop") |>
   ggplot(aes(x = earthquake_month, y = earthquakes, color = status)) +
   geom_line()
 ```
 
 
 ```{r}
-earthquakes %>%
-  filter(mag >= 6) %>%
-  group_by(place) %>%
-  summarize(earthquakes = n(), .groups = "drop") %>%
-  arrange(desc(earthquakes)) %>%
-  collect(n = 3) %>%
+earthquakes |>
+  filter(mag >= 6) |>
+  group_by(place) |>
+  summarize(earthquakes = n(), .groups = "drop") |>
+  arrange(desc(earthquakes)) |>
+  collect(n = 3) |>
   kable()
 ```
 
 For the next query, it seems easy enough to just put the result in a plot.
 
 ```{r}
-earthquakes %>%
-  filter(mag >= 6) %>%
+earthquakes |>
+  filter(mag >= 6) |>
   mutate(place = if_else(grepl(' of ', place),
                          split_part(place, ' of ', 2L), 
-                         place)) %>%
-  count(place, name = "earthquakes") %>%
-  arrange(desc(earthquakes)) %>%
-  collect(n = 10) %>%
+                         place)) |>
+  count(place, name = "earthquakes") |>
+  arrange(desc(earthquakes)) |>
+  collect(n = 10) |>
   ggplot(aes(y = fct_inorder(place), 
              x = earthquakes)) +
   geom_bar(stat = "identity")
@@ -437,44 +437,44 @@ earthquakes %>%
 ### Removal
 
 ```{r}
-earthquakes %>%
-  filter(!mag %in% c(-9,-9.99)) %>%
-  select(time, mag, type) %>%
-  collect(n = 10) %>%
+earthquakes |>
+  filter(!mag %in% c(-9,-9.99)) |>
+  select(time, mag, type) |>
+  collect(n = 10) |>
   kable()
 ```
 
 ```{r}
-earthquakes %>%
+earthquakes |>
   summarize(avg_mag = avg(mag),
-            avg_mag_adjusted = avg(if_else(mag > -9, mag, NA))) %>%
+            avg_mag_adjusted = avg(if_else(mag > -9, mag, NA))) |>
   kable()
 ```
 
 ```{r}
-earthquakes %>%
-  filter(place == 'Yellowstone National Park, Wyoming') %>%
+earthquakes |>
+  filter(place == 'Yellowstone National Park, Wyoming') |>
   summarize(avg_mag = avg(mag),
-            avg_mag_adjusted = avg(if_else(mag > -9, mag, NA))) %>%
+            avg_mag_adjusted = avg(if_else(mag > -9, mag, NA))) |>
   kable()
 ```
 
 ### Replacement with Alternate Values
 
 ```{r}
-earthquakes %>%
-  mutate(event_type = if_else(type == 'earthquake', type, 'Other')) %>%
-  count(event_type) %>%
+earthquakes |>
+  mutate(event_type = if_else(type == 'earthquake', type, 'Other')) |>
+  count(event_type) |>
   kable()
 ```
 
 ```{r}
 extremes <-
-  earthquakes %>%
+  earthquakes |>
   summarize(p95 = quantile(mag, probs = 0.95, na.rm = TRUE),
             p05 = quantile(mag, probs = 0.05, na.rm = TRUE))
 
-extremes %>% kable()
+extremes |> kable()
 ```
 
 Note that this SQL from the book^[I simplify the SQL from the book assuming that the table already includes a `CROSS JOIN` with the SQL equivalent of `extremes` and I use shorter variable names for the extremes.]
@@ -501,26 +501,26 @@ And `dbplyr` will translate `pmin` and `pmax` for us, so we can get winsorized d
 ```{r}
 #| warning: false
 earthquakes_wins <-
-  earthquakes %>%
-  mutate(mag = if_else(mag %in% c(-9.99, -9), NA, mag)) %>%
-  filter(!is.na(mag)) %>%
-  cross_join(extremes) %>%
-  mutate(mag_winsorized = pmin(pmax(mag, p05), p95)) %>%
+  earthquakes |>
+  mutate(mag = if_else(mag %in% c(-9.99, -9), NA, mag)) |>
+  filter(!is.na(mag)) |>
+  cross_join(extremes) |>
+  mutate(mag_winsorized = pmin(pmax(mag, p05), p95)) |>
   select(time, place, mag, mag_winsorized) 
 
-earthquakes_wins %>%
-  arrange(desc(mag)) %>%
-  collect(n = 3) %>%
+earthquakes_wins |>
+  arrange(desc(mag)) |>
+  collect(n = 3) |>
   kable()
 
-earthquakes_wins %>%
-  filter(mag == mag_winsorized) %>%
-  collect(n = 3) %>%
+earthquakes_wins |>
+  filter(mag == mag_winsorized) |>
+  collect(n = 3) |>
   kable()
 
-earthquakes_wins %>%
-  arrange(mag) %>%
-  collect(n = 3) %>%
+earthquakes_wins |>
+  arrange(mag) |>
+  collect(n = 3) |>
   kable()
 ```
 
@@ -530,25 +530,25 @@ In the book, it says `WHERE depth >= 0.05`, but I need to use `WHERE depth > 0.0
 
 ```{r}
 quake_depths <-
-  earthquakes %>%
-  filter(depth > 0.05) %>%
-  mutate(depth = round(depth, 1)) %>%
+  earthquakes |>
+  filter(depth > 0.05) |>
+  mutate(depth = round(depth, 1)) |>
   select(depth)
 
-quake_depths %>%
-  mutate(log_depth = log(depth, base = 10)) %>%
-  count(depth, log_depth) %>%
-  arrange(depth) %>%
-  collect(n = 3) %>%
+quake_depths |>
+  mutate(log_depth = log(depth, base = 10)) |>
+  count(depth, log_depth) |>
+  arrange(depth) |>
+  collect(n = 3) |>
   kable()
 
-quake_depths %>%
+quake_depths |>
   ggplot(aes(x = depth)) +
   geom_histogram(binwidth = 0.1)
 ```
 
 ```{r}
-quake_depths %>%
+quake_depths |>
   ggplot(aes(x = log(depth, base = 10))) +
   geom_histogram(binwidth = 0.1)
 ```

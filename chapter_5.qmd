@@ -45,8 +45,8 @@ res <- lapply(files, csv_to_db)
 ```{r}
 ufo <- tbl(db, "ufo")
 
-ufo %>%
-  mutate(length = length(sighting_report)) %>%
+ufo |>
+  mutate(length = length(sighting_report)) |>
   ggplot(aes(x = length)) +
   geom_histogram(binwidth = 1)
 ```
@@ -62,7 +62,7 @@ initcap <- function(x) {
 ```{r}
 #| cache: true
 ufo <- 
-  tbl(db, "ufo") %>% 
+  tbl(db, "ufo") |> 
   mutate(id = row_number())
 
 regex <- paste0("Occurred :\\s*(.*)\\s*",
@@ -76,19 +76,19 @@ regex2 <- paste0("^(.*?)",
                  "(?:\\s*\\(Entered as :\\s*(.*)\\))?\\s*$")
 
 ufo_extracted <- 
-  ufo %>%
+  ufo |>
   mutate(occurred_plus = regexp_extract(sighting_report, regex, 1L),
          reported = regexp_extract(sighting_report, regex, 2L),
          posted = regexp_extract(sighting_report, regex, 3L),
          location = regexp_extract(sighting_report, regex, 4L),
          shape = regexp_extract(sighting_report, regex, 5L),
-         duration = regexp_extract(sighting_report, regex, 6L)) %>%
-  select(id, occurred_plus:duration) %>%
+         duration = regexp_extract(sighting_report, regex, 6L)) |>
+  select(id, occurred_plus:duration) |>
   mutate(occurred_raw = regexp_extract(occurred_plus, regex2, 1L),
-         entered = regexp_extract(occurred_plus, regex2, 1L)) %>%
-  select(-occurred_plus) %>%
+         entered = regexp_extract(occurred_plus, regex2, 1L)) |>
+  select(-occurred_plus) |>
   mutate(location_clean = regexp_replace(location, 
-                                         "(outside of|close to)", "near")) %>%
+                                         "(outside of|close to)", "near")) |>
   mutate(reported = 
            case_when(reported == '' ~ NA,
                      nchar(reported) < 8 ~ NA,
@@ -106,46 +106,46 @@ ufo_extracted <-
                        strptime(occurred_raw, "%m/%d/%Y %H:%M:%S"),
                      TRUE ~ strptime(occurred_raw, "%m/%d/%Y %H:%M")),
          posted = if_else(posted == '', NA, 
-                          as.Date(strptime(posted, "%m/%d/%Y")))) %>%
-  collect() %>%
+                          as.Date(strptime(posted, "%m/%d/%Y")))) |>
+  collect() |>
   mutate(shape = initcap(shape)) 
 ```
 
 ```{r}
-ufo_extracted %>%
+ufo_extracted |>
   ggplot(aes(y = fct_rev(fct_infreq(shape)))) +
   geom_bar() +
   ylab("Shape")
 ```
 
 ```{r}
-ufo_extracted %>%
-  filter(!is.na(occurred_raw)) %>%
-  count(occurred_raw) %>%
-  arrange(desc(n)) %>%
-  slice_head(n = 10) %>%
-  mutate(occurred_raw = fct_rev(fct_inorder(as.character(occurred_raw)))) %>%
+ufo_extracted |>
+  filter(!is.na(occurred_raw)) |>
+  count(occurred_raw) |>
+  arrange(desc(n)) |>
+  slice_head(n = 10) |>
+  mutate(occurred_raw = fct_rev(fct_inorder(as.character(occurred_raw)))) |>
   ggplot(aes(y = occurred_raw, x = n)) +
   geom_bar(stat = "identity")
 ```
 
 
 ```{r}
-ufo_extracted %>%
-  count(duration) %>%
-  arrange(desc(n)) %>%
-  slice_head(n = 10) %>%
-  mutate(duration = fct_rev(fct_inorder(duration))) %>%
+ufo_extracted |>
+  count(duration) |>
+  arrange(desc(n)) |>
+  slice_head(n = 10) |>
+  mutate(duration = fct_rev(fct_inorder(duration))) |>
   ggplot(aes(y = duration, x = n)) +
   geom_bar(stat = "identity")
 ```
 
 ```{r}
-ufo_extracted %>%
-  count(location) %>%
-  arrange(desc(n)) %>%
-  slice_head(n = 10) %>%
-  mutate(location = fct_rev(fct_inorder(location))) %>%
+ufo_extracted |>
+  count(location) |>
+  arrange(desc(n)) |>
+  slice_head(n = 10) |>
+  mutate(location = fct_rev(fct_inorder(location))) |>
   ggplot(aes(y = location, x = n)) +
   geom_bar(stat = "identity")
 ```

@@ -37,15 +37,15 @@ videogame_sales <- tbl(pg, "videogame_sales")
 ```
 
 ```{r}
-earthquakes %>%
+earthquakes |>
   filter(date_part('year', time) >= 2019,
-         between(mag, 0, 1)) %>%
+         between(mag, 0, 1)) |>
   mutate(place = case_when(grepl('CA', place) ~ 'California',
                            grepl('AK', place) ~ 'Alaska',
-                           TRUE ~ trim(split_part(place, ',', 2L)))) %>%
-  count(place, type, mag) %>%
-  arrange(desc(n)) %>%
-  collect(n = 10) %>%
+                           TRUE ~ trim(split_part(place, ',', 2L)))) |>
+  count(place, type, mag) |>
+  arrange(desc(n)) |>
+  collect(n = 10) |>
   kable()
 ```
 
@@ -69,17 +69,17 @@ One hardly need give this much thought.
 
 ```{r}
 terms_by_states <-
-  legislators_terms %>%
-  group_by(state) %>%
-  summarize(terms = n()) %>%
-  filter(terms >= 1000) %>%
+  legislators_terms |>
+  group_by(state) |>
+  summarize(terms = n()) |>
+  filter(terms >= 1000) |>
   arrange(desc(terms))
 
-terms_by_states %>%
+terms_by_states |>
   show_query()
 
-terms_by_states %>%
-  collect(n = 10) %>%
+terms_by_states |>
+  collect(n = 10) |>
   kable()
 ```
 
@@ -90,22 +90,22 @@ In this specific case, I find the `dplyr` code to be more intuitive than the SQL
 
 
 ```{r}
-legislators_terms %>%
-  group_by(state) %>%
-  summarize(terms = n(), .groups = "drop") %>%
-  mutate(avg_terms = mean(terms, na.rm = TRUE)) %>%
-  collect(n = 10) %>%
+legislators_terms |>
+  group_by(state) |>
+  summarize(terms = n(), .groups = "drop") |>
+  mutate(avg_terms = mean(terms, na.rm = TRUE)) |>
+  collect(n = 10) |>
   kable(digits = 2)
 ```
 
 ```{r}
-legislators_terms %>%
-  group_by(state) %>%
-  summarize(terms = n(), .groups = "drop") %>%
-  window_order(desc(terms)) %>%
-  mutate(rank = row_number()) %>%
-  arrange(rank) %>%
-  collect(n = 10) %>%
+legislators_terms |>
+  group_by(state) |>
+  summarize(terms = n(), .groups = "drop") |>
+  window_order(desc(terms)) |>
+  mutate(rank = row_number()) |>
+  arrange(rank) |>
+  collect(n = 10) |>
   kable()
 ```
 
@@ -145,24 +145,24 @@ Translating the CTE version into `dbplyr` is a piece of cake.
 
 ```{r}
 current_legislators <-
-  legislators_terms %>%
-  filter(term_end > '2020-06-01') %>%
+  legislators_terms |>
+  filter(term_end > '2020-06-01') |>
   distinct(id_bioguide, party)
 
 party_changers <-
-  legislators_terms %>%
+  legislators_terms |>
   inner_join(current_legislators, 
-             join_by(id_bioguide)) %>%
-  filter(party.x != party.y) %>%
-  group_by(id_bioguide) %>%
+             join_by(id_bioguide)) |>
+  filter(party.x != party.y) |>
+  group_by(id_bioguide) |>
   summarize(first_term = min(term_start, na.rm = TRUE), .groups = "drop")
 
-current_legislators %>%
-  inner_join(party_changers, by = "id_bioguide") %>%
-  mutate(first_year = date_part('year', first_term)) %>%
-  group_by(first_year, party) %>%
-  summarize(legislators = n(), .groups = "drop") %>%
-  collect() %>%
+current_legislators |>
+  inner_join(party_changers, by = "id_bioguide") |>
+  mutate(first_year = date_part('year', first_term)) |>
+  group_by(first_year, party) |>
+  summarize(legislators = n(), .groups = "drop") |>
+  collect() |>
   kable()
 ```
 
@@ -172,16 +172,16 @@ Creating temporary tables with `dbplyr` is easy: simply append `compute()` at th
 Generally, `dbplyr` will take care of details that likely do not matter much, such as choosing a name for the table (we don't care because we can refer to the table below as `current_legislators` regardless of the name chosen for it).
 
 ```{r}
-current_legislators %>%
+current_legislators |>
   show_query()
 
 current_legislators <-
-  legislators_terms %>%
-  filter(term_end > '2020-06-01') %>%
-  distinct(id_bioguide, party) %>%
+  legislators_terms |>
+  filter(term_end > '2020-06-01') |>
+  distinct(id_bioguide, party) |>
   compute()
 
-current_legislators %>%
+current_legislators |>
   show_query()
 ```
 
@@ -198,17 +198,17 @@ For the sake of completeness, I rewrite the query given in the book here.
 
 ```{r}
 first_term <- 
-  legislators_terms %>%
-  group_by(id_bioguide) %>%
+  legislators_terms |>
+  group_by(id_bioguide) |>
   summarize(first_term = min(term_start, na.rm = TRUE),
             .groups = "drop")
     
-first_term %>%
-  inner_join(legislators_terms, by = "id_bioguide") %>%
-  mutate(periods = date_part('year', age(term_start, first_term))) %>%
-  group_by(periods) %>%
-  summarize(cohort_retained = n_distinct(id_bioguide)) %>%
-  collect(n = 3) %>%
+first_term |>
+  inner_join(legislators_terms, by = "id_bioguide") |>
+  mutate(periods = date_part('year', age(term_start, first_term))) |>
+  group_by(periods) |>
+  summarize(cohort_retained = n_distinct(id_bioguide)) |>
+  collect(n = 3) |>
   kable()
 ```
 
@@ -225,9 +225,9 @@ global_sales <-
     FROM videogame_sales
     GROUP BY grouping sets (platform, genre, publisher)"))
 
-global_sales %>%
-  arrange(desc(global_sales)) %>%
-  collect(n = 10) %>%
+global_sales |>
+  arrange(desc(global_sales)) |>
+  collect(n = 10) |>
   kable()
 ```
 
@@ -241,9 +241,9 @@ global_sales_cube <-
     FROM videogame_sales
     GROUP BY cube (platform, genre, publisher)"))
 
-global_sales_cube %>%
-  arrange(platform, genre, publisher) %>%
-  collect(n = 10) %>%
+global_sales_cube |>
+  arrange(platform, genre, publisher) |>
+  collect(n = 10) |>
   kable()
 ```
 
@@ -256,33 +256,33 @@ One can also use `random()` to similar effect.
 ### Reducing Dimensionality
 
 ```{r}
-legislators_terms %>%
+legislators_terms |>
   mutate(state_group = 
            case_when(state %in% c('CA', 'TX', 'FL', 'NY', 'PA') ~ state, 
-                     TRUE ~ 'Other')) %>%
-  group_by(state_group) %>%
-  summarize(terms = n()) %>%
-  arrange(desc(terms)) %>%
-  collect(n = 6) %>%
+                     TRUE ~ 'Other')) |>
+  group_by(state_group) |>
+  summarize(terms = n()) |>
+  arrange(desc(terms)) |>
+  collect(n = 6) |>
   kable()
 ```
 
 ```{r}
 top_states <-
-  legislators_terms %>%
-  group_by(state) %>%
-  summarize(n_reps = n_distinct(id_bioguide), .groups = "drop") %>%
-  window_order(desc(n_reps)) %>%
+  legislators_terms |>
+  group_by(state) |>
+  summarize(n_reps = n_distinct(id_bioguide), .groups = "drop") |>
+  window_order(desc(n_reps)) |>
   mutate(rank = row_number())
 
-legislators_terms %>%
-  inner_join(top_states, by = "state") %>%
+legislators_terms |>
+  inner_join(top_states, by = "state") |>
   mutate(state_group = case_when(rank <= 5 ~ state,
-                                 TRUE ~ 'Other')) %>%
-  group_by(state_group) %>%
-  summarize(terms = n_distinct(id_bioguide)) %>%
-  arrange(desc(terms)) %>%
-  collect(n = 6) %>%
+                                 TRUE ~ 'Other')) |>
+  group_by(state_group) |>
+  summarize(terms = n_distinct(id_bioguide)) |>
+  arrange(desc(terms)) |>
+  collect(n = 6) |>
   kable()
 ```
 
@@ -302,26 +302,26 @@ GROUP BY 1;
 ```
 ```{r}
 num_terms <- 
-  legislators_terms %>%
-  group_by(id_bioguide) %>%
+  legislators_terms |>
+  group_by(id_bioguide) |>
   summarize(terms = n(), .groups = "drop")
 
-num_terms %>%
-  mutate(two_terms_flag = terms >= 2) %>%
-  count(two_terms_flag) %>%
-  collect() %>%
+num_terms |>
+  mutate(two_terms_flag = terms >= 2) |>
+  count(two_terms_flag) |>
+  collect() |>
   kable()
 ```
 
 Now we can reuse the `num_terms` lazy table we created above.
 
 ```{r}
-num_terms %>%
+num_terms |>
   mutate(terms_level = case_when(terms >= 10 ~ '10+',
                                  terms >= 2 ~ '2 - 9',
-                                 TRUE ~ '1')) %>%
-  count(terms_level) %>%
-  collect() %>%
+                                 TRUE ~ '1')) |>
+  count(terms_level) |>
+  collect() |>
   kable()
 ```
 ### PII and Data Privacy

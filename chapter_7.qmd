@@ -111,26 +111,26 @@ If the experiment is very large or you would rather the database server do more 
 ```{r}
 #| label: cont_tbl
 cont_tbl <-
-  exp_assignment %>%
-  left_join(game_actions, by = "user_id") %>%
-  group_by(variant, user_id) %>%
+  exp_assignment |>
+  left_join(game_actions, by = "user_id") |>
+  group_by(variant, user_id) |>
   summarize(completed = 
               coalesce(any(action == "onboarding complete", na.rm = TRUE),
                        FALSE),
-            .groups = "drop") %>%
-  count(variant, completed) %>%
-  mutate(completed = if_else(completed, "Yes", "No")) %>%
-  pivot_wider(names_from = completed, values_from = n) %>%
+            .groups = "drop") |>
+  count(variant, completed) |>
+  mutate(completed = if_else(completed, "Yes", "No")) |>
+  pivot_wider(names_from = completed, values_from = n) |>
   collect()
 ```
 
 Using the packages `janitor` and `flextable`, I mimic the nicely formatted output shown in the book:
 
 ```{r}
-cont_tbl %>%
-  adorn_totals(c("row", "col")) %>%
-  mutate(`% Complete` = prettyNum(Yes/Total * 100, digits = 4)) %>%
-  flextable() %>%
+cont_tbl |>
+  adorn_totals(c("row", "col")) |>
+  mutate(`% Complete` = prettyNum(Yes/Total * 100, digits = 4)) |>
+  flextable() |>
   add_header_row(values=c("", "Completed onboarding", ""),
                  colwidths = c(1, 2, 2))
 ```
@@ -142,8 +142,8 @@ I then display the Chi-squared statistic and the $p$-value.
 
 ```{r}
 res <- 
-  cont_tbl %>%
-  column_to_rownames(var = "variant") %>%
+  cont_tbl |>
+  column_to_rownames(var = "variant") |>
   chisq.test(correct = FALSE)
 
 res$statistic
@@ -154,22 +154,22 @@ res$p.value
 
 ```{r}
 amounts <- 
-  exp_assignment %>%
-  filter(exp_name == 'Onboarding') %>%
-  left_join(game_purchases, by = "user_id") %>%
-  group_by(variant, user_id) %>%
+  exp_assignment |>
+  filter(exp_name == 'Onboarding') |>
+  left_join(game_purchases, by = "user_id") |>
+  group_by(variant, user_id) |>
   summarize(amount = sum(coalesce(amount, 0), na.rm = TRUE),
             .groups = "drop")
 
 t_test_stats <-
-  amounts %>%
-  group_by(variant) %>%
+  amounts |>
+  group_by(variant) |>
   summarize(n = n(),
             mean = mean(amount, na.rm = TRUE),
-            sd = sd(amount, na.rm = TRUE)) %>%
+            sd = sd(amount, na.rm = TRUE)) |>
   collect()
 
-t_test_stats %>%
+t_test_stats |>
   kable(digits = 3)
 ```
 
@@ -194,8 +194,8 @@ An alternative approach would be to `collect()` the underlying data and do the $
 
 ```{r}
 t_test_data <-
-  amounts %>%
-  select(variant, amount) %>%
+  amounts |>
+  select(variant, amount) |>
   collect()
 
 t.test(formula = amount ~ variant, data = t_test_data)
@@ -203,16 +203,16 @@ t.test(formula = amount ~ variant, data = t_test_data)
 
 ```{r}
 t_test_stats_2 <-
-  amounts %>%
-  inner_join(game_actions, by = "user_id") %>%
-  filter(action == "onboarding complete") %>%
-  group_by(variant) %>%
+  amounts |>
+  inner_join(game_actions, by = "user_id") |>
+  filter(action == "onboarding complete") |>
+  group_by(variant) |>
   summarize(n = n(),
             mean = mean(amount, na.rm = TRUE),
-            sd = sd(amount, na.rm = TRUE)) %>%
+            sd = sd(amount, na.rm = TRUE)) |>
   collect()
 
-t_test_stats_2 %>%
+t_test_stats_2 |>
   kable(digits = 3)
 ```
 
@@ -227,17 +227,17 @@ t_test(t_test_stats_2)
 ### Outliers
 
 ```{r}
-exp_assignment %>%
+exp_assignment |>
   left_join(game_purchases, by = "user_id", keep = TRUE,
-            suffix = c("", ".y")) %>%
-  inner_join(game_actions, by = "user_id") %>%
+            suffix = c("", ".y")) |>
+  inner_join(game_actions, by = "user_id") |>
   filter(action == "onboarding complete",
-         exp_name == 'Onboarding') %>%
-  group_by(variant) %>%
+         exp_name == 'Onboarding') |>
+  group_by(variant) |>
   summarize(total_cohorted = n_distinct(user_id),
             purchasers = n_distinct(user_id.y),
-            .groups = "drop") %>%
-  mutate(pct_purchased = purchasers * 100.0 / total_cohorted) %>%
+            .groups = "drop") |>
+  mutate(pct_purchased = purchasers * 100.0 / total_cohorted) |>
   kable(digits = 2)
 ```
 
@@ -245,25 +245,25 @@ exp_assignment %>%
 
 ```{r}
 amounts_boxed <- 
-  exp_assignment %>%
-  filter(exp_name == 'Onboarding') %>%
-  mutate(exp_end = exp_date + days(7)) %>%
+  exp_assignment |>
+  filter(exp_name == 'Onboarding') |>
+  mutate(exp_end = exp_date + days(7)) |>
   left_join(game_purchases, 
-            by = join_by(user_id, exp_end >= purch_date)) %>%
-  group_by(variant, user_id) %>%
+            by = join_by(user_id, exp_end >= purch_date)) |>
+  group_by(variant, user_id) |>
   summarize(amount = sum(coalesce(amount, 0), na.rm = TRUE),
             .groups = "drop")
 
 
 t_test_stats_boxed <-
-  amounts_boxed %>%
-  group_by(variant) %>%
+  amounts_boxed |>
+  group_by(variant) |>
   summarize(n = n(),
             mean = mean(amount, na.rm = TRUE),
-            sd = sd(amount, na.rm = TRUE)) %>%
+            sd = sd(amount, na.rm = TRUE)) |>
   collect()
 
-t_test_stats_boxed %>%
+t_test_stats_boxed |>
   kable(digits = 3)
 ```
 
@@ -305,40 +305,40 @@ We calculate `not_opted_in` so that our table is better prepared for the `chisq.
 
 ```{r}
 opt_in_df <-
-  game_users %>%
+  game_users |>
   filter(between(created, 
                  as.Date('2020-01-13'), 
-                 as.Date('2020-02-09'))) %>%
-  left_join(game_actions %>% 
+                 as.Date('2020-02-09'))) |>
+  left_join(game_actions |> 
               filter(action == 'email_optin'), by = "user_id",
             keep = TRUE,
-            suffix = c("", ".y")) %>%
-  mutate(variant = if_else(created <= '2020-01-26', 'pre', 'post')) %>%
-  group_by(variant) %>%
+            suffix = c("", ".y")) |>
+  mutate(variant = if_else(created <= '2020-01-26', 'pre', 'post')) |>
+  group_by(variant) |>
   summarize(cohorted = n_distinct(user_id),
             opted_in = n_distinct(user_id.y),
             days = n_distinct(created),
-            .groups = "drop") %>%
-  mutate(not_opted_in = cohorted - opted_in) %>%
+            .groups = "drop") |>
+  mutate(not_opted_in = cohorted - opted_in) |>
   collect()
 ```
 
 ```{r}
-opt_in_df %>%
-  select(variant, days, opted_in, not_opted_in, cohorted) %>%
-  adorn_totals(c("row")) %>%
-  mutate(`% opted in` = prettyNum(100.0 * opted_in/cohorted, digits = 4)) %>%
-  rename(Yes = opted_in, No = not_opted_in, Total = cohorted) %>%
-  flextable() %>%
+opt_in_df |>
+  select(variant, days, opted_in, not_opted_in, cohorted) |>
+  adorn_totals(c("row")) |>
+  mutate(`% opted in` = prettyNum(100.0 * opted_in/cohorted, digits = 4)) |>
+  rename(Yes = opted_in, No = not_opted_in, Total = cohorted) |>
+  flextable() |>
   add_header_row(values=c("", "Opted in", ""),
                  colwidths = c(2, 2, 2))
 ```
 
 ```{r}
 res <- 
-  opt_in_df %>% 
-  select(-cohorted, -days) %>%
-  column_to_rownames(var = "variant") %>%
+  opt_in_df |> 
+  select(-cohorted, -days) |>
+  column_to_rownames(var = "variant") |>
   chisq.test(correct = FALSE)
 
 res$statistic
@@ -349,26 +349,26 @@ res$p.value
 
 ```{r}
 by_country <- 
-  game_users %>%
-  filter(country %in% c('United States', 'Canada')) %>%
+  game_users |>
+  filter(country %in% c('United States', 'Canada')) |>
   left_join(game_purchases, by = "user_id",
             keep = TRUE,
-            suffix = c("", ".y")) %>%
-  group_by(country) %>%
+            suffix = c("", ".y")) |>
+  group_by(country) |>
   summarize(cohorted = n_distinct(user_id),
             opted_in = n_distinct(user_id.y),
-            .groups = "drop") %>%
-  mutate(pct_purchased = 1.0 * opted_in/cohorted) %>%
+            .groups = "drop") |>
+  mutate(pct_purchased = 1.0 * opted_in/cohorted) |>
   collect()
 
-by_country %>% kable()
+by_country |> kable()
 ```
 
 ```{r}
 res <- 
-  by_country %>% 
-  select(-pct_purchased) %>%
-  column_to_rownames(var = "country") %>%
+  by_country |> 
+  select(-pct_purchased) |>
+  column_to_rownames(var = "country") |>
   chisq.test(correct = FALSE)
 
 res$statistic

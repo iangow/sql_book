@@ -193,8 +193,8 @@ SELECT max(term_start) AS max_term_start,
 FROM legislators_terms
 ```
 ```{r}
-legislators_terms %>%
-  filter(term_end > '2020-05-19') %>%
+legislators_terms |>
+  filter(term_end > '2020-05-19') |>
   count(term_end, term_type)
 ```
   
@@ -232,19 +232,19 @@ LIMIT 4;
 
 ```{r}
 first_terms <- 
-  legislators_terms %>%
-  group_by(id_bioguide) %>%
+  legislators_terms |>
+  group_by(id_bioguide) |>
   summarize(first_term = min(term_start, na.rm = TRUE),
             .groups = "drop")
 
 cohorts <-
-  legislators_terms %>%
-  inner_join(first_terms, by = "id_bioguide") %>%
-  mutate(period = year(age(term_start, first_term))) %>%
-  group_by(period) %>%
+  legislators_terms |>
+  inner_join(first_terms, by = "id_bioguide") |>
+  mutate(period = year(age(term_start, first_term))) |>
+  group_by(period) |>
   summarize(cohort_retained = sql("count(distinct id_bioguide)")) 
 
-cohorts %>%
+cohorts |>
   arrange(period)
 ```
 
@@ -276,17 +276,17 @@ LIMIT 3;
 
 ```{r}
 retained_data <-
-  cohorts %>%
-  window_order(period) %>%
-  mutate(cohort_size = first(cohort_retained)) %>%
-  mutate(pct_retained = cohort_retained * 1.0/cohort_size) %>%
+  cohorts |>
+  window_order(period) |>
+  mutate(cohort_size = first(cohort_retained)) |>
+  mutate(pct_retained = cohort_retained * 1.0/cohort_size) |>
   select(period, cohort_size, cohort_retained, pct_retained) 
 
 retained_data
 ```
 
 ```{r}
-retained_data %>%
+retained_data |>
   ggplot(aes(x = period, y = pct_retained)) +
   geom_line()
 ```
@@ -325,11 +325,11 @@ GROUP BY 1;
 ```
 
 ```{r}
-retained_data %>%
-  select(period, pct_retained) %>%
-  filter(period <= 4) %>%
-  collect() %>%
-  arrange(period) %>%
+retained_data |>
+  select(period, pct_retained) |>
+  filter(period <= 4) |>
+  collect() |>
+  arrange(period) |>
   pivot_wider(names_from = period, 
               names_prefix = "yr",
               values_from = pct_retained)
@@ -343,8 +343,8 @@ Use `copy_inline()` here if using a read-only database.
 year_ends <-
   tibble(date = seq(as.Date('1770-12-31'), 
                     as.Date('2030-12-31'), 
-                    by = "1 year")) %>%
-  copy_to(db, ., overwrite = TRUE, name = "year_ends")
+                    by = "1 year")) |>
+  copy_to(db, df = _, overwrite = TRUE, name = "year_ends")
 ```
 
 ```{sql}
@@ -369,11 +369,11 @@ LIMIT 3;
 
 ```{r}
 cohorts <-
-  first_terms %>%
-  inner_join(legislators_terms, by = join_by(id_bioguide)) %>%
+  first_terms |>
+  inner_join(legislators_terms, by = join_by(id_bioguide)) |>
   left_join(year_ends, 
-            by = join_by(between(y$date, x$term_start, x$term_end))) %>%
-  mutate(period = date_part('year', age(date, first_term))) %>%
+            by = join_by(between(y$date, x$term_start, x$term_end))) |>
+  mutate(period = date_part('year', age(date, first_term))) |>
   select(id_bioguide, first_term, term_start, term_end, date, period) 
 
 cohorts
@@ -407,26 +407,26 @@ WINDOW w AS (ORDER BY period);
 
 ```{r}
 cohorts_retained <-
-  cohorts %>%
-  mutate(period = coalesce(date_part('year', age(date, first_term)), 0)) %>%
-  select(period, id_bioguide) %>%
-  distinct() %>%
-  group_by(period) %>%
+  cohorts |>
+  mutate(period = coalesce(date_part('year', age(date, first_term)), 0)) |>
+  select(period, id_bioguide) |>
+  distinct() |>
+  group_by(period) |>
   summarize(cohort_retained = n()) 
 
 pct_retained <-
-  cohorts_retained %>%
-  window_order(period) %>%
+  cohorts_retained |>
+  window_order(period) |>
   mutate(cohort_size = first(cohort_retained),
          cohort_retained = as.double(cohort_retained),
          pct_retained = cohort_retained/cohort_size) 
 
-pct_retained %>%
+pct_retained |>
   arrange(period)
 ```
 
 ```{r}
-pct_retained %>%
+pct_retained |>
   ggplot(aes(x = period, y = pct_retained)) + 
   geom_line()
 ```
@@ -448,11 +448,11 @@ LIMIT 3;
 ```
 
 ```{r}
-first_terms %>%
-  inner_join(legislators_terms, by = join_by(id_bioguide)) %>%
+first_terms |>
+  inner_join(legislators_terms, by = join_by(id_bioguide)) |>
   mutate(term_end = 
            case_when(term_type == 'rep' ~ term_start + years(2),
-                     term_type == 'sen' ~ term_start + years(6))) %>%
+                     term_type == 'sen' ~ term_start + years(6))) |>
   select(id_bioguide, first_term, term_start, term_end)
 ```
 
@@ -482,27 +482,27 @@ LIMIT 3;
 
 ```{r}
 yr_cohort_retaineds <-
-  first_terms %>%
-  inner_join(legislators_terms, by = "id_bioguide") %>%
+  first_terms |>
+  inner_join(legislators_terms, by = "id_bioguide") |>
   left_join(year_ends, 
-            join_by(between(y$date, x$term_start, x$term_end))) %>%
+            join_by(between(y$date, x$term_start, x$term_end))) |>
   mutate(first_year = year(first_term),
-         period = coalesce(year(age(date, first_term)), 0)) %>%
-  group_by(first_year, period) %>%
+         period = coalesce(year(age(date, first_term)), 0)) |>
+  group_by(first_year, period) |>
   summarize(cohort_retained = n_distinct(id_bioguide),
             .groups = "drop") 
 
-yr_cohort_retaineds %>%
+yr_cohort_retaineds |>
   arrange(first_year, period)
 ```
 
 ```{r}
-yr_cohort_retaineds %>%
-  group_by(first_year) %>%
-  window_order(period) %>%
+yr_cohort_retaineds |>
+  group_by(first_year) |>
+  window_order(period) |>
   mutate(cohort_size = first(cohort_retained),
-         pct_retained = 1.0 * cohort_retained/cohort_size) %>%
-  select(first_year, period, cohort_size, cohort_retained, pct_retained) %>%
+         pct_retained = 1.0 * cohort_retained/cohort_size) |>
+  select(first_year, period, cohort_size, cohort_retained, pct_retained) |>
   arrange(first_year, period)
 ```
 
@@ -537,35 +537,35 @@ LIMIT 3;
 
 ```{r}
 cen_cohort_retaineds <-
-  first_terms %>%
-  inner_join(legislators_terms, by = "id_bioguide") %>%
+  first_terms |>
+  inner_join(legislators_terms, by = "id_bioguide") |>
   left_join(year_ends, 
-            join_by(between(y$date, x$term_start, x$term_end))) %>%
+            join_by(between(y$date, x$term_start, x$term_end))) |>
   mutate(first_century = century(first_term),
-         period = coalesce(year(age(date, first_term)), 0)) %>%
-  group_by(first_century, period) %>%
+         period = coalesce(year(age(date, first_term)), 0)) |>
+  group_by(first_century, period) |>
   summarize(cohort_retained = n_distinct(id_bioguide),
             .groups = "drop")
 ```
 
 ```{r}
 cen_pct_retaineds <-
-  cen_cohort_retaineds %>%
-  group_by(first_century) %>%
-  window_order(period) %>%
+  cen_cohort_retaineds |>
+  group_by(first_century) |>
+  window_order(period) |>
   mutate(cohort_size = first(cohort_retained),
-         pct_retained = 1.0 * cohort_retained/cohort_size) %>%
-  ungroup() %>%
+         pct_retained = 1.0 * cohort_retained/cohort_size) |>
+  ungroup() |>
   select(first_century, period, cohort_size, cohort_retained, pct_retained) 
 
-cen_pct_retaineds %>%
+cen_pct_retaineds |>
   arrange(first_century, period)
 ```
 
 ```{r}
-cen_pct_retaineds %>%
-  collect() %>%
-  mutate(first_century = factor(first_century)) %>%
+cen_pct_retaineds |>
+  collect() |>
+  mutate(first_century = factor(first_century)) |>
   ggplot(aes(x = period, y = pct_retained,
              color = first_century,
              linetype = first_century,
@@ -585,13 +585,13 @@ ORDER BY id_bioguide
 ```{r}
 first_states <-
   first_terms <- 
-  legislators_terms %>%
-  group_by(id_bioguide) %>%
-  window_order(term_start) %>%
+  legislators_terms |>
+  group_by(id_bioguide) |>
+  window_order(term_start) |>
   mutate(first_term = min(term_start, na.rm = TRUE),
-         first_state = first(state)) %>%
-  ungroup() %>%
-  select(id_bioguide, first_term, first_state) %>%
+         first_state = first(state)) |>
+  ungroup() |>
+  select(id_bioguide, first_term, first_state) |>
   distinct()
 ```
 
@@ -629,35 +629,35 @@ LIMIT 3;
 
 ```{r}
 state_first_periods <-
-  first_states %>%
-  inner_join(legislators_terms, by = "id_bioguide") %>%
+  first_states |>
+  inner_join(legislators_terms, by = "id_bioguide") |>
   left_join(year_ends, 
-            join_by(between(y$date, x$term_start, x$term_end))) %>%
-  mutate(period = coalesce(year(age(date, first_term)), 0)) %>%
-  group_by(first_state, period) %>%
+            join_by(between(y$date, x$term_start, x$term_end))) |>
+  mutate(period = coalesce(year(age(date, first_term)), 0)) |>
+  group_by(first_state, period) |>
   summarize(cohort_retained = n_distinct(id_bioguide),
             .groups = "drop")
 ```
 
 ```{r}
 state_pct_retaineds <- 
-  state_first_periods %>%
-  select(first_state, period, cohort_retained) %>%
-  group_by(first_state) %>%
-  window_order(period) %>%
+  state_first_periods |>
+  select(first_state, period, cohort_retained) |>
+  group_by(first_state) |>
+  window_order(period) |>
   mutate(cohort_size = first(cohort_retained),
-         prop_retained = cohort_retained * 1.0 / cohort_size) %>%
+         prop_retained = cohort_retained * 1.0 / cohort_size) |>
   ungroup()
 
-state_pct_retaineds %>%
+state_pct_retaineds |>
   arrange(first_state, period) 
 ```
 
 ```{r}
 top_5_states <- c("NY", "PA", "OH", "IL", "MA")
 
-state_pct_retaineds %>%
-  filter(first_state %in% top_5_states) %>%
+state_pct_retaineds |>
+  filter(first_state %in% top_5_states) |>
   ggplot(aes(x = period, 
              y = prop_retained,
              color = first_state,
@@ -688,17 +688,17 @@ LIMIT 4;
 
 ```{r}
 cohorts <-
-  first_terms %>%
-  inner_join(legislators_terms, by = "id_bioguide") %>%
-  left_join(year_ends, join_by(between(y$date, x$term_start, x$term_end))) %>%
-  inner_join(legislators, by = "id_bioguide") %>%
-  mutate(period = coalesce(year(age(date, first_term)), 0)) %>%
-  group_by(gender, period) %>%
+  first_terms |>
+  inner_join(legislators_terms, by = "id_bioguide") |>
+  left_join(year_ends, join_by(between(y$date, x$term_start, x$term_end))) |>
+  inner_join(legislators, by = "id_bioguide") |>
+  mutate(period = coalesce(year(age(date, first_term)), 0)) |>
+  group_by(gender, period) |>
   summarize(cohort_retained = n_distinct(id_bioguide),
             .groups = "drop")
 
-cohorts %>%
-  arrange(period, gender) %>%
+cohorts |>
+  arrange(period, gender) |>
   collect(n = 4) 
 ```
 
@@ -731,13 +731,13 @@ LIMIT 4;
 ```
 
 ```{r}
-cohorts %>%
-  group_by(gender) %>%
-  window_order(period) %>%
-  mutate(cohort_size = first(cohort_retained)) %>%
-  ungroup() %>%
-  mutate(pct_retained = 1.0 * cohort_retained / cohort_size) %>%
-    arrange(period, gender) %>%
+cohorts |>
+  group_by(gender) |>
+  window_order(period) |>
+  mutate(cohort_size = first(cohort_retained)) |>
+  ungroup() |>
+  mutate(pct_retained = 1.0 * cohort_retained / cohort_size) |>
+    arrange(period, gender) |>
   collect(n = 4)
 ```
 
@@ -773,23 +773,23 @@ LIMIT 4;
 
 ```{r}
 cohorts <-
-  first_terms %>%
-  filter(between(first_term, '1917-01-01', '1999-12-31')) %>%
-  inner_join(legislators_terms, by = "id_bioguide") %>%
-  left_join(year_ends, join_by(between(y$date, x$term_start, x$term_end))) %>%
-  inner_join(legislators, by = "id_bioguide") %>%
-  mutate(period = coalesce(year(age(date, first_term)), 0)) %>%
-  group_by(gender, period) %>%
+  first_terms |>
+  filter(between(first_term, '1917-01-01', '1999-12-31')) |>
+  inner_join(legislators_terms, by = "id_bioguide") |>
+  left_join(year_ends, join_by(between(y$date, x$term_start, x$term_end))) |>
+  inner_join(legislators, by = "id_bioguide") |>
+  mutate(period = coalesce(year(age(date, first_term)), 0)) |>
+  group_by(gender, period) |>
   summarize(cohort_retained = n_distinct(id_bioguide),
             .groups = "drop") 
 
-cohorts %>%
-  group_by(gender) %>%
-  window_order(period) %>%
-  mutate(cohort_size = first(cohort_retained)) %>%
-  ungroup() %>%
-  mutate(pct_retained = 1.0 * cohort_retained / cohort_size) %>%
-  arrange(period, gender) %>%
+cohorts |>
+  group_by(gender) |>
+  window_order(period) |>
+  mutate(cohort_size = first(cohort_retained)) |>
+  ungroup() |>
+  mutate(pct_retained = 1.0 * cohort_retained / cohort_size) |>
+  arrange(period, gender) |>
   collect(n = 4)
 ```
 
@@ -861,29 +861,29 @@ LIMIT 3;
 
 ```{r}
 first_terms <- 
-  legislators_terms %>%
-  group_by(id_bioguide) %>%
+  legislators_terms |>
+  group_by(id_bioguide) |>
   summarize(term_start = min(term_start, na.rm = TRUE),
             .groups = "drop")
 
 first_states <-
-  first_terms %>%
-  inner_join(legislators_terms, join_by(id_bioguide, term_start)) %>%
-  inner_join(legislators, by = "id_bioguide") %>%
+  first_terms |>
+  inner_join(legislators_terms, join_by(id_bioguide, term_start)) |>
+  inner_join(legislators, by = "id_bioguide") |>
   rename(first_term = term_start,
-         first_state = state) %>%
-  filter(between(first_term, '1917-01-01', '1999-12-31')) %>%
+         first_state = state) |>
+  filter(between(first_term, '1917-01-01', '1999-12-31')) |>
   select(id_bioguide, gender, first_term, first_state)
 ```
 
 ```{r}
 cohorts <-
-  first_states %>% 
-  inner_join(legislators_terms, by = "id_bioguide") %>%
+  first_states |> 
+  inner_join(legislators_terms, by = "id_bioguide") |>
   left_join(year_ends, 
-            join_by(between(y$date, x$term_start, x$term_end))) %>%
-  mutate(period = coalesce(year(age(date, first_term)), 0)) %>%
-  group_by(first_state, gender, period) %>%
+            join_by(between(y$date, x$term_start, x$term_end))) |>
+  mutate(period = coalesce(year(age(date, first_term)), 0)) |>
+  group_by(first_state, gender, period) |>
   summarize(cohort_retained = n_distinct(id_bioguide), 
             .groups = "drop")
 ```
@@ -892,10 +892,10 @@ From the query below, it seems we're having an issue whereby legislators are "re
 
 
 ```{r}
-cohorts %>% 
-  filter(first_state == "AR", gender == "F") %>% 
-  select(period, cohort_retained) %>%
-  arrange(period) %>%
+cohorts |> 
+  filter(first_state == "AR", gender == "F") |> 
+  select(period, cohort_retained) |>
+  arrange(period) |>
   collect(n = 8)
 ```
 
@@ -909,22 +909,22 @@ We then look at some data from `legislators` and `legislators_terms` for these t
 
 ```{r}
 weird_id_bioguides <-
-  first_states %>% 
-  filter(first_state == "AR", gender == "F") %>%
-  inner_join(legislators_terms, by = "id_bioguide") %>%
+  first_states |> 
+  filter(first_state == "AR", gender == "F") |>
+  inner_join(legislators_terms, by = "id_bioguide") |>
   left_join(year_ends, 
-            join_by(between(y$date, x$term_start, x$term_end))) %>%
-  mutate(period = coalesce(year(age(date, first_term)), 0)) %>%
-  filter(period >= 4) %>%
-  select(id_bioguide) %>%
-  distinct() %>%
+            join_by(between(y$date, x$term_start, x$term_end))) |>
+  mutate(period = coalesce(year(age(date, first_term)), 0)) |>
+  filter(period >= 4) |>
+  select(id_bioguide) |>
+  distinct() |>
   pull()
 
-legislators %>%
-  filter(id_bioguide %in% weird_id_bioguides) %>%
-  inner_join(legislators_terms, by = "id_bioguide") %>%
-  select(id_bioguide, full_name, term_type, term_start, term_end) %>%
-  arrange(id_bioguide, term_start) %>%
+legislators |>
+  filter(id_bioguide %in% weird_id_bioguides) |>
+  inner_join(legislators_terms, by = "id_bioguide") |>
+  select(id_bioguide, full_name, term_type, term_start, term_end) |>
+  arrange(id_bioguide, term_start) |>
   collect()
 ```
 
@@ -935,67 +935,67 @@ For example, by added `cohort_ids = array_agg(id_bioguide)` to the query, we can
 
 ```{r}
 cohorts <-
-  first_states %>% 
-  inner_join(legislators_terms, by = "id_bioguide") %>%
+  first_states |> 
+  inner_join(legislators_terms, by = "id_bioguide") |>
   left_join(year_ends, 
-            join_by(between(y$date, x$term_start, x$term_end))) %>%
-  mutate(period = coalesce(year(age(date, first_term)), 0)) %>%
-  group_by(first_state, gender, period) %>%
+            join_by(between(y$date, x$term_start, x$term_end))) |>
+  mutate(period = coalesce(year(age(date, first_term)), 0)) |>
+  group_by(first_state, gender, period) |>
   summarize(cohort_retained = n_distinct(id_bioguide),
             cohort_ids = array_agg(id_bioguide),
             .groups = "drop")
 ```
 
 ```{r}
-cohorts %>%
+cohorts |>
   filter(first_state == "AR", gender == "F", 
-         between(period, 3, 8)) %>%
-  mutate(cohort_ids = as.character(cohort_ids)) %>%
-  select(period, cohort_retained, cohort_ids) %>%
-  arrange(period) %>%
+         between(period, 3, 8)) |>
+  mutate(cohort_ids = as.character(cohort_ids)) |>
+  select(period, cohort_retained, cohort_ids) |>
+  arrange(period) |>
   collect()
 ```
 
 ```{r}
 periods <- 
-  tibble(period = 1:20) %>%
-  copy_to(db, .)
+  tibble(period = 1:20) |>
+  copy_to(db, df = _)
 ```
 
 ```{r}
 cohort_sizes <-
-  first_states %>%
-  group_by(gender, first_state) %>%
+  first_states |>
+  group_by(gender, first_state) |>
   summarize(cohort_size = n_distinct(id_bioguide),
             .groups = "drop")
 ```
 
 ```{r}
 pct_retaineds <-
-  cohort_sizes %>%
-  cross_join(periods) %>%
+  cohort_sizes |>
+  cross_join(periods) |>
   left_join(cohorts, 
-            join_by(gender, first_state, period)) %>%
+            join_by(gender, first_state, period)) |>
   mutate(cohort_retained = coalesce(cohort_retained, 0),
-         pct_retained = cohort_retained * 1.0/ cohort_size) %>%
+         pct_retained = cohort_retained * 1.0/ cohort_size) |>
   select(gender, first_state, period, cohort_size,
          cohort_retained, pct_retained)
 ```
 
 ```{r}
-pct_retaineds %>%
+pct_retaineds |>
   filter(period %in% c(2, 4, 6, 8, 10),
-         first_state %in% c('AL', 'AR', 'CA')) %>%
-  select(gender, first_state, cohort_size, period, pct_retained) %>%
+         first_state %in% c('AL', 'AR', 'CA')) |>
+  select(gender, first_state, cohort_size, period, pct_retained) |>
   pivot_wider(names_from = "period",
               names_prefix = "yr",
-              values_from = "pct_retained") %>%
+              values_from = "pct_retained") |>
   arrange(gender, first_state)
 ```
 
 ```{r}
-pct_retaineds %>%
-  filter(first_state %in% c('AL', 'AR', 'CA')) %>%
+pct_retaineds |>
+  filter(first_state %in% c('AL', 'AR', 'CA')) |>
   ggplot(aes(x = period, y = pct_retained, 
              colour = gender, group = gender)) +
   geom_line() +
@@ -1044,53 +1044,53 @@ LIMIT 4;
 min_year <- 2000L
 
 first_terms <-
-  legislators_terms %>%
+  legislators_terms |>
   filter(year(term_start) <= min_year, 
-         year(term_end) >= min_year) %>%
-  mutate(first_term = as.Date(paste0(min_year, '-01-01'))) %>%
-  group_by(id_bioguide, term_type, first_term) %>%
+         year(term_end) >= min_year) |>
+  mutate(first_term = as.Date(paste0(min_year, '-01-01'))) |>
+  group_by(id_bioguide, term_type, first_term) |>
   summarize(min_start = min(term_start, na.rm = TRUE),
             .groups = "drop")
 ```
   
 ```{r}
 cohort_dates <-
-  legislators_terms %>%
+  legislators_terms |>
   left_join(year_ends, 
-            join_by(between(y$date, x$term_start, x$term_end))) %>%
-  filter(year(date) >= min_year) %>%
+            join_by(between(y$date, x$term_start, x$term_end))) |>
+  filter(year(date) >= min_year) |>
   select(id_bioguide, date)
 ```
 
 ```{r}
 cohorts <-
-  first_terms %>%
-  inner_join(cohort_dates, by = "id_bioguide") %>%
-  mutate(period = coalesce(year(age(date, first_term)), 0)) %>%
-  group_by(term_type, period) %>%
+  first_terms |>
+  inner_join(cohort_dates, by = "id_bioguide") |>
+  mutate(period = coalesce(year(age(date, first_term)), 0)) |>
+  group_by(term_type, period) |>
   summarize(cohort_retained = n_distinct(id_bioguide),
             .groups = "drop")
 ```
 
 ```{r}
 pct_retained_2000 <-
-  cohorts %>% 
-  group_by(term_type) %>%
-  window_order(period) %>%
+  cohorts |> 
+  group_by(term_type) |>
+  window_order(period) |>
   mutate(cohort_size = first(cohort_retained),
-         pct_retained = cohort_retained * 1.0 / cohort_size) %>%
+         pct_retained = cohort_retained * 1.0 / cohort_size) |>
   select(term_type, period, cohort_size, cohort_retained,
          pct_retained)
 
-pct_retained_2000 %>%
-  arrange(period, term_type) %>%
+pct_retained_2000 |>
+  arrange(period, term_type) |>
   collect(n = 4)
 ```
 
 ```{r}
-pct_retained_2000 %>%
-  filter(period <= 20) %>%
-  mutate(pct_retained = pct_retained * 100) %>%
+pct_retained_2000 |>
+  filter(period <= 20) |>
+  mutate(pct_retained = pct_retained * 100) |>
   ggplot(aes(x = period, y = pct_retained,
              colour = term_type, group = term_type)) +
   geom_line()
@@ -1168,27 +1168,27 @@ LIMIT 3;
 
 ```{r}
 first_centuries <-
-  legislators_terms %>%
-  group_by(id_bioguide) %>%
+  legislators_terms |>
+  group_by(id_bioguide) |>
   summarize(first_century = century(min(term_start, na.rm = TRUE)),
             total_terms = n())
 ```
 
 ```{r}
 terms <- 
-  tibble(terms = 1:20) %>%
-  copy_to(db, ., name = "terms")
+  tibble(terms = 1:20) |>
+  copy_to(db, df = _, name = "terms")
 ```
 
 ```{r}
-first_centuries %>%
-  cross_join(terms) %>%
-  mutate(survived_id = if_else(total_terms >= terms, id_bioguide, NA)) %>%
-  group_by(first_century, terms) %>%
+first_centuries |>
+  cross_join(terms) |>
+  mutate(survived_id = if_else(total_terms >= terms, id_bioguide, NA)) |>
+  group_by(first_century, terms) |>
   summarize(cohort = n_distinct(id_bioguide),
             cohort_survived = n_distinct(survived_id), 
-            .groups = "drop") %>%
-  mutate(pct_survived = 1.0 * cohort_survived / cohort) %>%
+            .groups = "drop") |>
+  mutate(pct_survived = 1.0 * cohort_survived / cohort) |>
   arrange(first_century, terms)
 ```
 
@@ -1565,49 +1565,49 @@ ORDER BY date DESC;
 
 ```{r}
 term_dates <-
-  legislators_terms %>%
-  inner_join(year_ends %>% filter(date <= '2020-01-01'),
-             join_by(between(y$date, x$term_start, x$term_end))) %>%
+  legislators_terms |>
+  inner_join(year_ends |> filter(date <= '2020-01-01'),
+             join_by(between(y$date, x$term_start, x$term_end))) |>
   distinct(id_bioguide, date) 
 ```
 
 ```{r}
 cum_term_dates <-
-  term_dates %>%
-  group_by(id_bioguide) %>%
-  window_order(date) %>%
-  window_frame(-Inf, 0) %>%
-  mutate(cume_years = n()) %>%
-  ungroup() %>%
+  term_dates |>
+  group_by(id_bioguide) |>
+  window_order(date) |>
+  window_frame(-Inf, 0) |>
+  mutate(cume_years = n()) |>
+  ungroup() |>
   select(id_bioguide, date, cume_years) 
 ```
 
 ```{r}
 cum_term_bands <-
-  cum_term_dates %>% 
+  cum_term_dates |> 
   mutate(tenure = case_when(cume_years <= 4 ~ '1 to 4',
                             cume_years <= 10 ~ '5 to 10',
                             cume_years <= 20 ~ '11 to 20',
-                            TRUE ~ '21+')) %>%
-  group_by(date, tenure) %>%
+                            TRUE ~ '21+')) |>
+  group_by(date, tenure) |>
   summarize(legislators = n_distinct(id_bioguide),
             .groups = "drop") 
 ```
 
 ```{r}
 total_legs <-
-  cum_term_bands %>%
-  group_by(date) %>%
+  cum_term_bands |>
+  group_by(date) |>
   summarize(num_legs = sum(legislators, na.rm = TRUE),
             .groups = "drop")
 ```
 
 ```{r}
-cum_term_bands %>%
-  inner_join(total_legs, by = "date") %>%
-  mutate(pct_legislators = legislators * 100.0 / num_legs) %>%
-  select(date, tenure, pct_legislators) %>%
-  arrange(desc(date)) %>%
+cum_term_bands |>
+  inner_join(total_legs, by = "date") |>
+  mutate(pct_legislators = legislators * 100.0 / num_legs) |>
+  select(date, tenure, pct_legislators) |>
+  arrange(desc(date)) |>
   collect(n = 8)
 ```
 

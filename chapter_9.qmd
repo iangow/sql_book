@@ -33,14 +33,14 @@ This seems the natural translation of the ideas represented in the SQL there.
 
 ```{r}
 #| eval: false
-users %>%
+users |>
   left_join(step_one, by = "user_id",
-            keep = TRUE, suffix = c("", "_1")) %>%
+            keep = TRUE, suffix = c("", "_1")) |>
   left_join(step_two, by = "user_id",
-            keep = TRUE, suffix = c("", "_2")) %>%
+            keep = TRUE, suffix = c("", "_2")) |>
   summarize(all_users = n_distinct(user_id),
             step_one_users = n_distinct(user_id_1),
-            step_two_users = n_distinct(user_id_2)) %>%
+            step_two_users = n_distinct(user_id_2)) |>
   mutate(pct_step_one = step_one_users/all_users,
          pct_one_to_two = step_two_users / step_one_users)
 ```
@@ -72,78 +72,78 @@ It seems that `dbplyr` detects this kind of situation and cleverly puts the calc
 
 ```{r}
 gap_intervals <-
-  legislators_terms %>%
-  filter(term_type == 'rep') %>%
-  group_by(id_bioguide) %>%
-  window_order(term_start) %>%
+  legislators_terms |>
+  filter(term_type == 'rep') |>
+  group_by(id_bioguide) |>
+  window_order(term_start) |>
   mutate(prev = lag(term_start),
-         gap_interval = age(term_start, prev)) %>%
-  ungroup() %>%
+         gap_interval = age(term_start, prev)) |>
+  ungroup() |>
   select(id_bioguide, term_start, prev, gap_interval)
 ```
 
 This makes it effectively a single line of code to transform the data into the average shown above.
 
 ```{r}
-gap_intervals %>%
-  summarize(avg_gap = mean(gap_interval, na.rm = TRUE)) %>%
+gap_intervals |>
+  summarize(avg_gap = mean(gap_interval, na.rm = TRUE)) |>
   kable()
 ```
 With `gap_intervals` in our pocket, the following query is *much* simpler than the SQL shown in the book.
 
 ```{r}
 gap_months <-
-  gap_intervals %>%
-  mutate(gap_months = year(gap_interval) * 12 + month(gap_interval)) %>%
-  count(gap_months, name = "instances") %>%
-  arrange(gap_months) %>%
+  gap_intervals |>
+  mutate(gap_months = year(gap_interval) * 12 + month(gap_interval)) |>
+  count(gap_months, name = "instances") |>
+  arrange(gap_months) |>
   ungroup()
 
-gap_months %>%
-  collect(n = 3) %>%
+gap_months |>
+  collect(n = 3) |>
   kable()
 ```
 
 The following plot better matches what is shown in the book, where it seems the caption is incorrect.
 
 ```{r} 
-gap_months %>%
-  filter(between(gap_months, 14, 49)) %>%
+gap_months |>
+  filter(between(gap_months, 14, 49)) |>
   ggplot(aes(x = gap_months, y = instances)) +
   geom_bar(stat = "identity")
 ```
 
 ```{r}
 latest_date <- 
-  legislators_terms %>% 
-  summarize(max = max(term_start)) %>%
+  legislators_terms |> 
+  summarize(max = max(term_start)) |>
   pull()
 
 intervals <-
-  legislators_terms %>%
-  filter(term_type == 'rep') %>%
-  group_by(id_bioguide) %>%
-  summarize(max_date = max(term_start), .groups = "drop") %>%
+  legislators_terms |>
+  filter(term_type == 'rep') |>
+  group_by(id_bioguide) |>
+  summarize(max_date = max(term_start), .groups = "drop") |>
   mutate(interval_since_last = age(latest_date, max_date))
 
-intervals %>%
-  mutate(years_since_last = year(interval_since_last)) %>%
-  count(years_since_last) %>%
-  arrange(years_since_last) %>%
-  collect(n = 3) %>%
+intervals |>
+  mutate(years_since_last = year(interval_since_last)) |>
+  count(years_since_last) |>
+  arrange(years_since_last) |>
+  collect(n = 3) |>
   kable()
 ```
 
 ```{r}
-intervals %>%
+intervals |>
   mutate(months_since_last = year(interval_since_last) * 12 +
-           month(interval_since_last)) %>%
-  count(months_since_last, name = "reps") %>%
+           month(interval_since_last)) |>
+  count(months_since_last, name = "reps") |>
   mutate(status = case_when(months_since_last <= 23 ~ 'Current',
                             months_since_last <= 48 ~ 'Lapsed',
-                            TRUE ~ 'Churned')) %>%
-  group_by(status) %>%
-  summarize(total_reps = sum(reps, na.rm = TRUE)) %>%
+                            TRUE ~ 'Churned')) |>
+  group_by(status) |>
+  summarize(total_reps = sum(reps, na.rm = TRUE)) |>
   kable()
 ```
 
@@ -164,9 +164,9 @@ purchases <- tribble(
   4, "bananas",
   4, "apples",
   4, "oranges",
-  4, "passionfruit") %>%
-  mutate(customer_id = as.integer(customer_id)) %>%
-  copy_inline(pg, .)
+  4, "passionfruit") |>
+  mutate(customer_id = as.integer(customer_id)) |>
+  copy_inline(pg, df = _)
 ```
 
 Now, let's make a function that performs as much of the analysis in the database as possible.
@@ -203,50 +203,50 @@ get_baskets <- function(df, p) {
   }
 
   n_prods <- 
-    df %>%
-    distinct(customer_id, product) %>%
-    group_by(customer_id) %>%
-    summarize(n_products = n()) %>%
-    select(n_products) %>%
-    distinct() %>%
+    df |>
+    distinct(customer_id, product) |>
+    group_by(customer_id) |>
+    summarize(n_products = n()) |>
+    select(n_products) |>
+    distinct() |>
     pull()
 
   combos <-
-    n_prods %>% 
-    lapply(get_combos, p = p) %>%
-    bind_rows() %>%
-    copy_inline(pg, .)
+    n_prods |> 
+    lapply(get_combos, p = p) |>
+    bind_rows() |>
+    copy_inline(pg, df = _)
 
   cust_prods <-
-    df %>% 
-    group_by(customer_id) %>% 
-    window_order(product) %>% 
-    mutate(prod_num = row_number()) %>%
-    ungroup() %>%
-    group_by(customer_id) %>% 
-    mutate(n_products = n()) %>%
+    df |> 
+    group_by(customer_id) |> 
+    window_order(product) |> 
+    mutate(prod_num = row_number()) |>
+    ungroup() |>
+    group_by(customer_id) |> 
+    mutate(n_products = n()) |>
     ungroup()
 
   base <- 
-    cust_prods %>%
-    select(customer_id, n_products) %>%
-    distinct() %>%
-    inner_join(combos, by = join_by(n_products)) %>%
+    cust_prods |>
+    select(customer_id, n_products) |>
+    distinct() |>
+    inner_join(combos, by = join_by(n_products)) |>
     select(-n_products)
 
   get_prod <- function(i) {
-    cust_prods %>%
-      rename_with(function(x) paste0("p_", i), "prod_num") %>%
-      inner_join(base) %>%
-      rename_with(function(x) paste0("product_", i), "product") %>%
+    cust_prods |>
+      rename_with(function(x) paste0("p_", i), "prod_num") |>
+      inner_join(base) |>
+      rename_with(function(x) paste0("product_", i), "product") |>
       select(customer_id, row_num, starts_with("product_"))
   }
 
-  Reduce(inner_join, lapply(1:p, get_prod)) %>%
-    arrange(customer_id, row_num) %>%
+  Reduce(inner_join, lapply(1:p, get_prod)) |>
+    arrange(customer_id, row_num) |>
     mutate(basket = 
-             sql(paste0("concat(", paste0("product_", 1:p, collapse = ", ', ', "), ")"))) %>%
-    compute() %>%
+             sql(paste0("concat(", paste0("product_", 1:p, collapse = ", ', ', "), ")"))) |>
+    compute() |>
     select(customer_id, basket)
 }
 ```
@@ -257,15 +257,15 @@ Now we can apply our function to our data to get two-item baskets.
 #| message: false
 pairs <- get_baskets(purchases, 2) 
 
-pairs %>% kable()
+pairs |> kable()
 ```
 
 And we can identify the most popular baskets easily:
 
 ```{r}
-pairs %>%
-  count(basket) %>%
-  arrange(desc(n)) %>%
+pairs |>
+  count(basket) |>
+  arrange(desc(n)) |>
   kable()
 ```
 
@@ -273,14 +273,14 @@ But the function also works for three-item baskets ...
 
 ```{r}
 #| message: false
-get_baskets(purchases, 3) %>% kable()
+get_baskets(purchases, 3) |> kable()
 ```
 
 ... and four-item baskets too.
 
 ```{r}
 #| message: false
-get_baskets(purchases, 4) %>% kable()
+get_baskets(purchases, 4) |> kable()
 ```
 
 ## Resources

@@ -1,10 +1,10 @@
 ```{r}
 cust_products_agg <-
-  purchases %>%
-  distinct(customer_id, product) %>%
-  group_by(customer_id) %>%
-  window_order(product) %>%
-  summarize(products = sql("array_agg(product ORDER BY product)")) %>%
+  purchases |>
+  distinct(customer_id, product) |>
+  group_by(customer_id) |>
+  window_order(product) |>
+  summarize(products = sql("array_agg(product ORDER BY product)")) |>
   collect()
 
 cust_products_agg
@@ -71,12 +71,12 @@ ORDER BY 1, 2, 3
 
 ```{r}
 cust_products <-
-  purchases %>%
-  distinct(customer_id, product) %>%
+  purchases |>
+  distinct(customer_id, product) |>
   collect()
 
 cust_nested <- 
-  cust_products %>% 
+  cust_products |> 
   nest(products = product, .by = customer_id)
 ```
 
@@ -98,19 +98,19 @@ get_combns <- function(x, n = 2) {
 
 
 ```{r}
-cust_nested %>% 
-  mutate(product = map(products, get_combns, n = 2)) %>%
-  select(-products) %>%
-  unnest(product) %>%
-  unnest_wider(product, names_sep = "_") %>%
+cust_nested |> 
+  mutate(product = map(products, get_combns, n = 2)) |>
+  select(-products) |>
+  unnest(product) |>
+  unnest_wider(product, names_sep = "_") |>
   kable()
 ```
 
 ```{r}
-cust_nested %>% 
-  mutate(product = map(products, get_combns, n = 3)) %>%
-  select(-products) %>%
-  unnest(product) %>%
-  unnest_wider(product, names_sep = "_") %>%
+cust_nested |> 
+  mutate(product = map(products, get_combns, n = 3)) |>
+  select(-products) |>
+  unnest(product) |>
+  unnest_wider(product, names_sep = "_") |>
   kable()
 ```

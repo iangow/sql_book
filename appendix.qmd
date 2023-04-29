@@ -93,14 +93,14 @@ sql <-
     '2020-12-01 16:00:01 US/Pacific'::timestamptz AS t1)"
 
 a_time <- tbl(db, sql(sql))
-a_time %>%
+a_time |>
   kable()
 ```
 
 ```{r}
 a_time_r <-
-  a_time %>%
-  select(t1) %>%
+  a_time |>
+  select(t1) |>
   pull()
 
 print(a_time_r, tz = "UTC")
@@ -158,7 +158,7 @@ sql <-
     '2020-12-01 00:00:01-00'::timestamptz AS t2)"
 
 two_times_notz <- tbl(db, sql(sql))
-two_times_notz %>% kable()
+two_times_notz |> kable()
 ```
 
 ```{r}
@@ -195,14 +195,14 @@ One such function
 ```{r}
 a_time_df <- tbl(db, sql("(SELECT '2020-10-04 12:33:35'::timestamp AS a_time)"))
 
-a_time_df %>% 
+a_time_df |> 
   mutate(a_trunced_time = date_trunc('month', a_time))
 
-a_time_df %>% 
-  mutate(a_trunced_time = date_trunc('month', a_time)) %>%
+a_time_df |> 
+  mutate(a_trunced_time = date_trunc('month', a_time)) |>
   show_query()
 
-a_time_df %>%
+a_time_df |>
   collect()
 ```
 
@@ -213,20 +213,20 @@ a_time_df %>%
 ```{r}
 a_time_df <- tbl(db, sql("(SELECT '2020-10-04 12:33:35 US/Pacific'::timestamptz AS a_time)"))
 
-a_time_df %>% 
+a_time_df |> 
   mutate(a_trunced_time = date_trunc('month', a_time)) 
 
-a_time_df %>% 
-  mutate(a_trunced_time = date_trunc('month', a_time)) %>%
+a_time_df |> 
+  mutate(a_trunced_time = date_trunc('month', a_time)) |>
   show_query()
 
-a_time_df %>%
+a_time_df |>
   collect()
 ```
 
 ```{r}
-a_time_df %>%
-  mutate(new_time = a_time + sql("interval '3 hours'")) %>%
+a_time_df |>
+  mutate(new_time = a_time + sql("interval '3 hours'")) |>
   collect()
 ```
 
@@ -273,19 +273,19 @@ read_tab <- function(year) {
   # Now pivot the data and convert sales to numeric values.
   # Also convert sales_month to dates (start of respective month).
   df <-
-    temp %>%
+    temp |>
     pivot_longer(names_to = "sales_month",
                  values_to = "sales",
-                 cols = -1:-2) %>%
+                 cols = -1:-2) |>
     mutate(sales_month = paste("01", str_remove(sales_month, "\\.")),
-           sales_month = as.Date(sales_month, "%d %b %Y")) %>%
+           sales_month = as.Date(sales_month, "%d %b %Y")) |>
     mutate(reason_for_null = case_when(sales == "(NA)" ~ "Not Available",
                                        sales == "(S)" ~ "Supressed",
                                        TRUE ~ NA),
            sales = case_when(sales == "(NA)" ~ NA,
                              sales == "(S)" ~ NA,
-                             TRUE ~ sales)) %>%
-    mutate(sales = as.double(sales)) %>%
+                             TRUE ~ sales)) |>
+    mutate(sales = as.double(sales)) |>
     select(sales_month, naics_code, kind_of_business,
            reason_for_null, sales)
   df
@@ -303,7 +303,7 @@ Note that there are differences between the `retail_sales_local` above and the d
 weeks <- 
   tibble(start_date = seq(as.Date("2010-01-01"), 
                           as.Date("2020-12-01"),
-                          by = 7)) %>%
+                          by = 7)) |>
   mutate(end_date = start_date + days(7))
   
 get_quake_data <- function(start, end) {
