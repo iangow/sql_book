@@ -1,16 +1,172 @@
-# Analysis with SQL
+# Introduction to SQL 
 
 ## What is Data Analysis?
 
+The focus of @tanimura2021sql is on preparing data sets for analysis by business practitioners, who might work in accounting, marketing, financial analysis, human resources, or product management.
+Data analysis blends computing, statistics, and background business knowledge.
+A successful data analyst will be able to write queries to get the right data for a particular question, but will also have skills in data visualization and statistical analysis.
+
 ## Why SQL?
 
-### What is SQL?
+SQL is the lanaguage of databases.
+So one answer to the question "why use SQL?" invokes [Sutton's Law](https://en.wikipedia.org/wiki/Sutton%27s_law).
+An apocryphal story has it that, when asked why he robbed banks, famed bank robber Willie Sutton replied "because that's where the money is."
+We use SQL because databases are where the data are.
 
-### Benefits of SQL
+## SQL: The basics
 
-### SQL versus R or Python
+### Setting up your computer
 
-### SQL as Part of the Data Analysis Workflow
+Assuming that you have the ability to install software and a WRDS account, setting up your computer so that you can run the code in this book is straightforward and takes just a few minutes.
+We list the required steps below and also provide a video demonstrating these steps [here](https://www.youtube.com/watch?v=xRY6Y8qXUJ8).
+
+1. Download and install R.
+R is available for all major platforms (Windows, Linux, and MacOS) [here](https://cloud.r-project.org).
+
+2. Download and install RStudio. 
+An open-source version of RStudio is available [here](https://www.rstudio.com/products/rstudio/download/#download).
+
+3. Install required packages from [CRAN](https://cran.r-project.org).
+CRAN stands for "Comprehensive R Archive Network" and is the official repository for **packages** (also known as **libraries**) made available for R.
+  In this book, we will make use of a number of R packages.
+  These can be installed easily by running the following code in RStudio.^[You can copy and paste the code into the "Console" in RStudio.]
+
+<ul>
+```{r, results = 'asis', echo=FALSE, message=FALSE, comment=NA}
+library(stringr)
+library(dplyr)
+
+path = getwd()
+
+file_list <-
+  tibble(full_path = list.files(path, full.names = TRUE)) %>%
+  filter(str_detect(full_path, "\\.(qmd)$"))
+
+get_libraries <- function(file) {
+  
+  libs <- 
+    str_match(readLines(file), "library\\(([A-Za-z0-0]*?)[,\\)]") %>%
+    .[, 2] 
+
+  tibble(file, lib = c(libs[!is.na(libs)], "duckdb"))
+}
+
+libs_df <-
+  file_list %>% 
+  select(full_path) %>%
+  pull() %>%
+  lapply(get_libraries) %>%
+  bind_rows()
+
+temp <-
+  libs_df %>%
+  select(lib) %>%
+  distinct() %>%
+  filter(!lib %in% c("parallel")) %>%
+  arrange(lib) %>%
+  paste(collapse = '", "') %>%
+  paste0('install.packages(', ., ')') %>%
+  formatR::tidy_source(text = ., wrap = TRUE, width.cutoff = 60, output = FALSE) 
+
+temp$text.tidy %>%
+  paste0("```r\n", . , "\n```") %>%
+  cat()
+```
+
+### Using SQL with RStudio
+
+
+
+
+```{r}
+#| message: false
+#| eval: true
+#| cache: false
+library(DBI)
+library(tidyverse)
+library(dbplyr)
+library(knitr)
+
+retail_sales_local <- read_csv("data/us_retail_sales.csv",
+                               show_col_types = FALSE)
+
+db <- dbConnect(duckdb::duckdb())
+retail_sales <- 
+  retail_sales_local |>
+  copy_to(db, df = _, name = "retail_sales")
+```
+
+### Introduction to SQL
+
+```{sql}
+#| connection: db
+SELECT *
+FROM retail_sales
+```
+
+```{sql}
+#| connection: db
+SELECT sales_month, kind_of_business, sales
+FROM retail_sales
+```
+
+```{sql}
+#| connection: db
+SELECT sales_month, kind_of_business, sales
+FROM retail_sales
+WHERE sales_month >= '2002-01-01'
+```
+
+```{sql}
+#| connection: db
+SELECT sales_month, kind_of_business, sales
+FROM retail_sales
+WHERE kind_of_business = 'Used car dealers'
+```
+
+```{sql}
+#| connection: db
+SELECT kind_of_business, sum(sales) AS total_sales
+FROM retail_sales
+GROUP BY kind_of_business
+ORDER BY total_sales DESC;
+```
+```{sql}
+#| connection: db
+SELECT kind_of_business, sum(sales) AS total_sales
+FROM retail_sales
+GROUP BY 1
+ORDER BY 2 DESC;
+```
+```{sql}
+#| connection: db
+SELECT year(sales_month) AS year,
+  sum(sales) AS total_sales
+FROM retail_sales
+WHERE kind_of_business = 'Used car dealers'
+GROUP BY 1
+ORDER BY 2 DESC;
+```
+
+```{sql}
+#| connection: db
+SELECT year(sales_month) AS year,
+  sum(sales) AS total_sales
+FROM retail_sales
+WHERE kind_of_business = 'Used car dealers'
+GROUP BY 1
+HAVING total_sales >= 100000
+ORDER BY 2 DESC;
+```
+
+```{sql}
+#| connection: db
+SELECT kind_of_business, reason_for_null,
+  count(*)
+FROM retail_sales
+WHERE sales IS NULL
+GROUP BY 1, 2
+```
 
 ## Database Types and How to Work with Them
 
