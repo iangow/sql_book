@@ -93,17 +93,6 @@ game_purchases <- copy_to(db, game_purchases, "game_purchases")
 exp_assignment <- copy_to(db, exp_assignment, "exp_assignment")
 ```
 
-```{r}
-#| eval: false 
-#| include: false
-library(data.table)
-library(dtplyr)
-game_users <- lazy_dt(as.data.table(game_users), immutable = FALSE)
-game_actions <- lazy_dt(as.data.table(game_actions), immutable = FALSE)
-game_purchases <- lazy_dt(as.data.table(game_purchases), immutable = FALSE)
-exp_assignment <- lazy_dt(as.data.table(exp_assignment), immutable = FALSE)
-```
-
 ## Types of Experiments
 
 I would reword the first paragraph here to the following for clarity (edits in *italics*):
