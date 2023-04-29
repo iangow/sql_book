@@ -168,13 +168,3 @@ WHERE sales IS NULL
 GROUP BY 1, 2
 ```
 
-## Database Types and How to Work with Them
-
-### Row-Store Databases
-
-### Column-Store Databases
-
-### Other Types of Data Infrastructure
-
-## Conclusion
-
