@@ -1,58 +1,176 @@
-# Preparing Data for Analysis
+# Using dplyr with databases
 
 Chapter 2 of @tanimura2021sql provides a good foundation discussion of issues related to preparing data for analysis.
 While the discussion is couched in terms of SQL, in reality the issues are not specific to SQL or databases.
 For this reason, I recommend that you read the chapter.
 
-While Chapter 2 of @tanimura2021sql contains many code snippets, few of these seem to be intended for users to run (in part because they assume a database set-up that users would not have).
-For this reason, I do not attempt to provide `dplyr` equivalents to the code there except for a couple of exceptions that I discuss below.
+In this chapter, I instead show how `dplyr`, a core Tidyverse package, can be used with SQL databases.
 
-In my view, some of the material in Chapter 2 of @tanimura2021sql would be better placed later in the book where there is more context for some of the issues discussed.
-Chapter 2 of @tanimura2021sql contains some example code, but no data, so the reader can merely read.
-As such, there isn't much for me to parallel here.
-Nonetheless, I recommend you go read Chapter 2 before coming back here.
+## Introduction to dplyr
 
-## Types of Data
+Our focus on using R and `dplyr` to access SQL databases means that we only need to learn a subset of the functionality of R.
 
-### Database Data Types
+While R offers a number of data structures---including vectors, lists, and matrices---we will focus primarily on data frames, which are R's equivalents of tables in SQL databases.
+R also offers rich functionality for statistical testing and modelling, but we will make little use of this here.
 
-R has all the types listed in Chapter 2.
-PostgreSQL has a richer set of data types than base R has.^[Some packages offer additional data types, so it is difficult to be definitive where R has fewer types once packages are included.]
+```{r}
+#| message: false
+#| eval: true
+#| cache: false
+library(DBI)
+library(tidyverse)
 
-In general, data retains the equivalent type when transferred from R to PostgreSQL or vice versa.
-Sometimes data makes round trips (e.g., data is pulled from PostgreSQL to R for computations and then sent back to R) and it is important to check that data types are retained in the process (e.g., that timestamps don't shift to a different time zone).
+retail_sales_local <- read_csv("data/us_retail_sales.csv",
+                               show_col_types = FALSE)
 
-### Structured versus Unstructured
+db <- dbConnect(duckdb::duckdb())
+retail_sales <- 
+  retail_sales_local |>
+  copy_to(db, df = _, name = "retail_sales")
+```
 
-### Quantitative versus Qualitative Data
+### Introduction to SQL
 
-### First-, Second-, and Third-Party Data
+```{r}
+retail_sales <- tbl(db, "retail_sales")
+```
 
-### Sparse Data
+```{r}
+retail_sales
+```
 
-## SQL Query Structure
+```{sql}
+#| eval: false
+#| connection: db
+SELECT sales_month, kind_of_business, sales
+FROM retail_sales
+```
 
-## Profiling: Distributions
+```{r}
+retail_sales |>
+  select(sales_month, kind_of_business, sales)
+```
 
-### Histograms and Frequencies
+```{sql}
+#| connection: db
+#| eval: false
+SELECT sales_month, kind_of_business, sales
+FROM retail_sales
+WHERE sales_month >= '2002-01-01'
+```
 
-### Binning
+```{r}
+retail_sales |>
+  select(sales_month, kind_of_business, sales) |>
+  filter(sales_month >= '2002-01-01')
+```
 
-### n-Tiles
 
-## Profiling: Data Quality
+```{sql}
+#| connection: db
+#| eval: false
+SELECT sales_month, kind_of_business, sales
+FROM retail_sales
+WHERE 
+```
 
-### Detecting Duplicates
+ - Use `==` instead of `=`.
+ - Can use `"` or `'` for quotes.
 
-### Deduplication with GROUP BY and DISTINCT
+```{r}
+retail_sales |>
+  select(sales_month, kind_of_business, sales) |>
+  filter(kind_of_business == 'Used car dealers')
+```
 
-## Preparing: Data Cleaning
+```{sql}
+#| connection: db
+SELECT kind_of_business, sum(sales) AS total_sales
+FROM retail_sales
+GROUP BY kind_of_business
+ORDER BY total_sales DESC;
+```
+ - use `na.rm = TRUE`
+ - Put new variable name to the left of aggregate function
+ - Use `arrange()` instead of `ORDER BY`
+ - Use `desc()` instead of `DESC`
+ - No need to separately select `GROUP BY` variables.
+ - No exact equivalent to reference by order
+ 
+```{r}
+retail_sales |>
+  group_by(kind_of_business) |>
+  summarize(total_sales = sum(sales, na.rm = TRUE)) |>
+  arrange(desc(total_sales))
+```
 
-### Cleaning Data with CASE Transformations
+```{r}
+retail_sales |>
+  group_by(kind_of_business) |>
+  summarize(total_sales = sum(sales, na.rm = TRUE)) |>
+  arrange(desc(total_sales))
+```
 
-### Type Conversions and Casting
 
-### Dealing with Nulls: coalesce, nullif, nvl Functions
+```{sql}
+#| connection: db
+SELECT year(sales_month) AS year,
+  sum(sales) AS total_sales
+FROM retail_sales
+WHERE kind_of_business = 'Used car dealers'
+GROUP BY 1
+ORDER BY 2 DESC;
+```
+
+```{r}
+retail_sales |>
+  mutate(year = year(sales_month)) |>
+  filter(kind_of_business == 'Used car dealers') |>
+  group_by(year) |>
+  summarize(total_sales = sum(sales, na.rm = TRUE)) |>
+  arrange(desc(total_sales))
+```
+
+
+```{sql}
+#| connection: db
+SELECT year(sales_month) AS year,
+  sum(sales) AS total_sales
+FROM retail_sales
+WHERE kind_of_business = 'Used car dealers'
+GROUP BY 1
+HAVING total_sales >= 100000
+ORDER BY 2 DESC;
+```
+
+```{r}
+retail_sales |>
+  mutate(year = year(sales_month)) |>
+  filter(kind_of_business == 'Used car dealers') |>
+  group_by(year) |>
+  summarize(total_sales = sum(sales, na.rm = TRUE)) |>
+  filter(total_sales >= 100000) |>
+  arrange(desc(total_sales)) 
+```
+
+```{sql}
+#| connection: db
+SELECT kind_of_business, reason_for_null,
+  count(*) AS num_null
+FROM retail_sales
+WHERE sales IS NULL
+GROUP BY 1, 2
+ORDER BY 3 DESC
+```
+ - `is.na()` instead of `IS NULL`
+ 
+```{r}
+retail_sales |>
+  filter(is.na(sales)) |>
+  group_by(kind_of_business, reason_for_null) |>
+  summarize(num_null = n(), .groups = "drop") %>%
+  arrange(desc(num_null))
+```
 
 ### Missing data
 

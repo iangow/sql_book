@@ -73,10 +73,10 @@ temp$text.tidy %>%
   cat()
 ```
 
-### Using SQL with RStudio
+### Reading in data
 
-
-
+If you copy and paste the following code into your R console and run it, you will load data into a database table `retail_sales`, which can be queried using SQL.
+You may find it easiest to download the template prepared for this chapter.
 
 ```{r}
 #| message: false
@@ -96,7 +96,13 @@ retail_sales <-
   copy_to(db, df = _, name = "retail_sales")
 ```
 
-### Introduction to SQL
+### Table expressions
+
+A table expression contains a `FROM` clause and (optionally) `WHERE`, `GROUP BY`, and `HAVING` clauses.
+The  `WHERE`, `GROUP BY`, and `HAVING` clauses specify a pipeline of successive transformations performed on the table specified in the `FROM` clause.
+These transformations produce a virtual table containing the rows that are passed to `SELECT` to compute the output rows of the query.
+
+Perhaps the most basic form of the `SELECT` statement is `SELECT *`, which asks for all columns from the table specified in the `FROM` clause.
 
 ```{sql}
 #| connection: db
@@ -104,11 +110,17 @@ SELECT *
 FROM retail_sales
 ```
 
+But we can also specify columns that we are interested in by name.
+
 ```{sql}
 #| connection: db
 SELECT sales_month, kind_of_business, sales
 FROM retail_sales
 ```
+
+The queries above retrieve all records or rows from a table.^[Though only the first 10 rows are displayed in this book.]
+Often we want to focus on rows meeting certain conditions and the `WHERE` clause allows us to do this.
+Here we retrieve all sales occurring in or after January 2002.^[Note that we specify the date as a **string literal** and in [ISO 8601 format](https://www.iso.org/iso-8601-date-and-time-format.html), in which the year, month, and day of the date are presented in that order, including leading zeros for the month and day and with the components separated by dashes. This format will become familiar with you if you continue to do any work in data science.]
 
 ```{sql}
 #| connection: db
@@ -117,12 +129,27 @@ FROM retail_sales
 WHERE sales_month >= '2002-01-01'
 ```
 
+### Functions and operators
+
+In the `WHERE` clause above we specified `sales_month >= '2002-01-01'`.
+We naturally think of this as being either `TRUE` or `FALSE` for a given observation, but there is also a third option that we will discuss in a moment and which allows us to handle cases where we do not know the value for ` `sales_month`.
+
+SQL contains the usual range of comparison operators: `<`, `>`, `<=`, `>=`, `=`, and `!=`, where `=` means "equal" and both `<>` and `!=` mean "not equal".
+
 ```{sql}
 #| connection: db
 SELECT sales_month, kind_of_business, sales
 FROM retail_sales
 WHERE kind_of_business = 'Used car dealers'
 ```
+
+Apart from the comparison operators, SQL includes the usual mathematical operators, including `+`, `-`, `*`, and `/`.
+
+All SQL implementations include a multitude of functions, including mathematical functions such as `abs()`, `exp()`, `log()`, `ln()`, and `sqrt()`.
+
+### Summarizing data
+
+An important class
 
 ```{sql}
 #| connection: db
@@ -167,4 +194,10 @@ FROM retail_sales
 WHERE sales IS NULL
 GROUP BY 1, 2
 ```
+
+### What have we not covered?
+
+ - Joins
+ - Subqueries and common table expressions (CTEs)
+ - 
 
