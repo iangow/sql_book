@@ -64,7 +64,26 @@ initcap <- function(x) {
 ufo <- 
   tbl(db, "ufo") |> 
   mutate(id = row_number())
+```
 
+```{r}
+ufo %>%
+  mutate(has_occurred = grepl('Occurred :', sighting_report),
+         has_reported = grepl('Reported:', sighting_report),
+         has_entered = grepl('\\(.*Entered as :', sighting_report),
+         has_posted = grepl('Posted:', sighting_report),
+         has_location = grepl('Location:', sighting_report),
+         has_shape = grepl('Shape:', sighting_report),
+         has_duration = grepl('Duration:', sighting_report)) %>%
+  # show_query()
+  count(has_occurred, has_reported, has_entered, has_posted,
+        has_location, has_shape, has_duration)
+```
+```{r}
+ufo %>% select(sighting_report)
+```
+
+```{r}
 regex <- paste0("Occurred :\\s*(.*)\\s*",
                 "Reported:\\s*(.* [AP]M).*?\\s*",
                 "Posted:\\s*(.*)\\s*",
