@@ -19,7 +19,7 @@ csv_to_db <- function(file) {
   dbWriteTable(db, df, name = "earthquakes", append = TRUE)
 }
 
-files <- list.files("data", "earthquakes.*gz",
+files <- list.files("data", "earthquakes.*csv",
                     full.names = TRUE)
 res <- lapply(files, csv_to_db)
 ```
