@@ -11,8 +11,8 @@ library(knitr)
 
 ```{r}
 #| warning: false
-#| eval: true 
-db <- dbConnect(duckdb::duckdb(), read_only = TRUE)
+#| eval: false 
+db <- dbConnect(duckdb::duckdb())
 
 csv_to_db <- function(file) {
   df <- read_csv(file, show_col_types = FALSE)
@@ -25,7 +25,25 @@ res <- lapply(files, csv_to_db)
 ```
 
 ```{r}
-#| eval: false
+#| warning: false
+#| eval: false 
+#| include: false
+db <- dbConnect(duckdb::duckdb(), dbdir = "data/earthquakes.duckdb")
+
+csv_to_db <- function(file) {
+  df <- read_csv(file, show_col_types = FALSE)
+  dbWriteTable(db, df, name = "earthquakes", append = TRUE)
+}
+
+files <- list.files("data", "earthquakes.*csv",
+                    full.names = TRUE)
+res <- lapply(files, csv_to_db)
+
+dbDisconnect(db, shutdown = TRUE)
+```
+
+```{r}
+#| eval: true
 #| include: false
 db <- dbConnect(duckdb::duckdb(), 
                 dbdir = "earthquakes.duckdb",
