@@ -10,12 +10,12 @@ book:
   
   chapters:
     - index.qmd
-    - chapter_1.qmd
-    - chapter_2.qmd
-    - chapter_3.qmd
+    - sql-intro.qmd
+    - dbplyr-intro.qmd
+    - time-series.qmd
     - cohorts.qmd
     - text.qmd
-    - chapter_6.qmd
+    - anomalies.qmd
     - chapter_7.qmd
     - chapter_8.qmd
     - chapter_9.qmd
