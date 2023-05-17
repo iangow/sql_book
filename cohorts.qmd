@@ -94,7 +94,8 @@ duckdb_read_csv <-
                         quote = quote, nrows = nrow.check, header = header, ...)
     } else {
       headers <- lapply(files, readr::read_delim, delim = delim, na = na.strings, 
-                        quote = quote, guess_max = nrow.check, col_names = header, 
+                        quote = quote, n_max = nrow.check,
+                        guess_max = nrow.check, col_names = header, 
                         show_col_types = FALSE, ...)
     }
     if (length(files) > 1) {
@@ -148,7 +149,6 @@ duckdb_read_csv <-
   }
 ```
 
-
 ```{r}
 #| include: false
 library(knitr)
@@ -170,14 +170,17 @@ registerS3method("knit_print", "data.frame", knit_print.data.frame)
 
 ```{r}
 db <- dbConnect(duckdb::duckdb())
+library(readr)
+
 duckdb_read_csv(db, "legislators",
-                files = "data/legislators.csv", use.readr = TRUE)
-duckdb_read_csv(db, "legislators_terms",
-                files = "data/legislators_terms.csv", use.readr = TRUE)
+                files = "data/legislators.csv", 
+                use.readr = TRUE, nrow.check = 5000)
+duckdb_read_csv(db, "legislators_terms", 
+                files = "data/legislators_terms.csv",
+                use.readr = TRUE)
 
 legislators <- tbl(db, "legislators")
 legislators_terms <- tbl(db, "legislators_terms")
-legislators_terms
 ```
 
 ### Exploring the data
