@@ -16,9 +16,9 @@ book:
     - cohorts.qmd
     - text.qmd
     - anomalies.qmd
-    - chapter_7.qmd
-    - chapter_8.qmd
-    - chapter_9.qmd
+    - experiments.qmd
+    - complex-data.qmd
+    - conclusion.qmd
     - appendix.qmd
     - references.qmd
 
