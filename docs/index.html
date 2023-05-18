@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Ian Gow">
-<meta name="dcterms.date" content="2023-04-29">
+<meta name="dcterms.date" content="2023-05-17">
 
 <title>SQL for Data Analysis using R</title>
 <style>
@@ -51,7 +51,7 @@ div.csl-indent {
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
-<link href="./chapter_1.html" rel="next">
+<link href="./sql-intro.html" rel="next">
 <script src="site_libs/quarto-html/quarto.js"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -121,47 +121,47 @@ div.csl-indent {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./chapter_1.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction to SQL</span></a>
+  <a href="./sql-intro.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction to SQL</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./chapter_2.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Preparing Data for Analysis</span></a>
+  <a href="./dbplyr-intro.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Using dplyr with databases</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./chapter_3.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Time Series Analysis</span></a>
+  <a href="./time-series.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Time Series Analysis</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./chapter_4.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Cohorts</span></a>
+  <a href="./cohorts.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Cohorts</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./chapter_5.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Text Analysis</span></a>
+  <a href="./text.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Text Analysis</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./chapter_6.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Anomaly Detection</span></a>
+  <a href="./anomalies.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Anomaly Detection</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./chapter_7.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Experiment Analysis</span></a>
+  <a href="./experiments.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Experiment Analysis</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./chapter_8.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Creating Complex Data Sets for Analysis</span></a>
+  <a href="./complex-data.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Creating Complex Data Sets for Analysis</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./chapter_9.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Conclusion</span></a>
+  <a href="./conclusion.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Conclusion</span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -213,7 +213,7 @@ div.csl-indent {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">29 April 2023</p>
+      <p class="date">17 May 2023</p>
     </div>
   </div>
   
@@ -225,17 +225,17 @@ div.csl-indent {
 
 <section id="preface" class="level1 unnumbered">
 <h1 class="unnumbered">Preface</h1>
-<p>This “book” is a collection of notes made as I work through <span class="citation" data-cites="tanimura2021sql">Tanimura (<a href="references.html#ref-tanimura2021sql" role="doc-biblioref">2021</a>)</span>. An alternative title might have been “Data Analysis with Data Stored in Databases”; while SQL is the language used in <span class="citation" data-cites="tanimura2021sql">Tanimura (<a href="references.html#ref-tanimura2021sql" role="doc-biblioref">2021</a>)</span> to do the analysis, this is in some ways a minor detail. My view is that one can easy do “SQL” analysis using the <code>dplyr</code> package in R (this uses <code>dbplyr</code> behind the scenes … mostly). The <code>dplyr</code> package will quietly translate R code into SQL for the user.</p>
+<p>This “book” is a collection of notes made as I work through <span class="citation" data-cites="tanimura2021sql">Tanimura (<a href="#ref-tanimura2021sql" role="doc-biblioref">2021</a>)</span>. An alternative title might have been “Data Analysis with Data Stored in Databases”; while SQL is the language used in <span class="citation" data-cites="tanimura2021sql">Tanimura (<a href="#ref-tanimura2021sql" role="doc-biblioref">2021</a>)</span> to do the analysis, this is in some ways a minor detail. My view is that one can easy do “SQL” analysis using the <code>dplyr</code> package in R (this uses <code>dbplyr</code> behind the scenes … mostly). The <code>dplyr</code> package will quietly translate R code into SQL for the user.</p>
 <p>An advantage of using <code>dplyr</code> rather than SQL directly is that one doesn’t need to learn as much SQL. In principle, one could use <code>dplyr</code> without knowing <em>any</em> SQL. Given that <code>dplyr</code> and R can be used to analyse data from other data sources, this reduces the amount that is needed to be learnt to do analysis. Additionally, one could write code to analyse data from a database and then easily reuse the code for data from a CSV file.</p>
-<p>Notwithstanding the discussion in the previous paragraph, I recommend that people who find themselves using SQL-driven databases a lot learn some SQL. This view is implicitly endorsed by Hadley Wickham with the inclusion of a significant amount of <a href="https://r4ds.hadley.nz/databases.html">material intended to teach SQL</a> to readers of “R for Data Science”. While we include a brief primer on SQL for <code>dplyr</code> users <a href="https://iangow.github.io/far_book/sql-primer.html">here</a>, clearly an excellent source for learning SQL is <span class="citation" data-cites="tanimura2021sql">Tanimura (<a href="references.html#ref-tanimura2021sql" role="doc-biblioref">2021</a>)</span> itself.</p>
-<p>Another benefit of using R is that we can do more with R. <span class="citation" data-cites="tanimura2021sql">Tanimura (<a href="references.html#ref-tanimura2021sql" role="doc-biblioref">2021</a>)</span> includes many plots of data produced using SQL, but the code to make the plots is not included. In contrast, here I will include code to produce the data as well as code to make plots (where applicable). In <a href="chapter_7.html"><span>Chapter&nbsp;7</span></a>, we will see that using R avoids the need to go off to an “online calculator” to calculate <span class="math inline">\(p\)</span>-values and the like.</p>
-<p>My view is that the material here might be useful to someone who is using <span class="citation" data-cites="tanimura2021sql">Tanimura (<a href="references.html#ref-tanimura2021sql" role="doc-biblioref">2021</a>)</span> and wants to see how the ideas there can be implemented using R, while at the same time being useful to someone who knows (or is looking to learn) R and is looking for realistic data sets to work on.</p>
+<p>Notwithstanding the discussion in the previous paragraph, I recommend that people who find themselves using SQL-driven databases a lot learn some SQL. This view is implicitly endorsed by Hadley Wickham with the inclusion of a significant amount of <a href="https://r4ds.hadley.nz/databases.html">material intended to teach SQL</a> to readers of “R for Data Science”. While we include a brief primer on SQL for <code>dplyr</code> users <a href="https://iangow.github.io/far_book/sql-primer.html">here</a>, clearly an excellent source for learning SQL is <span class="citation" data-cites="tanimura2021sql">Tanimura (<a href="#ref-tanimura2021sql" role="doc-biblioref">2021</a>)</span> itself.</p>
+<p>Another benefit of using R is that we can do more with R. <span class="citation" data-cites="tanimura2021sql">Tanimura (<a href="#ref-tanimura2021sql" role="doc-biblioref">2021</a>)</span> includes many plots of data produced using SQL, but the code to make the plots is not included. In contrast, here I will include code to produce the data as well as code to make plots (where applicable). In <a href="#sec-experiments"><span class="quarto-unresolved-ref">sec-experiments</span></a>, we will see that using R avoids the need to go off to an “online calculator” to calculate <span class="math inline">\(p\)</span>-values and the like.</p>
+<p>My view is that the material here might be useful to someone who is using <span class="citation" data-cites="tanimura2021sql">Tanimura (<a href="#ref-tanimura2021sql" role="doc-biblioref">2021</a>)</span> and wants to see how the ideas there can be implemented using R, while at the same time being useful to someone who knows (or is looking to learn) R and is looking for realistic data sets to work on.</p>
 <section id="the-structure-of-this-book" class="level2">
 <h2 class="anchored" data-anchor-id="the-structure-of-this-book">The structure of this book</h2>
-<p>First of all, I should note that this “book” is not a standalone book. To make sense of what I have here, you really need to get a copy of <span class="citation" data-cites="tanimura2021sql">Tanimura (<a href="references.html#ref-tanimura2021sql" role="doc-biblioref">2021</a>)</span> itself. This book is more of a companion guide to someone who is more familiar with R than SQL, or coming from SQL and looking to learn R in the most effective way possible, or simply looking for a way to get more out of <span class="citation" data-cites="tanimura2021sql">Tanimura (<a href="references.html#ref-tanimura2021sql" role="doc-biblioref">2021</a>)</span>.</p>
-<p>With that out of the way, the book evolves in its relation with <span class="citation" data-cites="tanimura2021sql">Tanimura (<a href="references.html#ref-tanimura2021sql" role="doc-biblioref">2021</a>)</span>. In Chapters 1 and 2, there is not much to say here, in part because there’s not a lot of SQL code to translate (the main feature of this book). For these two chapters, I mostly limit myself to some general observations on PostgreSQL, R, and <code>dplyr</code>/<code>dbplyr</code>.</p>
-<p>In Chapters 3 and 4, I focus on the task of translating SQL to <code>dbplyr</code> equivalents. As a convenience, I include SQL <em>and</em> equivalent R code for each code example provided in <span class="citation" data-cites="tanimura2021sql">Tanimura (<a href="references.html#ref-tanimura2021sql" role="doc-biblioref">2021</a>)</span>. In some cases, I tweak the SQL found in <span class="citation" data-cites="tanimura2021sql">Tanimura (<a href="references.html#ref-tanimura2021sql" role="doc-biblioref">2021</a>)</span> to better conform to my tastes or to make the translation exercise easier (e.g., I tend to use CTEs much more than <span class="citation" data-cites="tanimura2021sql">Tanimura (<a href="references.html#ref-tanimura2021sql" role="doc-biblioref">2021</a>)</span> does).</p>
-<p>From Chapter 5 onwards, I generally omit SQL and just present the <code>dplyr</code> equivalents of the SQL provided in <span class="citation" data-cites="tanimura2021sql">Tanimura (<a href="references.html#ref-tanimura2021sql" role="doc-biblioref">2021</a>)</span>.</p>
+<p>First of all, I should note that this “book” is not a standalone book. To make sense of what I have here, you really need to get a copy of <span class="citation" data-cites="tanimura2021sql">Tanimura (<a href="#ref-tanimura2021sql" role="doc-biblioref">2021</a>)</span> itself. This book is more of a companion guide to someone who is more familiar with R than SQL, or coming from SQL and looking to learn R in the most effective way possible, or simply looking for a way to get more out of <span class="citation" data-cites="tanimura2021sql">Tanimura (<a href="#ref-tanimura2021sql" role="doc-biblioref">2021</a>)</span>.</p>
+<p>With that out of the way, the book evolves in its relation with <span class="citation" data-cites="tanimura2021sql">Tanimura (<a href="#ref-tanimura2021sql" role="doc-biblioref">2021</a>)</span>. In Chapters 1 and 2, there is not much to say here, in part because there’s not a lot of SQL code to translate (the main feature of this book). For these two chapters, I mostly limit myself to some general observations on PostgreSQL, R, and <code>dplyr</code>/<code>dbplyr</code>.</p>
+<p>In Chapters 3 and 4, I focus on the task of translating SQL to <code>dbplyr</code> equivalents. As a convenience, I include SQL <em>and</em> equivalent R code for each code example provided in <span class="citation" data-cites="tanimura2021sql">Tanimura (<a href="#ref-tanimura2021sql" role="doc-biblioref">2021</a>)</span>. In some cases, I tweak the SQL found in <span class="citation" data-cites="tanimura2021sql">Tanimura (<a href="#ref-tanimura2021sql" role="doc-biblioref">2021</a>)</span> to better conform to my tastes or to make the translation exercise easier (e.g., I tend to use CTEs much more than <span class="citation" data-cites="tanimura2021sql">Tanimura (<a href="#ref-tanimura2021sql" role="doc-biblioref">2021</a>)</span> does).</p>
+<p>From Chapter 5 onwards, I generally omit SQL and just present the <code>dplyr</code> equivalents of the SQL provided in <span class="citation" data-cites="tanimura2021sql">Tanimura (<a href="#ref-tanimura2021sql" role="doc-biblioref">2021</a>)</span>.</p>
 </section>
 <section id="sql-and-me" class="level2">
 <h2 class="anchored" data-anchor-id="sql-and-me">SQL and me</h2>
@@ -251,7 +251,7 @@ div.csl-indent {
 <p>The point of boring any reader with the autobiographical details above is to illustrate that one can go a lot of places in data analysis and not get very far from SQL.</p>
 
 
-<div id="refs" class="references csl-bib-body hanging-indent" role="doc-bibliography" style="display: none">
+<div id="refs" class="references csl-bib-body hanging-indent" role="doc-bibliography">
 <div id="ref-tanimura2021sql" class="csl-entry" role="doc-biblioentry">
 Tanimura, C. 2021. <em>SQL for Data Analysis</em>. O’Reilly Media. <a href="https://books.google.com.au/books?id=ojhCEAAAQBAJ">https://books.google.com.au/books?id=ojhCEAAAQBAJ</a>.
 </div>
@@ -415,7 +415,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   <div class="nav-page nav-page-previous">
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./chapter_1.html" class="pagination-link">
+      <a href="./sql-intro.html" class="pagination-link">
         <span class="nav-page-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction to SQL</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
