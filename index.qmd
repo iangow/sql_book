@@ -28,8 +28,9 @@ To make sense of what I have here, you really need to get a copy of @tanimura202
 This book is more of a companion guide to someone who is more familiar with R than SQL, or coming from SQL and looking to learn R in the most effective way possible, or simply looking for a way to get more out of @tanimura2021sql.
 
 With that out of the way, the book evolves in its relation with @tanimura2021sql.
-In Chapters 1 and 2, there is not much to say here, in part because there's not a lot of SQL code to translate (the main feature of this book).
-For these two chapters, I mostly limit myself to some general observations on PostgreSQL, R, and `dplyr`/`dbplyr`.
+Chapters 1 and 2 differ from their counterparts in  @tanimura2021sql.
+Chapter 1 provides a tutorial on SQL.
+Chapter 2 provides a tutorial on `dbplyr`.
 
 In Chapters 3 and 4, I focus on the task of translating SQL to `dbplyr` equivalents.
 As a convenience, I include SQL *and* equivalent R code for each code example provided in @tanimura2021sql.
