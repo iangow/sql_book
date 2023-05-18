@@ -24,20 +24,11 @@ We read the data
 
 ```{r}
 #| eval: true
-#| cache: true
-retail_sales_local <- read_csv("data/us_retail_sales.csv",
-                               show_col_types = FALSE)
-```
+db <- dbConnect(duckdb::duckdb())
 
-```{r}
-#| eval: false
-#| cache: true
-#| include: false
-url <- paste0("https://raw.githubusercontent.com/",
-              "cathytanimura/sql_book/master/",
-              "Chapter%203%3A%20Time%20Series%20Analysis/",
-              "us_retail_sales.csv")
-retail_sales_local <- read_csv(url, show_col_types = FALSE)
+retail_sales <-
+  tbl(db, "read_csv_auto('data/us_retail_sales.csv')") |>
+  compute(name = "retail_sales")
 ```
 
 Now that we have the data in R, a few questions arise.
@@ -81,18 +72,8 @@ To install DuckDB, all we have to do is `install.packages("duckdb")`.
 
 Then we can create a connection as follows.
 
-```{r}
-db <- dbConnect(duckdb::duckdb())
-```
-
 Here we use the default of an in-memory database.
 At the end of this chapter, we discuss how we could store the data in a file (say, `legislators.duckdb`) if we want persistent storage.
-
-```{r}
-retail_sales <- 
-  retail_sales_local |>
-  copy_to(db, df = _, name = "retail_sales")
-```
 
 ## Trending the Data
 
