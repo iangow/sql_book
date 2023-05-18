@@ -299,17 +299,14 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>Let’s move onto the <em>legislators</em> data set.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>db <span class="ot">&lt;-</span> <span class="fu">dbConnect</span>(duckdb<span class="sc">::</span><span class="fu">duckdb</span>())</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readr)</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">duckdb_read_csv</span>(db, <span class="st">"legislators"</span>,</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">files =</span> <span class="st">"data/legislators.csv"</span>, </span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>                <span class="at">use.readr =</span> <span class="cn">TRUE</span>, <span class="at">nrow.check =</span> <span class="dv">5000</span>)</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="fu">duckdb_read_csv</span>(db, <span class="st">"legislators_terms"</span>, </span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>                <span class="at">files =</span> <span class="st">"data/legislators_terms.csv"</span>,</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>                <span class="at">use.readr =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>legislators <span class="ot">&lt;-</span> <span class="fu">tbl</span>(db, <span class="st">"legislators"</span>)</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>legislators_terms <span class="ot">&lt;-</span> <span class="fu">tbl</span>(db, <span class="st">"legislators_terms"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>legislators <span class="ot">&lt;-</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tbl</span>(db, <span class="st">"read_csv_auto('data/legislators.csv')"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">compute</span>(<span class="at">name =</span> <span class="st">"legislators"</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>legislators_terms <span class="ot">&lt;-</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tbl</span>(db, <span class="st">"read_csv_auto('data/legislators_terms.csv')"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">compute</span>(<span class="at">name =</span> <span class="st">"legislators_terms"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="exploring-the-data" class="level3" data-number="4.2.2">
@@ -742,7 +739,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> period, <span class="at">y =</span> pct_retained)) <span class="sc">+</span></span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="cohorts_files/figure-html/unnamed-chunk-19-1.png" class="img-fluid" width="672"></p>
+<p><img src="cohorts_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <div class="cell">
@@ -1109,7 +1106,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> period, <span class="at">y =</span> pct_retained)) <span class="sc">+</span> </span>
 <span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="cohorts_files/figure-html/unnamed-chunk-27-1.png" class="img-fluid" width="672"></p>
+<p><img src="cohorts_files/figure-html/unnamed-chunk-26-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <div class="cell">
@@ -1473,7 +1470,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>             <span class="at">group =</span> first_century)) <span class="sc">+</span> </span>
 <span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="cohorts_files/figure-html/unnamed-chunk-36-1.png" class="img-fluid" width="672"></p>
+<p><img src="cohorts_files/figure-html/unnamed-chunk-35-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <div class="cell">
@@ -1698,7 +1695,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb39-9"><a href="#cb39-9" aria-hidden="true" tabindex="-1"></a>             <span class="at">group =</span> first_state)) <span class="sc">+</span> </span>
 <span id="cb39-10"><a href="#cb39-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="cohorts_files/figure-html/unnamed-chunk-42-1.png" class="img-fluid" width="672"></p>
+<p><img src="cohorts_files/figure-html/unnamed-chunk-41-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section>
@@ -2506,7 +2503,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb57-5"><a href="#cb57-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
 <span id="cb57-6"><a href="#cb57-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="fu">vars</span>(first_state), <span class="at">ncol =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="cohorts_files/figure-html/unnamed-chunk-60-1.png" class="img-fluid" width="672"></p>
+<p><img src="cohorts_files/figure-html/unnamed-chunk-59-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section>
@@ -2651,7 +2648,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb64-5"><a href="#cb64-5" aria-hidden="true" tabindex="-1"></a>             <span class="at">colour =</span> term_type, <span class="at">group =</span> term_type)) <span class="sc">+</span></span>
 <span id="cb64-6"><a href="#cb64-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="cohorts_files/figure-html/unnamed-chunk-66-1.png" class="img-fluid" width="672"></p>
+<p><img src="cohorts_files/figure-html/unnamed-chunk-65-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section>
@@ -3362,44 +3359,44 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">1994-12-31</td>
-<td style="text-align: right;">542</td>
+<td style="text-align: left;">1929-12-31</td>
+<td style="text-align: right;">567</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">1993-12-31</td>
-<td style="text-align: right;">544</td>
+<td style="text-align: left;">1930-12-31</td>
+<td style="text-align: right;">566</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">1989-12-31</td>
-<td style="text-align: right;">543</td>
+<td style="text-align: left;">1928-12-31</td>
+<td style="text-align: right;">554</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">1991-12-31</td>
-<td style="text-align: right;">543</td>
+<td style="text-align: left;">1932-12-31</td>
+<td style="text-align: right;">563</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">1990-12-31</td>
-<td style="text-align: right;">540</td>
+<td style="text-align: left;">1927-12-31</td>
+<td style="text-align: right;">549</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">1992-12-31</td>
-<td style="text-align: right;">541</td>
+<td style="text-align: left;">1931-12-31</td>
+<td style="text-align: right;">559</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">1988-12-31</td>
-<td style="text-align: right;">542</td>
+<td style="text-align: left;">1925-12-31</td>
+<td style="text-align: right;">549</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">1987-12-31</td>
-<td style="text-align: right;">542</td>
+<td style="text-align: left;">1926-12-31</td>
+<td style="text-align: right;">548</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">1986-12-31</td>
-<td style="text-align: right;">544</td>
+<td style="text-align: left;">1924-12-31</td>
+<td style="text-align: right;">557</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">1985-12-31</td>
-<td style="text-align: right;">544</td>
+<td style="text-align: left;">1923-12-31</td>
+<td style="text-align: right;">559</td>
 </tr>
 </tbody>
 </table>
@@ -3432,54 +3429,54 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">1919-12-31</td>
-<td style="text-align: right;">20</td>
-<td style="text-align: right;">516</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">1965-12-31</td>
-<td style="text-align: right;">20</td>
-<td style="text-align: right;">546</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">1995-12-31</td>
-<td style="text-align: right;">20</td>
-<td style="text-align: right;">539</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">2005-12-31</td>
-<td style="text-align: right;">20</td>
-<td style="text-align: right;">388</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">1975-12-31</td>
-<td style="text-align: right;">20</td>
-<td style="text-align: right;">547</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">1811-12-31</td>
+<td style="text-align: left;">1853-12-31</td>
 <td style="text-align: right;">19</td>
-<td style="text-align: right;">153</td>
+<td style="text-align: right;">315</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">1843-12-31</td>
+<td style="text-align: right;">19</td>
+<td style="text-align: right;">295</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">1893-12-31</td>
+<td style="text-align: left;">1847-12-31</td>
+<td style="text-align: right;">19</td>
+<td style="text-align: right;">301</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">1842-12-31</td>
+<td style="text-align: right;">19</td>
+<td style="text-align: right;">320</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">1819-12-31</td>
+<td style="text-align: right;">19</td>
+<td style="text-align: right;">238</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">1829-12-31</td>
+<td style="text-align: right;">19</td>
+<td style="text-align: right;">273</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">1879-12-31</td>
+<td style="text-align: right;">19</td>
+<td style="text-align: right;">390</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">1899-12-31</td>
 <td style="text-align: right;">19</td>
 <td style="text-align: right;">470</td>
 </tr>
-<tr class="even">
-<td style="text-align: left;">1909-12-31</td>
-<td style="text-align: right;">20</td>
-<td style="text-align: right;">344</td>
-</tr>
 <tr class="odd">
-<td style="text-align: left;">1937-12-31</td>
+<td style="text-align: left;">1911-12-31</td>
 <td style="text-align: right;">20</td>
-<td style="text-align: right;">547</td>
+<td style="text-align: right;">404</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">2010-12-31</td>
-<td style="text-align: right;">21</td>
-<td style="text-align: right;">262</td>
+<td style="text-align: left;">1913-12-31</td>
+<td style="text-align: right;">20</td>
+<td style="text-align: right;">476</td>
 </tr>
 </tbody>
 </table>
@@ -3815,54 +3812,54 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">1963-12-31</td>
-<td style="text-align: right;">23</td>
-<td style="text-align: right;">9</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">1895-12-31</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">192</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">1899-12-31</td>
-<td style="text-align: right;">5</td>
-<td style="text-align: right;">74</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">1918-12-31</td>
-<td style="text-align: right;">6</td>
-<td style="text-align: right;">101</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">1847-12-31</td>
-<td style="text-align: right;">5</td>
-<td style="text-align: right;">45</td>
-</tr>
-<tr class="even">
 <td style="text-align: left;">1914-12-31</td>
 <td style="text-align: right;">2</td>
 <td style="text-align: right;">180</td>
 </tr>
+<tr class="even">
+<td style="text-align: left;">1829-12-31</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">23</td>
+</tr>
 <tr class="odd">
-<td style="text-align: left;">1947-12-31</td>
-<td style="text-align: right;">9</td>
-<td style="text-align: right;">70</td>
+<td style="text-align: left;">1955-12-31</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">56</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">1899-12-31</td>
-<td style="text-align: right;">15</td>
-<td style="text-align: right;">8</td>
+<td style="text-align: left;">1978-12-31</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">64</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">1894-12-31</td>
+<td style="text-align: left;">1918-12-31</td>
 <td style="text-align: right;">2</td>
-<td style="text-align: right;">163</td>
+<td style="text-align: right;">107</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">1921-12-31</td>
+<td style="text-align: left;">1947-12-31</td>
 <td style="text-align: right;">5</td>
-<td style="text-align: right;">72</td>
+<td style="text-align: right;">80</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">1952-12-31</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">55</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">1850-12-31</td>
+<td style="text-align: right;">18</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">1901-12-31</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">89</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">1930-12-31</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">79</td>
 </tr>
 </tbody>
 </table>
@@ -3993,43 +3990,43 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </tr>
 <tr class="odd">
 <td style="text-align: left;">2019-12-31</td>
-<td style="text-align: left;">21+</td>
-<td style="text-align: right;">17.87710</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">2019-12-31</td>
 <td style="text-align: left;">11 to 20</td>
 <td style="text-align: right;">20.11173</td>
 </tr>
-<tr class="odd">
-<td style="text-align: left;">2018-12-31</td>
-<td style="text-align: left;">1 to 4</td>
-<td style="text-align: right;">25.60297</td>
-</tr>
 <tr class="even">
-<td style="text-align: left;">2018-12-31</td>
+<td style="text-align: left;">2019-12-31</td>
 <td style="text-align: left;">21+</td>
-<td style="text-align: right;">19.29499</td>
+<td style="text-align: right;">17.87710</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">2018-12-31</td>
-<td style="text-align: left;">5 to 10</td>
-<td style="text-align: right;">33.76623</td>
-</tr>
-<tr class="even">
 <td style="text-align: left;">2018-12-31</td>
 <td style="text-align: left;">11 to 20</td>
 <td style="text-align: right;">21.33581</td>
 </tr>
+<tr class="even">
+<td style="text-align: left;">2018-12-31</td>
+<td style="text-align: left;">5 to 10</td>
+<td style="text-align: right;">33.76623</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2018-12-31</td>
+<td style="text-align: left;">21+</td>
+<td style="text-align: right;">19.29499</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2018-12-31</td>
+<td style="text-align: left;">1 to 4</td>
+<td style="text-align: right;">25.60297</td>
+</tr>
 <tr class="odd">
 <td style="text-align: left;">2017-12-31</td>
-<td style="text-align: left;">1 to 4</td>
-<td style="text-align: right;">24.53532</td>
+<td style="text-align: left;">11 to 20</td>
+<td style="text-align: right;">21.37546</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">2017-12-31</td>
-<td style="text-align: left;">21+</td>
-<td style="text-align: right;">19.33085</td>
+<td style="text-align: left;">5 to 10</td>
+<td style="text-align: right;">34.75836</td>
 </tr>
 </tbody>
 </table>
@@ -4109,23 +4106,23 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </tr>
 <tr class="odd">
 <td style="text-align: left;">2018-12-31</td>
-<td style="text-align: left;">11 to 20</td>
-<td style="text-align: right;">21.33581</td>
+<td style="text-align: left;">21+</td>
+<td style="text-align: right;">19.29499</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">2018-12-31</td>
-<td style="text-align: left;">5 to 10</td>
-<td style="text-align: right;">33.76623</td>
-</tr>
-<tr class="odd">
 <td style="text-align: left;">2018-12-31</td>
 <td style="text-align: left;">1 to 4</td>
 <td style="text-align: right;">25.60297</td>
 </tr>
+<tr class="odd">
+<td style="text-align: left;">2018-12-31</td>
+<td style="text-align: left;">5 to 10</td>
+<td style="text-align: right;">33.76623</td>
+</tr>
 <tr class="even">
 <td style="text-align: left;">2018-12-31</td>
-<td style="text-align: left;">21+</td>
-<td style="text-align: right;">19.29499</td>
+<td style="text-align: left;">11 to 20</td>
+<td style="text-align: right;">21.33581</td>
 </tr>
 </tbody>
 </table>
