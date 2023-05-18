@@ -16,24 +16,21 @@ library(dbplyr)
 library(knitr)
 ```
 
-```{r}
-pg <- dbConnect(RPostgres::Postgres(), 
-                bigint = "integer",
-                check_interrupts = TRUE)
-```
-
-
-```{r}
-#| include: false
-dbExecute(pg, "SET search_path TO sql_book")
-```
 
 ## Code Organization
 
 ```{r}
-earthquakes <- tbl(pg, "earthquakes")
-legislators_terms <- tbl(pg, "legislators_terms")
-videogame_sales <- tbl(pg, "videogame_sales")
+db <- dbConnect(duckdb::duckdb())
+
+earthquakes <- tbl(db, "read_csv_auto('data/earthquakes*.csv')")
+
+legislators_terms <- 
+  tbl(db, "read_csv_auto('data/legislators_terms.csv')") |>
+  compute(name = "legislators_terms")
+
+videogame_sales <- 
+  tbl(db, "read_csv_auto('data/videogame_sales.csv')") |>
+  compute(name = "videogame_sales")
 ```
 
 ```{r}
@@ -118,7 +115,7 @@ The query in the book written with `LATERAL` seems much more confusing to me tha
 I rewrote the `LATERAL` query using CTEs and got the following, which seems closer to the second SQL query included in the book.
 
 ```{sql}
-#| connection: pg
+#| connection: db
 WITH 
 
 current_legislators AS (
@@ -212,18 +209,20 @@ first_term |>
   kable()
 ```
 
-### grouping sets
+### GROUPING SETS
 
 I don't think there *is* a "pure" `dbplyr` way of doing these.
 However, not all is lost for the dedicated `dbplyr` user, as the following examples demonstrate.
+Note that DuckDB requires a more explicit statement of the `GROUPING SETS`.
 
 ```{r}
 global_sales <-
-  tbl(pg, sql("
-    SELECT platform, genre, publisher,
+  tbl(db, sql("
+    (SELECT platform, genre, publisher,
       sum(global_sales) as global_sales
     FROM videogame_sales
-    GROUP BY grouping sets (platform, genre, publisher)"))
+    GROUP BY GROUPING SETS ((platform, genre, publisher), 
+                             platform, genre, publisher))"))
 
 global_sales |>
   arrange(desc(global_sales)) |>
@@ -233,13 +232,13 @@ global_sales |>
 
 ```{r}
 global_sales_cube <-
-  tbl(pg, sql("
-    SELECT coalesce(platform, 'All') as platform,
+  tbl(db, sql("
+    (SELECT coalesce(platform, 'All') as platform,
       coalesce(genre,'All') AS genre,
       coalesce(publisher,'All') AS publisher,
       sum(global_sales) AS global_sales
     FROM videogame_sales
-    GROUP BY cube (platform, genre, publisher)"))
+    GROUP BY cube (platform, genre, publisher))"))
 
 global_sales_cube |>
   arrange(platform, genre, publisher) |>
@@ -289,7 +288,7 @@ legislators_terms |>
 Note that the `CASE WHEN` in the SQL in the book can be significantly simplified.
 
 ```{sql}
-#| connection: pg
+#| connection: db
 WITH num_terms AS (
   SELECT id_bioguide, count(term_id) as terms
     FROM legislators_terms
