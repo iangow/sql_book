@@ -10,21 +10,12 @@ library(dbplyr)
 
 ```{r}
 #| output: false
-pg <- dbConnect(RPostgres::Postgres(), 
-                bigint = "integer",
-                check_interrupts = TRUE)
-```
+db <- dbConnect(duckdb::duckdb())
 
-```{r}
-#| include: false
-dbExecute(pg, "SET search_path TO sql_book")
+legislators_terms <-
+  tbl(db, "read_csv_auto('data/legislators_terms.csv')") |>
+  compute(name = "legislators_terms")
 ```
-
-```{r}
-#| include: false
-legislators_terms <- tbl(pg, "legislators_terms")
-```
-
 
 ## Funnel Analysis
 
@@ -51,8 +42,12 @@ This yields the second of the two options provided, which seems to be the implic
 
 This query seems easier to follow with a separate window specification (`WINDOW w AS`) and using a CTE.
 
+**This query does not run on DuckDB because `avg(INTERVAL)` is not defined there.**
+
+
 ```{sql}
-#| connection: pg
+#| eval: false
+#| connection: db
 WITH gap_intervals AS (
   SELECT id_bioguide, term_start,
     lag(term_start) OVER w AS prev,
@@ -70,6 +65,8 @@ Translating this query into `dplyr` is straightforward, with again most of the w
 Note that we can refer to `prev` created in an earlier part of the `mutate` call in creating `gap_interval`.
 It seems that `dbplyr` detects this kind of situation and cleverly puts the calculation of `prev` into a subquery.
 
+**This query does not run on DuckDB because `avg(INTERVAL)` is not defined there.**
+
 ```{r}
 gap_intervals <-
   legislators_terms |>
@@ -85,6 +82,7 @@ gap_intervals <-
 This makes it effectively a single line of code to transform the data into the average shown above.
 
 ```{r}
+#| eval: false
 gap_intervals |>
   summarize(avg_gap = mean(gap_interval, na.rm = TRUE)) |>
   kable()
@@ -166,7 +164,7 @@ purchases <- tribble(
   4, "oranges",
   4, "passionfruit") |>
   mutate(customer_id = as.integer(customer_id)) |>
-  copy_inline(pg, df = _)
+  copy_inline(db, df = _)
 ```
 
 Now, let's make a function that performs as much of the analysis in the database as possible.
@@ -215,7 +213,7 @@ get_baskets <- function(df, p) {
     n_prods |> 
     lapply(get_combos, p = p) |>
     bind_rows() |>
-    copy_inline(pg, df = _)
+    copy_inline(db, df = _)
 
   cust_prods <-
     df |> 
