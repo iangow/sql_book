@@ -87,13 +87,11 @@ library(tidyverse)
 library(dbplyr)
 library(knitr)
 
-retail_sales_local <- read_csv("data/us_retail_sales.csv",
-                               show_col_types = FALSE)
-
 db <- dbConnect(duckdb::duckdb())
-retail_sales <- 
-  retail_sales_local |>
-  copy_to(db, df = _, name = "retail_sales")
+
+retail_sales <-
+  tbl(db, "read_csv_auto('data/us_retail_sales.csv')") |>
+  compute(name = "retail_sales")
 ```
 
 ### Table expressions
