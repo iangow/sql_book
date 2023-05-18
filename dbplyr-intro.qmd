@@ -19,24 +19,16 @@ R also offers rich functionality for statistical testing and modelling, but we w
 #| cache: false
 library(DBI)
 library(tidyverse)
-
-retail_sales_local <- read_csv("data/us_retail_sales.csv",
-                               show_col_types = FALSE)
-
-db <- dbConnect(duckdb::duckdb())
-retail_sales <- 
-  retail_sales_local |>
-  copy_to(db, df = _, name = "retail_sales")
 ```
 
 ### Introduction to SQL
 
 ```{r}
-retail_sales <- tbl(db, "retail_sales")
-```
+db <- dbConnect(duckdb::duckdb())
 
-```{r}
-retail_sales
+retail_sales <-
+  tbl(db, "read_csv_auto('data/us_retail_sales.csv')") |>
+  compute(name = "retail_sales")
 ```
 
 ```{sql}
@@ -190,14 +182,7 @@ library(knitr)
 
 ```{r}
 #| output: false
-pg <- dbConnect(RPostgres::Postgres(), 
-                bigint = "integer",
-                check_interrupts = TRUE)
-```
-
-```{r}
-#| include: false
-dbExecute(pg, "SET search_path TO sql_book")
+db <- dbConnect(duckdb::duckdb(), bigint = "integer")
 ```
 
 ## Preparing: Shaping Data
@@ -240,7 +225,7 @@ ctry_pops_long |>
 Next, I copy the data to PostgreSQL, so that it's a (temporary) table inside the database.^["Temporary" here means that it will disappear once we close our connection to the database.]
 
 ```{r}
-ctry_pops_db <- copy_to(pg, ctry_pops)
+ctry_pops_db <- copy_to(db, ctry_pops)
 ctry_pops_db
 ```
 

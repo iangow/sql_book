@@ -9,20 +9,6 @@ library(knitr)
 library(duckdb)
 ```
 
-```{r}
-#| output: false
-#| include: false
-#| eval: false
-db <- dbConnect(RPostgres::Postgres(), 
-                bigint = "integer",
-                check_interrupts = TRUE)
-```
-
-```{r}
-#| include: false
-#| eval: false
-dbExecute(db, "SET search_path TO sql_book")
-```
 
 ```{r}
 db <- dbConnect(duckdb::duckdb())
