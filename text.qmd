@@ -53,12 +53,6 @@ initcap <- function(x) {
 ```
 
 ```{r}
-#| cache: true
-ufo <- 
-  tbl(db, "ufo") 
-```
-
-```{r}
 ufo %>%
   mutate(has_occurred = grepl('Occurred :', sighting_report),
          has_reported = grepl('Reported:', sighting_report),
