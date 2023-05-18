@@ -32,66 +32,21 @@ library(janitor)
 ## The Data Set
 
 As discussed in @tanimura2021sql, there are four tables used in this chapter.
-We can get these data from the [GitHub site](https://github.com/cathytanimura/sql_book) associated with @tanimura2021sql.
+We can get these data from the [GitHub site](https://github.com/cathytanimura/sql_book) associated with @tanimura2021sql.^[I `compute()` two tables so that I can refer to them using SQL below.]
 
 ```{r}
-#| output: false
-#| include: false
-#| eval: false
-db <- dbConnect(RPostgres::Postgres(), 
-                bigint = "integer",
-                check_interrupts = TRUE)
-```
-
-```{r}
-#| include: false
-#| eval: false
-dbExecute(db, "SET search_path TO sql_book")
-```
-
-```{r}
-#| cache: true
 #| warning: false
-url <- paste0("https://raw.githubusercontent.com/",
-              "cathytanimura/sql_book/master/",
-              "Chapter%207%3A%20Experiment%20Analysis/")
-
-game_users <- read_csv(paste0(url, "game_users.csv"),
-                        col_types = "iDc")
-
-game_actions <- read_csv(paste0(url, "game_actions.csv"),
-                         col_types = "icD")
-
-game_purchases <- read_csv(paste0(url, "game_purchases.csv"),
-                         col_types = "iDd")
-
-exp_assignment <- read_csv(paste0(url, "exp_assignment.csv"),
-                           col_types = "ciDc")
-```              
-
-Having obtained these four data tables, we replace the `tibble` version of each with an equivalent stored in an in-memory DuckDB database.
-Note that all the code below works if you skip the following five lines of code.
-However, in compiling a version of this chapter, I could do it in about 24 seconds *without* these lines (i.e., using local data frames) and in about 4 seconds *with* these lines (i.e., using DuckDB).^][Using PostgreSQL instead of DuckDB yield a time of around 6 seconds; so a substantial improvement over `dplyr`, but not quite as quick as in-memory DuckDB.]
-
-```{r}
-#| include: true
-#| eval: true
 db <- dbConnect(duckdb::duckdb())
-game_users <- copy_to(db, game_users, "game_users")
-game_actions <- copy_to(db, game_actions, "game_actions")
-game_purchases <- copy_to(db, game_purchases, "game_purchases")
-exp_assignment <- copy_to(db, exp_assignment, "exp_assignment")
-```
 
-```{r}
-#| eval: false
-#| include: false 
-db <- dbConnect(RPostgres::Postgres(), bigint = "integer")
-game_users <- copy_to(db, game_users, "game_users")
-game_actions <- copy_to(db, game_actions, "game_actions")
-game_purchases <- copy_to(db, game_purchases, "game_purchases")
-exp_assignment <- copy_to(db, exp_assignment, "exp_assignment")
-```
+game_users <-
+  tbl(db, "read_csv_auto('data/game_users.csv')") |>
+  compute(name = "game_users")
+game_actions <- 
+  tbl(db, "read_csv_auto('data/game_actions.csv')") |>
+  compute(name = "game_actions")
+game_purchases <- tbl(db, "read_csv_auto('data/game_purchases.csv')")
+exp_assignment <- tbl(db, "read_csv_auto('data/exp_assignment.csv')")
+```              
 
 ## Types of Experiments
 
