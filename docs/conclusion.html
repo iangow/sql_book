@@ -279,9 +279,11 @@ div.csl-indent {
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dbplyr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>pg <span class="ot">&lt;-</span> <span class="fu">dbConnect</span>(RPostgres<span class="sc">::</span><span class="fu">Postgres</span>(), </span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>                <span class="at">bigint =</span> <span class="st">"integer"</span>,</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>                <span class="at">check_interrupts =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>db <span class="ot">&lt;-</span> <span class="fu">dbConnect</span>(duckdb<span class="sc">::</span><span class="fu">duckdb</span>())</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>legislators_terms <span class="ot">&lt;-</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tbl</span>(db, <span class="st">"read_csv_auto('data/legislators_terms.csv')"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">compute</span>(<span class="at">name =</span> <span class="st">"legislators_terms"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <section id="funnel-analysis" class="level2" data-number="9.1">
 <h2 data-number="9.1" class="anchored" data-anchor-id="funnel-analysis"><span class="header-section-number">9.1</span> Funnel Analysis</h2>
@@ -303,6 +305,7 @@ div.csl-indent {
 <section id="churn-lapse-and-other-definitions-of-departure" class="level2" data-number="9.2">
 <h2 data-number="9.2" class="anchored" data-anchor-id="churn-lapse-and-other-definitions-of-departure"><span class="header-section-number">9.2</span> Churn, Lapse, and Other Definitions of Departure</h2>
 <p>This query seems easier to follow with a separate window specification (<code>WINDOW w AS</code>) and using a CTE.</p>
+<p><strong>This query does not run on DuckDB because <code>avg(INTERVAL)</code> is not defined there.</strong></p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span> gap_intervals <span class="kw">AS</span> (</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">SELECT</span> id_bioguide, term_start,</span>
@@ -316,23 +319,9 @@ div.csl-indent {
 <span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">avg</span>(gap_interval) <span class="kw">AS</span> avg_gap</span>
 <span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> gap_intervals</span>
 <span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> gap_interval <span class="kw">IS</span> <span class="kw">NOT</span> <span class="kw">NULL</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="knitsql-table">
-<table class="table table-sm table-striped">
-<caption>1 records</caption>
-<thead>
-<tr class="header">
-<th style="text-align: left;">avg_gap</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">2 years 2 mons 17 days 15:41:54.83805</td>
-</tr>
-</tbody>
-</table>
-</div>
 </div>
 <p>Translating this query into <code>dplyr</code> is straightforward, with again most of the work being done in creation of <code>gap_intervals</code>. Note that we can refer to <code>prev</code> created in an earlier part of the <code>mutate</code> call in creating <code>gap_interval</code>. It seems that <code>dbplyr</code> detects this kind of situation and cleverly puts the calculation of <code>prev</code> into a subquery.</p>
+<p><strong>This query does not run on DuckDB because <code>avg(INTERVAL)</code> is not defined there.</strong></p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>gap_intervals <span class="ot">&lt;-</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  legislators_terms <span class="sc">|&gt;</span></span>
@@ -349,20 +338,6 @@ div.csl-indent {
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>gap_intervals <span class="sc">|&gt;</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">avg_gap =</span> <span class="fu">mean</span>(gap_interval, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">|&gt;</span></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<table class="table table-sm table-striped">
-<thead>
-<tr class="header">
-<th style="text-align: left;">avg_gap</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">2 years 2 mons 17 days 15:41:54.83805</td>
-</tr>
-</tbody>
-</table>
-</div>
 </div>
 <p>With <code>gap_intervals</code> in our pocket, the following query is <em>much</em> simpler than the SQL shown in the book.</p>
 <div class="cell">
@@ -386,16 +361,16 @@ div.csl-indent {
 </thead>
 <tbody>
 <tr class="odd">
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">11236</td>
+</tr>
+<tr class="even">
 <td style="text-align: right;">1</td>
 <td style="text-align: right;">25</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: right;">2</td>
 <td style="text-align: right;">4</td>
-</tr>
-<tr class="odd">
-<td style="text-align: right;">3</td>
-<td style="text-align: right;">2</td>
 </tr>
 </tbody>
 </table>
@@ -408,7 +383,7 @@ div.csl-indent {
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> gap_months, <span class="at">y =</span> instances)) <span class="sc">+</span></span>
 <span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="conclusion_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid" width="672"></p>
+<p><img src="conclusion_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <div class="cell">
@@ -513,7 +488,7 @@ This warning is displayed once every 8 hours.</code></pre>
 <span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>  <span class="dv">4</span>, <span class="st">"oranges"</span>,</span>
 <span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>  <span class="dv">4</span>, <span class="st">"passionfruit"</span>) <span class="sc">|&gt;</span></span>
 <span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">customer_id =</span> <span class="fu">as.integer</span>(customer_id)) <span class="sc">|&gt;</span></span>
-<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">copy_inline</span>(pg, <span class="at">df =</span> _)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">copy_inline</span>(db, <span class="at">df =</span> _)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Now, let’s make a function that performs as much of the analysis in the database as possible. The only data we bring into R relates to the distinct number of products purchased by customers. So let’s say some customers purchase one product, others two, three, or four, while some customers purchase six products. In this case <code>n_prods = c(1, 2, 3, 4, 6)</code> and that is the only data we need in R from the database. If <code>p = 2</code> (i.e., we’re interested in product pairs), we then create all the combinations of 2 products for each value in <code>n_prods</code>. For a customer with one product, there is no pair. For a customer with two products, there is one pair. For a customer with three products, there are two pairs: <code>{1, 2}</code> and <code>{2, 3}</code>. These combinations are created in R and the resulting table (<code>combos</code>) is passed back to the database.</p>
 <p>From there, everything is processed in the database.</p>
@@ -545,7 +520,7 @@ This warning is displayed once every 8 hours.</code></pre>
 <span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a>    n_prods <span class="sc">|&gt;</span> </span>
 <span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a>    <span class="fu">lapply</span>(get_combos, <span class="at">p =</span> p) <span class="sc">|&gt;</span></span>
 <span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a>    <span class="fu">bind_rows</span>() <span class="sc">|&gt;</span></span>
-<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a>    <span class="fu">copy_inline</span>(pg, <span class="at">df =</span> _)</span>
+<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a>    <span class="fu">copy_inline</span>(db, <span class="at">df =</span> _)</span>
 <span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a>  cust_prods <span class="ot">&lt;-</span></span>
 <span id="cb14-28"><a href="#cb14-28" aria-hidden="true" tabindex="-1"></a>    df <span class="sc">|&gt;</span> </span>
@@ -658,11 +633,11 @@ This warning is displayed once every 8 hours.</code></pre>
 <td style="text-align: right;">3</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">bananas, oranges</td>
+<td style="text-align: left;">apples, bananas</td>
 <td style="text-align: right;">2</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">apples, bananas</td>
+<td style="text-align: left;">bananas, oranges</td>
 <td style="text-align: right;">2</td>
 </tr>
 <tr class="even">
@@ -670,11 +645,11 @@ This warning is displayed once every 8 hours.</code></pre>
 <td style="text-align: right;">1</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">oranges, passionfruit</td>
+<td style="text-align: left;">bananas, passionfruit</td>
 <td style="text-align: right;">1</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">bananas, passionfruit</td>
+<td style="text-align: left;">oranges, passionfruit</td>
 <td style="text-align: right;">1</td>
 </tr>
 </tbody>
