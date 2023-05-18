@@ -30,21 +30,14 @@ library(dbplyr)
 ```{r}
 #| warning: false
 #| eval: true 
-db <- dbConnect(duckdb::duckdb(), read_only = TRUE)
-
-csv_to_db <- function(file) {
-  df <- read_csv(file, show_col_types = FALSE)
-  dbWriteTable(db, df, name = "ufo", append = TRUE)
-}
-
-files <- list.files("data", "ufo.*csv",
-                    full.names = TRUE)
-res <- lapply(files, csv_to_db)
+db <- dbConnect(duckdb::duckdb())
+ufo <-
+  tbl(db, "read_csv_auto('data/ufo*.csv', HEADER=TRUE)") |>
+  mutate(id = row_number()) |> 
+  compute(name = "ufo")
 ```
 
 ```{r}
-ufo <- tbl(db, "ufo")
-
 ufo |>
   mutate(length = length(sighting_report)) |>
   ggplot(aes(x = length)) +
@@ -62,8 +55,7 @@ initcap <- function(x) {
 ```{r}
 #| cache: true
 ufo <- 
-  tbl(db, "ufo") |> 
-  mutate(id = row_number())
+  tbl(db, "ufo") 
 ```
 
 ```{r}
