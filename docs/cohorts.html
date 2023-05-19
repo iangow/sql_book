@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.2.269">
+<meta name="generator" content="quarto-1.1.189">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -264,7 +264,6 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="quarto-title-meta">
 
     
-  
     
   </div>
   
@@ -312,7 +311,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <section id="exploring-the-data" class="level3" data-number="4.2.2">
 <h3 data-number="4.2.2" class="anchored" data-anchor-id="exploring-the-data"><span class="header-section-number">4.2.2</span> Exploring the data</h3>
 <p>There are two tables in the <em>legislators</em> data set. The <code>legislators</code> data looks to have <code>id_bioguide</code> as a primary key.</p>
-<div class="cell">
+<div class="cell" data-connection="db">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>id_rows <span class="kw">AS</span> (</span>
@@ -341,7 +340,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </table>
 </div>
 </div>
-<div class="cell">
+<div class="cell" data-connection="db">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">COUNT</span>(<span class="op">*</span>) <span class="kw">AS</span> num_missing_ids</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> legislators</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> id_bioguide <span class="kw">IS</span> <span class="kw">NULL</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -361,7 +360,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </table>
 </div>
 </div>
-<div class="cell">
+<div class="cell" data-connection="db">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span> id_rows <span class="kw">AS</span> (</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">SELECT</span> id_bioguide, term_start,</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">count</span>(<span class="op">*</span>) <span class="kw">AS</span> rows_per_id</span>
@@ -389,7 +388,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </table>
 </div>
 </div>
-<div class="cell">
+<div class="cell" data-connection="db">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">COUNT</span>(<span class="op">*</span>) <span class="kw">AS</span> num_missing_ids</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> legislators_terms</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> id_bioguide <span class="kw">IS</span> <span class="kw">NULL</span> <span class="kw">OR</span> term_start <span class="kw">IS</span> <span class="kw">NULL</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -409,7 +408,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </table>
 </div>
 </div>
-<div class="cell">
+<div class="cell" data-connection="db">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span> id_rows <span class="kw">AS</span> (</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">SELECT</span> id_bioguide, term_number,</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">count</span>(<span class="op">*</span>) <span class="kw">AS</span> rows_per_id</span>
@@ -437,7 +436,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </table>
 </div>
 </div>
-<div class="cell">
+<div class="cell" data-connection="db">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">COUNT</span>(<span class="op">*</span>) <span class="kw">AS</span> num_missing_ids</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> legislators_terms</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> term_end <span class="kw">IS</span> <span class="kw">NULL</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -457,7 +456,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </table>
 </div>
 </div>
-<div class="cell">
+<div class="cell" data-connection="db">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">max</span>(term_start) <span class="kw">AS</span> max_term_start,</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">max</span>(term_end) <span class="kw">AS</span> max_term_end</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> legislators_terms</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -519,7 +518,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h2 data-number="4.3" class="anchored" data-anchor-id="retention"><span class="header-section-number">4.3</span> Retention</h2>
 <section id="sql-for-a-basic-retention-curve" class="level3" data-number="4.3.1">
 <h3 data-number="4.3.1" class="anchored" data-anchor-id="sql-for-a-basic-retention-curve"><span class="header-section-number">4.3.1</span> SQL for a Basic Retention Curve</h3>
-<div class="cell">
+<div class="cell" data-connection="db">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> id_bioguide, <span class="fu">min</span>(term_start) <span class="kw">AS</span> first_term</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> legislators_terms </span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> <span class="dv">1</span></span>
@@ -550,7 +549,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </table>
 </div>
 </div>
-<div class="cell">
+<div class="cell" data-connection="db">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span> first_terms <span class="kw">AS</span> (</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">SELECT</span> id_bioguide, <span class="fu">min</span>(term_start) <span class="kw">AS</span> first_term</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> legislators_terms </span>
@@ -635,7 +634,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </table>
 </div>
 </div>
-<div class="cell">
+<div class="cell" data-connection="db">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span> </span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>first_terms <span class="kw">AS</span> (</span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">SELECT</span> id_bioguide, <span class="fu">min</span>(term_start) <span class="kw">AS</span> first_term</span>
@@ -742,7 +741,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p><img src="cohorts_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<div class="cell">
+<div class="cell" data-connection="db">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span> </span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>first_terms <span class="kw">AS</span> (</span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">SELECT</span> id_bioguide, <span class="fu">min</span>(term_start) <span class="kw">AS</span> first_term</span>
@@ -841,7 +840,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>                    <span class="at">by =</span> <span class="st">"1 year"</span>)) <span class="sc">|&gt;</span></span>
 <span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">copy_to</span>(db, <span class="at">df =</span> _, <span class="at">overwrite =</span> <span class="cn">TRUE</span>, <span class="at">name =</span> <span class="st">"year_ends"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell">
+<div class="cell" data-connection="db">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span></span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>first_terms <span class="kw">AS</span> (</span>
@@ -951,7 +950,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </table>
 </div>
 </div>
-<div class="cell">
+<div class="cell" data-connection="db">
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span></span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>first_terms <span class="kw">AS</span> (</span>
@@ -1109,7 +1108,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p><img src="cohorts_files/figure-html/unnamed-chunk-26-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<div class="cell">
+<div class="cell" data-connection="db">
 <div class="sourceCode cell-code" id="cb25"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span> first_terms <span class="kw">AS</span> (</span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">SELECT</span> id_bioguide, <span class="fu">min</span>(term_start) <span class="kw">AS</span> first_term</span>
 <span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> legislators_terms </span>
@@ -1200,7 +1199,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </section>
 <section id="cohorts-derived-from-the-time-series-itself" class="level3" data-number="4.3.3">
 <h3 data-number="4.3.3" class="anchored" data-anchor-id="cohorts-derived-from-the-time-series-itself"><span class="header-section-number">4.3.3</span> Cohorts Derived from the Time Series Itself</h3>
-<div class="cell">
+<div class="cell" data-connection="db">
 <div class="sourceCode cell-code" id="cb27"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span> first_terms <span class="kw">AS</span> (</span>
 <span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">SELECT</span> id_bioguide, <span class="fu">min</span>(term_start) <span class="kw">AS</span> first_term</span>
 <span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> legislators_terms </span>
@@ -1335,7 +1334,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </table>
 </div>
 </div>
-<div class="cell">
+<div class="cell" data-connection="db">
 <div class="sourceCode cell-code" id="cb30"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span> first_terms <span class="kw">AS</span> (</span>
 <span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">SELECT</span> id_bioguide, <span class="fu">min</span>(term_start) <span class="kw">AS</span> first_term</span>
 <span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> legislators_terms </span>
@@ -1473,7 +1472,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p><img src="cohorts_files/figure-html/unnamed-chunk-35-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<div class="cell">
+<div class="cell" data-connection="db">
 <div class="sourceCode cell-code" id="cb34"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="kw">DISTINCT</span> id_bioguide,</span>
 <span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">min</span>(term_start) <span class="kw">OVER</span> w <span class="kw">AS</span> first_term,</span>
 <span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">first_value</span>(state) <span class="kw">OVER</span> w <span class="kw">AS</span> first_state</span>
@@ -1557,7 +1556,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(id_bioguide, first_term, first_state) <span class="sc">|&gt;</span></span>
 <span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell">
+<div class="cell" data-connection="db">
 <div class="sourceCode cell-code" id="cb36"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span> first_states <span class="kw">AS</span> (</span>
 <span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">SELECT</span> <span class="kw">DISTINCT</span> id_bioguide,</span>
 <span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">min</span>(term_start) <span class="kw">OVER</span> w <span class="kw">AS</span> first_term,</span>
@@ -1701,7 +1700,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </section>
 <section id="defining-the-cohort-from-a-separate-table" class="level3" data-number="4.3.4">
 <h3 data-number="4.3.4" class="anchored" data-anchor-id="defining-the-cohort-from-a-separate-table"><span class="header-section-number">4.3.4</span> Defining the Cohort from a Separate Table</h3>
-<div class="cell">
+<div class="cell" data-connection="db">
 <div class="sourceCode cell-code" id="cb40"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span> first_terms <span class="kw">AS</span> (</span>
 <span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">SELECT</span> id_bioguide, <span class="fu">min</span>(term_start) <span class="kw">AS</span> first_term</span>
 <span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> legislators_terms </span>
@@ -1800,7 +1799,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </table>
 </div>
 </div>
-<div class="cell">
+<div class="cell" data-connection="db">
 <div class="sourceCode cell-code" id="cb42"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span> first_terms <span class="kw">AS</span> (</span>
 <span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">SELECT</span> id_bioguide, <span class="fu">min</span>(term_start) <span class="kw">AS</span> first_term</span>
 <span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> legislators_terms </span>
@@ -1923,7 +1922,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </table>
 </div>
 </div>
-<div class="cell">
+<div class="cell" data-connection="db">
 <div class="sourceCode cell-code" id="cb44"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span> first_terms <span class="kw">AS</span> (</span>
 <span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">SELECT</span> id_bioguide, <span class="fu">min</span>(term_start) <span class="kw">AS</span> first_term</span>
 <span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> legislators_terms </span>
@@ -2061,7 +2060,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </section>
 <section id="dealing-with-sparse-cohorts" class="level3" data-number="4.3.5">
 <h3 data-number="4.3.5" class="anchored" data-anchor-id="dealing-with-sparse-cohorts"><span class="header-section-number">4.3.5</span> Dealing with Sparse Cohorts</h3>
-<div class="cell">
+<div class="cell" data-connection="db">
 <div class="sourceCode cell-code" id="cb46"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span> </span>
 <span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>first_terms <span class="kw">AS</span> (</span>
 <span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">SELECT</span> id_bioguide, <span class="fu">min</span>(term_start) <span class="kw">AS</span> term_start,</span>
@@ -2509,7 +2508,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </section>
 <section id="defining-cohorts-from-dates-other-than-the-first-date" class="level3" data-number="4.3.6">
 <h3 data-number="4.3.6" class="anchored" data-anchor-id="defining-cohorts-from-dates-other-than-the-first-date"><span class="header-section-number">4.3.6</span> Defining Cohorts from Dates other than the First Date</h3>
-<div class="cell">
+<div class="cell" data-connection="db">
 <div class="sourceCode cell-code" id="cb58"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span> first_terms <span class="kw">AS</span> (</span>
 <span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">SELECT</span> <span class="kw">DISTINCT</span> id_bioguide, term_type,</span>
 <span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">'2000-01-01'</span>:<span class="ch">:date</span> <span class="kw">AS</span> first_term,</span>
@@ -2657,7 +2656,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h2 data-number="4.4" class="anchored" data-anchor-id="related-cohort-analyses"><span class="header-section-number">4.4</span> Related Cohort Analyses</h2>
 <section id="survivorship" class="level3" data-number="4.4.1">
 <h3 data-number="4.4.1" class="anchored" data-anchor-id="survivorship"><span class="header-section-number">4.4.1</span> Survivorship</h3>
-<div class="cell">
+<div class="cell" data-connection="db">
 <div class="sourceCode cell-code" id="cb65"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span> first_centuries <span class="kw">AS</span> (</span>
 <span id="cb65-2"><a href="#cb65-2" aria-hidden="true" tabindex="-1"></a>   <span class="kw">SELECT</span> id_bioguide,</span>
 <span id="cb65-3"><a href="#cb65-3" aria-hidden="true" tabindex="-1"></a>    date_part(<span class="st">'century'</span>, <span class="fu">min</span>(term_start)) <span class="kw">AS</span> first_century,</span>
@@ -2715,7 +2714,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </table>
 </div>
 </div>
-<div class="cell">
+<div class="cell" data-connection="db">
 <div class="sourceCode cell-code" id="cb66"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span> first_centuries <span class="kw">AS</span> (</span>
 <span id="cb66-2"><a href="#cb66-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">SELECT</span> id_bioguide,</span>
 <span id="cb66-3"><a href="#cb66-3" aria-hidden="true" tabindex="-1"></a>    date_part(<span class="st">'century'</span>, <span class="fu">min</span>(term_start)) <span class="kw">AS</span> first_century,</span>
@@ -2771,7 +2770,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </table>
 </div>
 </div>
-<div class="cell">
+<div class="cell" data-connection="db">
 <div class="sourceCode cell-code" id="cb67"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span> first_centuries <span class="kw">AS</span> (</span>
 <span id="cb67-2"><a href="#cb67-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">SELECT</span> id_bioguide,</span>
 <span id="cb67-3"><a href="#cb67-3" aria-hidden="true" tabindex="-1"></a>    date_part(<span class="st">'century'</span>,<span class="fu">min</span>(term_start)) <span class="kw">AS</span> first_century,</span>
@@ -2894,7 +2893,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </section>
 <section id="returnship-or-repeat-purchase-behaviour" class="level3" data-number="4.4.2">
 <h3 data-number="4.4.2" class="anchored" data-anchor-id="returnship-or-repeat-purchase-behaviour"><span class="header-section-number">4.4.2</span> Returnship, or Repeat Purchase Behaviour</h3>
-<div class="cell">
+<div class="cell" data-connection="db">
 <div class="sourceCode cell-code" id="cb71"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span> rep_first_terms <span class="kw">AS</span> (</span>
 <span id="cb71-2"><a href="#cb71-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">SELECT</span> id_bioguide, <span class="fu">min</span>(term_start) <span class="kw">AS</span> first_term</span>
 <span id="cb71-3"><a href="#cb71-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> legislators_terms</span>
@@ -2936,7 +2935,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </table>
 </div>
 </div>
-<div class="cell">
+<div class="cell" data-connection="db">
 <div class="sourceCode cell-code" id="cb72"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span> rep_first_terms <span class="kw">AS</span> (</span>
 <span id="cb72-2"><a href="#cb72-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">SELECT</span> id_bioguide, <span class="fu">min</span>(term_start) <span class="kw">AS</span> first_term</span>
 <span id="cb72-3"><a href="#cb72-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> legislators_terms</span>
@@ -2978,7 +2977,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </table>
 </div>
 </div>
-<div class="cell">
+<div class="cell" data-connection="db">
 <div class="sourceCode cell-code" id="cb73"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span> rep_first_terms <span class="kw">AS</span> (</span>
 <span id="cb73-2"><a href="#cb73-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">SELECT</span> id_bioguide, <span class="fu">min</span>(term_start) <span class="kw">AS</span> first_term</span>
 <span id="cb73-3"><a href="#cb73-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> legislators_terms</span>
@@ -3034,7 +3033,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </table>
 </div>
 </div>
-<div class="cell">
+<div class="cell" data-connection="db">
 <div class="sourceCode cell-code" id="cb74"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb74-1"><a href="#cb74-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span> </span>
 <span id="cb74-2"><a href="#cb74-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb74-3"><a href="#cb74-3" aria-hidden="true" tabindex="-1"></a>rep_first_terms <span class="kw">AS</span> (</span>
@@ -3095,7 +3094,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </table>
 </div>
 </div>
-<div class="cell">
+<div class="cell" data-connection="db">
 <div class="sourceCode cell-code" id="cb75"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span> </span>
 <span id="cb75-2"><a href="#cb75-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb75-3"><a href="#cb75-3" aria-hidden="true" tabindex="-1"></a>rep_first_terms <span class="kw">AS</span> (</span>
@@ -3183,7 +3182,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </section>
 <section id="cumulative-calculations" class="level3" data-number="4.4.3">
 <h3 data-number="4.4.3" class="anchored" data-anchor-id="cumulative-calculations"><span class="header-section-number">4.4.3</span> Cumulative Calculations</h3>
-<div class="cell">
+<div class="cell" data-connection="db">
 <div class="sourceCode cell-code" id="cb76"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span> <span class="kw">types</span> <span class="kw">AS</span> (</span>
 <span id="cb76-2"><a href="#cb76-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">SELECT</span> <span class="kw">distinct</span> id_bioguide,</span>
 <span id="cb76-3"><a href="#cb76-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">first_value</span>(term_type) <span class="kw">over</span> w <span class="kw">as</span> first_type,</span>
@@ -3265,7 +3264,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </table>
 </div>
 </div>
-<div class="cell">
+<div class="cell" data-connection="db">
 <div class="sourceCode cell-code" id="cb77"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb77-1"><a href="#cb77-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span> a <span class="kw">AS</span> (</span>
 <span id="cb77-2"><a href="#cb77-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">SELECT</span> <span class="kw">DISTINCT</span> id_bioguide,</span>
 <span id="cb77-3"><a href="#cb77-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">first_value</span>(term_type) <span class="kw">OVER</span> w <span class="kw">AS</span> first_type,</span>
@@ -3341,7 +3340,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </section>
 <section id="cross-section-analysis-through-a-cohort-lens" class="level2" data-number="4.5">
 <h2 data-number="4.5" class="anchored" data-anchor-id="cross-section-analysis-through-a-cohort-lens"><span class="header-section-number">4.5</span> Cross-Section Analysis, Through a Cohort Lens</h2>
-<div class="cell">
+<div class="cell" data-connection="db">
 <div class="sourceCode cell-code" id="cb78"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb78-1"><a href="#cb78-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> b.<span class="dt">date</span>, <span class="fu">count</span>(<span class="kw">distinct</span> a.id_bioguide) <span class="kw">as</span> legislators</span>
 <span id="cb78-2"><a href="#cb78-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> legislators_terms a</span>
 <span id="cb78-3"><a href="#cb78-3" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> year_ends b <span class="kw">on</span> b.<span class="dt">date</span> <span class="kw">between</span> a.term_start <span class="kw">and</span> a.term_end</span>
@@ -3359,50 +3358,50 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">1959-12-31</td>
-<td style="text-align: right;">549</td>
+<td style="text-align: left;">1855-12-31</td>
+<td style="text-align: right;">306</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">1960-12-31</td>
-<td style="text-align: right;">550</td>
+<td style="text-align: left;">1856-12-31</td>
+<td style="text-align: right;">306</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">1957-12-31</td>
-<td style="text-align: right;">545</td>
+<td style="text-align: left;">1853-12-31</td>
+<td style="text-align: right;">315</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">1962-12-31</td>
-<td style="text-align: right;">555</td>
+<td style="text-align: left;">1854-12-31</td>
+<td style="text-align: right;">316</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">1958-12-31</td>
-<td style="text-align: right;">544</td>
+<td style="text-align: left;">1851-12-31</td>
+<td style="text-align: right;">303</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">1955-12-31</td>
-<td style="text-align: right;">538</td>
+<td style="text-align: left;">1852-12-31</td>
+<td style="text-align: right;">310</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">1956-12-31</td>
-<td style="text-align: right;">541</td>
+<td style="text-align: left;">1849-12-31</td>
+<td style="text-align: right;">310</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">1954-12-31</td>
-<td style="text-align: right;">549</td>
+<td style="text-align: left;">1850-12-31</td>
+<td style="text-align: right;">313</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">1953-12-31</td>
-<td style="text-align: right;">543</td>
+<td style="text-align: left;">1848-12-31</td>
+<td style="text-align: right;">306</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">1952-12-31</td>
-<td style="text-align: right;">550</td>
+<td style="text-align: left;">1847-12-31</td>
+<td style="text-align: right;">301</td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
-<div class="cell">
+<div class="cell" data-connection="db">
 <div class="sourceCode cell-code" id="cb79"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb79-1"><a href="#cb79-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> b.<span class="dt">date</span></span>
 <span id="cb79-2"><a href="#cb79-2" aria-hidden="true" tabindex="-1"></a>,date_part(<span class="st">'century'</span>,first_term):<span class="ch">:int</span> <span class="kw">as</span> century</span>
 <span id="cb79-3"><a href="#cb79-3" aria-hidden="true" tabindex="-1"></a>,<span class="fu">count</span>(<span class="kw">distinct</span> a.id_bioguide) <span class="kw">as</span> legislators</span>
@@ -3429,60 +3428,60 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">2012-12-31</td>
+<td style="text-align: left;">1919-12-31</td>
 <td style="text-align: right;">20</td>
-<td style="text-align: right;">226</td>
+<td style="text-align: right;">516</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">1928-12-31</td>
-<td style="text-align: right;">19</td>
-<td style="text-align: right;">15</td>
+<td style="text-align: left;">1965-12-31</td>
+<td style="text-align: right;">20</td>
+<td style="text-align: right;">546</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">1964-12-31</td>
+<td style="text-align: left;">1995-12-31</td>
 <td style="text-align: right;">20</td>
-<td style="text-align: right;">549</td>
+<td style="text-align: right;">539</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">1947-12-31</td>
+<td style="text-align: left;">2005-12-31</td>
 <td style="text-align: right;">20</td>
-<td style="text-align: right;">549</td>
+<td style="text-align: right;">388</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">1999-12-31</td>
+<td style="text-align: left;">1975-12-31</td>
 <td style="text-align: right;">20</td>
-<td style="text-align: right;">540</td>
+<td style="text-align: right;">547</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">1896-12-31</td>
+<td style="text-align: left;">1811-12-31</td>
 <td style="text-align: right;">19</td>
-<td style="text-align: right;">465</td>
+<td style="text-align: right;">153</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">1997-12-31</td>
-<td style="text-align: right;">20</td>
-<td style="text-align: right;">538</td>
+<td style="text-align: left;">1893-12-31</td>
+<td style="text-align: right;">19</td>
+<td style="text-align: right;">470</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">1926-12-31</td>
-<td style="text-align: right;">19</td>
-<td style="text-align: right;">17</td>
+<td style="text-align: left;">1909-12-31</td>
+<td style="text-align: right;">20</td>
+<td style="text-align: right;">344</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">1892-12-31</td>
-<td style="text-align: right;">19</td>
-<td style="text-align: right;">442</td>
+<td style="text-align: left;">1937-12-31</td>
+<td style="text-align: right;">20</td>
+<td style="text-align: right;">547</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">1981-12-31</td>
-<td style="text-align: right;">20</td>
-<td style="text-align: right;">548</td>
+<td style="text-align: left;">2010-12-31</td>
+<td style="text-align: right;">21</td>
+<td style="text-align: right;">262</td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
-<div class="cell">
+<div class="cell" data-connection="db">
 <div class="sourceCode cell-code" id="cb80"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb80-1"><a href="#cb80-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="dt">date</span></span>
 <span id="cb80-2"><a href="#cb80-2" aria-hidden="true" tabindex="-1"></a>,century</span>
 <span id="cb80-3"><a href="#cb80-3" aria-hidden="true" tabindex="-1"></a>,legislators</span>
@@ -3593,7 +3592,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </table>
 </div>
 </div>
-<div class="cell">
+<div class="cell" data-connection="db">
 <div class="sourceCode cell-code" id="cb81"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb81-1"><a href="#cb81-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span> </span>
 <span id="cb81-2"><a href="#cb81-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb81-3"><a href="#cb81-3" aria-hidden="true" tabindex="-1"></a>first_terms <span class="kw">AS</span> (</span>
@@ -3708,7 +3707,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </table>
 </div>
 </div>
-<div class="cell">
+<div class="cell" data-connection="db">
 <div class="sourceCode cell-code" id="cb82"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb82-1"><a href="#cb82-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> id_bioguide, <span class="dt">date</span>,</span>
 <span id="cb82-2"><a href="#cb82-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(<span class="dt">date</span>) <span class="kw">over</span> (<span class="kw">partition</span> <span class="kw">by</span> id_bioguide <span class="kw">order</span> <span class="kw">by</span> <span class="dt">date</span> <span class="kw">rows</span> <span class="kw">between</span> <span class="kw">unbounded</span> <span class="kw">preceding</span> <span class="kw">and</span> <span class="kw">current</span> <span class="kw">row</span>) <span class="kw">as</span> cume_years</span>
 <span id="cb82-3"><a href="#cb82-3" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> (</span>
@@ -3782,7 +3781,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </table>
 </div>
 </div>
-<div class="cell">
+<div class="cell" data-connection="db">
 <div class="sourceCode cell-code" id="cb83"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb83-1"><a href="#cb83-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="dt">date</span>, cume_years,</span>
 <span id="cb83-2"><a href="#cb83-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(<span class="kw">distinct</span> id_bioguide) <span class="kw">as</span> legislators</span>
 <span id="cb83-3"><a href="#cb83-3" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span></span>
@@ -3812,60 +3811,60 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">1895-12-31</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">192</td>
+<td style="text-align: left;">1995-12-31</td>
+<td style="text-align: right;">17</td>
+<td style="text-align: right;">30</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">1914-12-31</td>
+<td style="text-align: left;">1999-12-31</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">68</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2018-12-31</td>
 <td style="text-align: right;">6</td>
+<td style="text-align: right;">71</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">1988-12-31</td>
+<td style="text-align: right;">2</td>
 <td style="text-align: right;">54</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">1988-12-31</td>
-<td style="text-align: right;">6</td>
-<td style="text-align: right;">80</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">1918-12-31</td>
+<td style="text-align: left;">1978-12-31</td>
 <td style="text-align: right;">2</td>
-<td style="text-align: right;">107</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">1841-12-31</td>
-<td style="text-align: right;">5</td>
-<td style="text-align: right;">45</td>
+<td style="text-align: right;">79</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">1976-12-31</td>
-<td style="text-align: right;">14</td>
-<td style="text-align: right;">37</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">1910-12-31</td>
-<td style="text-align: right;">10</td>
-<td style="text-align: right;">39</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">1904-12-31</td>
-<td style="text-align: right;">12</td>
-<td style="text-align: right;">29</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">1847-12-31</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">3</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">2005-12-31</td>
+<td style="text-align: left;">1903-12-31</td>
 <td style="text-align: right;">7</td>
-<td style="text-align: right;">41</td>
+<td style="text-align: right;">75</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2018-12-31</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">61</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">1948-12-31</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">10</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">1868-12-31</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">119</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">1999-12-31</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">30</td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
-<div class="cell">
+<div class="cell" data-connection="db">
 <div class="sourceCode cell-code" id="cb84"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb84-1"><a href="#cb84-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span> aa <span class="kw">AS</span> (</span>
 <span id="cb84-2"><a href="#cb84-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">SELECT</span> <span class="kw">DISTINCT</span> a.id_bioguide, b.<span class="dt">date</span></span>
 <span id="cb84-3"><a href="#cb84-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> legislators_terms a</span>
@@ -3940,7 +3939,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </table>
 </div>
 </div>
-<div class="cell">
+<div class="cell" data-connection="db">
 <div class="sourceCode cell-code" id="cb85"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb85-1"><a href="#cb85-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span> term_dates <span class="kw">AS</span> (</span>
 <span id="cb85-2"><a href="#cb85-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">SELECT</span> <span class="kw">distinct</span> a.id_bioguide, b.<span class="dt">date</span></span>
 <span id="cb85-3"><a href="#cb85-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> legislators_terms a</span>
@@ -3985,48 +3984,48 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </tr>
 <tr class="even">
 <td style="text-align: left;">2019-12-31</td>
-<td style="text-align: left;">11 to 20</td>
-<td style="text-align: right;">20.11173</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">2019-12-31</td>
 <td style="text-align: left;">5 to 10</td>
 <td style="text-align: right;">32.02980</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: left;">2019-12-31</td>
 <td style="text-align: left;">21+</td>
 <td style="text-align: right;">17.87710</td>
 </tr>
-<tr class="odd">
-<td style="text-align: left;">2018-12-31</td>
-<td style="text-align: left;">5 to 10</td>
-<td style="text-align: right;">33.76623</td>
-</tr>
 <tr class="even">
+<td style="text-align: left;">2019-12-31</td>
+<td style="text-align: left;">11 to 20</td>
+<td style="text-align: right;">20.11173</td>
+</tr>
+<tr class="odd">
 <td style="text-align: left;">2018-12-31</td>
 <td style="text-align: left;">11 to 20</td>
 <td style="text-align: right;">21.33581</td>
 </tr>
-<tr class="odd">
-<td style="text-align: left;">2018-12-31</td>
-<td style="text-align: left;">21+</td>
-<td style="text-align: right;">19.29499</td>
-</tr>
 <tr class="even">
+<td style="text-align: left;">2018-12-31</td>
+<td style="text-align: left;">5 to 10</td>
+<td style="text-align: right;">33.76623</td>
+</tr>
+<tr class="odd">
 <td style="text-align: left;">2018-12-31</td>
 <td style="text-align: left;">1 to 4</td>
 <td style="text-align: right;">25.60297</td>
 </tr>
+<tr class="even">
+<td style="text-align: left;">2018-12-31</td>
+<td style="text-align: left;">21+</td>
+<td style="text-align: right;">19.29499</td>
+</tr>
 <tr class="odd">
 <td style="text-align: left;">2017-12-31</td>
-<td style="text-align: left;">21+</td>
-<td style="text-align: right;">19.33085</td>
+<td style="text-align: left;">11 to 20</td>
+<td style="text-align: right;">21.37546</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">2017-12-31</td>
-<td style="text-align: left;">1 to 4</td>
-<td style="text-align: right;">24.53532</td>
+<td style="text-align: left;">5 to 10</td>
+<td style="text-align: right;">34.75836</td>
 </tr>
 </tbody>
 </table>
@@ -4096,33 +4095,33 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </tr>
 <tr class="odd">
 <td style="text-align: left;">2019-12-31</td>
-<td style="text-align: left;">21+</td>
-<td style="text-align: right;">17.87710</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">2019-12-31</td>
 <td style="text-align: left;">11 to 20</td>
 <td style="text-align: right;">20.11173</td>
 </tr>
+<tr class="even">
+<td style="text-align: left;">2019-12-31</td>
+<td style="text-align: left;">21+</td>
+<td style="text-align: right;">17.87710</td>
+</tr>
 <tr class="odd">
 <td style="text-align: left;">2018-12-31</td>
-<td style="text-align: left;">1 to 4</td>
-<td style="text-align: right;">25.60297</td>
+<td style="text-align: left;">11 to 20</td>
+<td style="text-align: right;">21.33581</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">2018-12-31</td>
-<td style="text-align: left;">21+</td>
-<td style="text-align: right;">19.29499</td>
-</tr>
-<tr class="odd">
 <td style="text-align: left;">2018-12-31</td>
 <td style="text-align: left;">5 to 10</td>
 <td style="text-align: right;">33.76623</td>
 </tr>
+<tr class="odd">
+<td style="text-align: left;">2018-12-31</td>
+<td style="text-align: left;">21+</td>
+<td style="text-align: right;">19.29499</td>
+</tr>
 <tr class="even">
 <td style="text-align: left;">2018-12-31</td>
-<td style="text-align: left;">11 to 20</td>
-<td style="text-align: right;">21.33581</td>
+<td style="text-align: left;">1 to 4</td>
+<td style="text-align: right;">25.60297</td>
 </tr>
 </tbody>
 </table>
@@ -4196,24 +4195,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     button.classList.add('code-copy-button-checked');
     var currentTitle = button.getAttribute("title");
     button.setAttribute("title", "Copied!");
-    let tooltip;
-    if (window.bootstrap) {
-      button.setAttribute("data-bs-toggle", "tooltip");
-      button.setAttribute("data-bs-placement", "left");
-      button.setAttribute("data-bs-title", "Copied!");
-      tooltip = new bootstrap.Tooltip(button, 
-        { trigger: "manual", 
-          customClass: "code-copy-button-tooltip",
-          offset: [0, -8]});
-      tooltip.show();    
-    }
     setTimeout(function() {
-      if (tooltip) {
-        tooltip.hide();
-        button.removeAttribute("data-bs-title");
-        button.removeAttribute("data-bs-toggle");
-        button.removeAttribute("data-bs-placement");
-      }
       button.setAttribute("title", currentTitle);
       button.classList.remove('code-copy-button-checked');
     }, 1000);
@@ -4249,42 +4231,24 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       return note.innerHTML;
     });
   }
-  const findCites = (el) => {
-    const parentEl = el.parentElement;
-    if (parentEl) {
-      const cites = parentEl.dataset.cites;
-      if (cites) {
-        return {
-          el,
-          cites: cites.split(' ')
-        };
-      } else {
-        return findCites(el.parentElement)
-      }
-    } else {
-      return undefined;
-    }
-  };
   var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
   for (var i=0; i<bibliorefs.length; i++) {
     const ref = bibliorefs[i];
-    const citeInfo = findCites(ref);
-    if (citeInfo) {
-      tippyHover(citeInfo.el, function() {
-        var popup = window.document.createElement('div');
-        citeInfo.cites.forEach(function(cite) {
-          var citeDiv = window.document.createElement('div');
-          citeDiv.classList.add('hanging-indent');
-          citeDiv.classList.add('csl-entry');
-          var biblioDiv = window.document.getElementById('ref-' + cite);
-          if (biblioDiv) {
-            citeDiv.innerHTML = biblioDiv.innerHTML;
-          }
-          popup.appendChild(citeDiv);
-        });
-        return popup.innerHTML;
+    const cites = ref.parentNode.getAttribute('data-cites').split(' ');
+    tippyHover(ref, function() {
+      var popup = window.document.createElement('div');
+      cites.forEach(function(cite) {
+        var citeDiv = window.document.createElement('div');
+        citeDiv.classList.add('hanging-indent');
+        citeDiv.classList.add('csl-entry');
+        var biblioDiv = window.document.getElementById('ref-' + cite);
+        if (biblioDiv) {
+          citeDiv.innerHTML = biblioDiv.innerHTML;
+        }
+        popup.appendChild(citeDiv);
       });
-    }
+      return popup.innerHTML;
+    });
   }
 });
 </script>

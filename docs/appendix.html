@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.2.269">
+<meta name="generator" content="quarto-1.1.189">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -269,7 +269,6 @@ div.csl-indent {
 <div class="quarto-title-meta">
 
     
-  
     
   </div>
   
@@ -288,7 +287,7 @@ div.csl-indent {
 </div>
 <section id="sec-dates" class="level2">
 <h2 class="anchored" data-anchor-id="sec-dates">Date, Datetime, and Time Manipulations</h2>
-<div class="cell">
+<div class="cell" data-connection="db">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>INSTALL <span class="st">'icu'</span>;</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>LOAD <span class="st">'icu'</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
@@ -296,7 +295,7 @@ div.csl-indent {
 <h3 class="anchored" data-anchor-id="time-zone-conversions">Time Zone Conversions</h3>
 <p><span class="citation" data-cites="tanimura2021sql">Tanimura (<a href="references.html#ref-tanimura2021sql" role="doc-biblioref">2021</a>)</span> points out that often “timestamps in the database are not encoded with the time zone, and you will need to consult with the source or developer to figure out how your data was stored.” When pushing data to a PostgreSQL database, I use the <code>timestamp with time zone</code> type as much as possible.</p>
 <p><span class="citation" data-cites="tanimura2021sql">Tanimura (<a href="references.html#ref-tanimura2021sql" role="doc-biblioref">2021</a>)</span> provides the following example, which is interesting because the west coast of the United States would not be on the PST time zone at that time of year. Instead, it would be on PDT.</p>
-<div class="cell">
+<div class="cell" data-connection="db">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> timestamptz <span class="st">'2020-09-01 00:00:00 -0'</span> <span class="kw">AT</span> <span class="dt">TIME</span> <span class="dt">ZONE</span> <span class="st">'PST'</span> <span class="kw">AS</span> <span class="dt">time</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="knitsql-table">
 <table class="table table-sm table-striped">
@@ -315,7 +314,7 @@ div.csl-indent {
 </div>
 </div>
 <p>In PostgreSQL, we would get a different answer with the following query, but in DuckDB it seems that <code>PDT</code> is not recognized as a time zone abbreviation at all, so we just get the original UTC timestamp back.</p>
-<div class="cell">
+<div class="cell" data-connection="db">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> timestamptz <span class="st">'2020-09-01 00:00:00 -0'</span> <span class="kw">AT</span> <span class="dt">TIME</span> <span class="dt">ZONE</span> <span class="st">'PDT'</span> <span class="kw">AS</span> <span class="dt">time</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="knitsql-table">
 <table class="table table-sm table-striped">
@@ -335,7 +334,7 @@ div.csl-indent {
 </div>
 <p>I think most people barely know the difference between PST and PDT and even fewer would know the exact dates that one switches from one to the other. A better approach is to use a time zone that encodes information about when PDT is used and when PST is used. In PostgreSQL and DuckDB, the function <code>pg_timezone_names()</code> returns a table with the information that we need.</p>
 <p>However, it seems that there are inconsistencies between PostgreSQL and DuckDB in terms of the abbreviations used. As such it’s probably safer to use the <code>name</code> form (e.g., <code>US/Pacific</code>) whenever possible. Given the widespread confusion about the meaning of terms like <code>EST</code>, <code>EDT</code>, and so on, just use <code>US/Eastern</code>, etc.</p>
-<div class="cell">
+<div class="cell" data-connection="db">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> name, abbrev</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> pg_timezone_names()</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> regexp_matches(name, <span class="st">'^US/'</span>);</span>
@@ -395,7 +394,7 @@ div.csl-indent {
 </div>
 </div>
 <p>The following queries demonstrate that daylight savings information is encoded in the database.</p>
-<div class="cell">
+<div class="cell" data-connection="db">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="st">'2020-09-01 17:00:01 US/Pacific'</span>:<span class="ch">:timestamptz</span> <span class="kw">AS</span> t1,</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>       <span class="st">'2020-09-02 10:00:01 Australia/Melbourne'</span>:<span class="ch">:timestamptz</span>  <span class="kw">AS</span> t2;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="knitsql-table">
@@ -416,7 +415,7 @@ div.csl-indent {
 </table>
 </div>
 </div>
-<div class="cell">
+<div class="cell" data-connection="db">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="st">'2020-12-01 16:00:01 US/Pacific'</span>:<span class="ch">:timestamptz</span> <span class="kw">AS</span> t1,</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>       <span class="st">'2020-12-02 11:00:01 Australia/Melbourne'</span>:<span class="ch">:timestamptz</span>  <span class="kw">AS</span> t2;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="knitsql-table">
@@ -488,7 +487,7 @@ div.csl-indent {
 <p>Second, columns of type <code>TIMESTAMP WITH TIME ZONE</code> come into R with the associated time-zone information, which is what we want (especially if we will later put timestamp data back into PostgreSQL).</p>
 <p>Third, we can see that we can choose to <em>display</em> information in a different time zone without changing the underlying data.</p>
 <p>Some care is needed with timestamp data. I think the <code>AT TIME ZONE</code> queries provided in <span class="citation" data-cites="tanimura2021sql">Tanimura (<a href="references.html#ref-tanimura2021sql" role="doc-biblioref">2021</a>)</span> are actually pretty dangerous, as can be seen in the following query. While we supply <code>2020-09-01 00:00:01</code> as UTC and then render it <code>AT TIME ZONE 'US/Pacific'</code>, it turns out that the returned value is interpreted as a <code>TIMESTAMP WITHOUT TIME ZONE</code> and subsequent queries lead to confusing behaviour. In the query below, the second application of <code>AT TIME ZONE</code> interprets the <code>TIMESTAMP WITHOUT TIME ZONE</code> as though it came from the stated time zone and the results seem to have <code>AT TIME ZONE</code> doing the opposite of what it did when given a <code>TIMESTAMP WITH TIME ZONE</code> (as in the initial literal <code>'2020-09-01 00:00:01 -0'</code>).</p>
-<div class="cell">
+<div class="cell" data-connection="db">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span> q1 <span class="kw">AS</span></span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a> (<span class="kw">SELECT</span> timestamptz <span class="st">'2020-09-01 00:00:01-00'</span> <span class="kw">AT</span> <span class="dt">TIME</span> <span class="dt">ZONE</span> <span class="st">'US/Pacific'</span> <span class="kw">AS</span> t1,</span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>         <span class="dt">timestamp</span> <span class="st">'2020-09-01 00:00:01'</span> <span class="kw">AT</span> <span class="dt">TIME</span> <span class="dt">ZONE</span> <span class="st">'US/Pacific'</span> <span class="kw">AS</span> t2)</span>
@@ -536,7 +535,7 @@ div.csl-indent {
 </div>
 </div>
 <p>It seems that <code>TIMESTAMP WITHOUT TIME ZONE</code> values should be converted to a time zone as quickly as possible to avoid confusion and that care is needed with <code>AT TIME ZONE</code> given that it does very different (essentially opposite) things according to the supplied data type.</p>
-<div class="cell">
+<div class="cell" data-connection="db">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span> q1 <span class="kw">AS</span></span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a> (<span class="kw">SELECT</span> <span class="st">'2020-09-01 00:00:01-00'</span>:<span class="ch">:timestamptz</span> <span class="kw">AS</span> t1)</span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a> </span>
@@ -625,7 +624,7 @@ div.csl-indent {
 <section id="date-and-timestamp-format-conversions" class="level3">
 <h3 class="anchored" data-anchor-id="date-and-timestamp-format-conversions">Date and Timestamp Format Conversions</h3>
 <p>As discussed in <span class="citation" data-cites="tanimura2021sql">Tanimura (<a href="references.html#ref-tanimura2021sql" role="doc-biblioref">2021</a>)</span>, PostgreSQL has a rich array of functions for converting dates and times and extracting such information as months and days of the week.</p>
-<div class="cell">
+<div class="cell" data-connection="db">
 <div class="sourceCode cell-code" id="cb33"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> date_trunc(<span class="st">'month'</span>,<span class="st">'2020-10-04 12:33:35 -00'</span>:<span class="ch">:timestamptz</span>);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="knitsql-table">
 <table class="table table-sm table-striped">
@@ -654,7 +653,7 @@ div.csl-indent {
 <span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">a_trunced_time =</span> <span class="fu">date_trunc</span>(<span class="st">'month'</span>, a_time))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># Source:   SQL [1 x 2]
-# Database: DuckDB 0.7.1 [iangow@Darwin 22.5.0:R 4.3.0/:memory:]
+# Database: DuckDB 0.7.1 [igow@Darwin 22.5.0:R 4.2.3/:memory:]
   a_time              a_trunced_time
   &lt;dttm&gt;              &lt;date&gt;        
 1 2020-10-04 12:33:35 2020-10-01    </code></pre>
@@ -689,7 +688,7 @@ FROM (SELECT '2020-10-04 12:33:35'::timestamp AS a_time)</code></pre>
 <span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">a_trunced_time =</span> <span class="fu">date_trunc</span>(<span class="st">'month'</span>, a_time)) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># Source:   SQL [1 x 2]
-# Database: DuckDB 0.7.1 [iangow@Darwin 22.5.0:R 4.3.0/:memory:]
+# Database: DuckDB 0.7.1 [igow@Darwin 22.5.0:R 4.2.3/:memory:]
   a_time              a_trunced_time     
   &lt;dttm&gt;              &lt;dttm&gt;             
 1 2020-10-04 19:33:35 2020-10-01 04:00:00</code></pre>
@@ -871,24 +870,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     button.classList.add('code-copy-button-checked');
     var currentTitle = button.getAttribute("title");
     button.setAttribute("title", "Copied!");
-    let tooltip;
-    if (window.bootstrap) {
-      button.setAttribute("data-bs-toggle", "tooltip");
-      button.setAttribute("data-bs-placement", "left");
-      button.setAttribute("data-bs-title", "Copied!");
-      tooltip = new bootstrap.Tooltip(button, 
-        { trigger: "manual", 
-          customClass: "code-copy-button-tooltip",
-          offset: [0, -8]});
-      tooltip.show();    
-    }
     setTimeout(function() {
-      if (tooltip) {
-        tooltip.hide();
-        button.removeAttribute("data-bs-title");
-        button.removeAttribute("data-bs-toggle");
-        button.removeAttribute("data-bs-placement");
-      }
       button.setAttribute("title", currentTitle);
       button.classList.remove('code-copy-button-checked');
     }, 1000);
@@ -924,42 +906,24 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       return note.innerHTML;
     });
   }
-  const findCites = (el) => {
-    const parentEl = el.parentElement;
-    if (parentEl) {
-      const cites = parentEl.dataset.cites;
-      if (cites) {
-        return {
-          el,
-          cites: cites.split(' ')
-        };
-      } else {
-        return findCites(el.parentElement)
-      }
-    } else {
-      return undefined;
-    }
-  };
   var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
   for (var i=0; i<bibliorefs.length; i++) {
     const ref = bibliorefs[i];
-    const citeInfo = findCites(ref);
-    if (citeInfo) {
-      tippyHover(citeInfo.el, function() {
-        var popup = window.document.createElement('div');
-        citeInfo.cites.forEach(function(cite) {
-          var citeDiv = window.document.createElement('div');
-          citeDiv.classList.add('hanging-indent');
-          citeDiv.classList.add('csl-entry');
-          var biblioDiv = window.document.getElementById('ref-' + cite);
-          if (biblioDiv) {
-            citeDiv.innerHTML = biblioDiv.innerHTML;
-          }
-          popup.appendChild(citeDiv);
-        });
-        return popup.innerHTML;
+    const cites = ref.parentNode.getAttribute('data-cites').split(' ');
+    tippyHover(ref, function() {
+      var popup = window.document.createElement('div');
+      cites.forEach(function(cite) {
+        var citeDiv = window.document.createElement('div');
+        citeDiv.classList.add('hanging-indent');
+        citeDiv.classList.add('csl-entry');
+        var biblioDiv = window.document.getElementById('ref-' + cite);
+        if (biblioDiv) {
+          citeDiv.innerHTML = biblioDiv.innerHTML;
+        }
+        popup.appendChild(citeDiv);
       });
-    }
+      return popup.innerHTML;
+    });
   }
 });
 </script>

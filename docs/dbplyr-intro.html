@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.2.269">
+<meta name="generator" content="quarto-1.1.189">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -272,7 +272,6 @@ div.csl-indent {
 <div class="quarto-title-meta">
 
     
-  
     
   </div>
   
@@ -298,7 +297,7 @@ div.csl-indent {
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tbl</span>(db, <span class="st">"read_csv_auto('data/us_retail_sales.csv')"</span>) <span class="sc">|&gt;</span></span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">compute</span>(<span class="at">name =</span> <span class="st">"retail_sales"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell">
+<div class="cell" data-connection="db">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> sales_month, kind_of_business, sales</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> retail_sales</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
@@ -307,7 +306,7 @@ div.csl-indent {
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(sales_month, kind_of_business, sales)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># Source:   SQL [?? x 3]
-# Database: DuckDB 0.7.1 [iangow@Darwin 22.5.0:R 4.3.0/:memory:]
+# Database: DuckDB 0.7.1 [igow@Darwin 22.5.0:R 4.2.3/:memory:]
    sales_month kind_of_business                                        sales
    &lt;date&gt;      &lt;chr&gt;                                                   &lt;dbl&gt;
  1 1992-01-01  Motor vehicle and parts dealers                         29811
@@ -323,7 +322,7 @@ div.csl-indent {
 # ℹ more rows</code></pre>
 </div>
 </div>
-<div class="cell">
+<div class="cell" data-connection="db">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> sales_month, kind_of_business, sales</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> retail_sales</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> sales_month <span class="op">&gt;=</span> <span class="st">'2002-01-01'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -334,7 +333,7 @@ div.csl-indent {
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(sales_month <span class="sc">&gt;=</span> <span class="st">'2002-01-01'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># Source:   SQL [?? x 3]
-# Database: DuckDB 0.7.1 [iangow@Darwin 22.5.0:R 4.3.0/:memory:]
+# Database: DuckDB 0.7.1 [igow@Darwin 22.5.0:R 4.2.3/:memory:]
    sales_month kind_of_business                                        sales
    &lt;date&gt;      &lt;chr&gt;                                                   &lt;dbl&gt;
  1 2002-01-01  Motor vehicle and parts dealers                         60565
@@ -350,7 +349,7 @@ div.csl-indent {
 # ℹ more rows</code></pre>
 </div>
 </div>
-<div class="cell">
+<div class="cell" data-connection="db">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> sales_month, kind_of_business, sales</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> retail_sales</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -365,7 +364,7 @@ div.csl-indent {
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(kind_of_business <span class="sc">==</span> <span class="st">'Used car dealers'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># Source:   SQL [?? x 3]
-# Database: DuckDB 0.7.1 [iangow@Darwin 22.5.0:R 4.3.0/:memory:]
+# Database: DuckDB 0.7.1 [igow@Darwin 22.5.0:R 4.2.3/:memory:]
    sales_month kind_of_business sales
    &lt;date&gt;      &lt;chr&gt;            &lt;dbl&gt;
  1 1992-01-01  Used car dealers  1744
@@ -381,7 +380,7 @@ div.csl-indent {
 # ℹ more rows</code></pre>
 </div>
 </div>
-<div class="cell">
+<div class="cell" data-connection="db">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> kind_of_business, <span class="fu">sum</span>(sales) <span class="kw">AS</span> total_sales</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> retail_sales</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> kind_of_business</span>
@@ -459,7 +458,7 @@ div.csl-indent {
 <span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(total_sales))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># Source:     SQL [?? x 2]
-# Database:   DuckDB 0.7.1 [iangow@Darwin 22.5.0:R 4.3.0/:memory:]
+# Database:   DuckDB 0.7.1 [igow@Darwin 22.5.0:R 4.2.3/:memory:]
 # Ordered by: desc(total_sales)
    kind_of_business                                                  total_sales
    &lt;chr&gt;                                                                   &lt;dbl&gt;
@@ -483,7 +482,7 @@ div.csl-indent {
 <span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(total_sales))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># Source:     SQL [?? x 2]
-# Database:   DuckDB 0.7.1 [iangow@Darwin 22.5.0:R 4.3.0/:memory:]
+# Database:   DuckDB 0.7.1 [igow@Darwin 22.5.0:R 4.2.3/:memory:]
 # Ordered by: desc(total_sales)
    kind_of_business                                                  total_sales
    &lt;chr&gt;                                                                   &lt;dbl&gt;
@@ -500,7 +499,7 @@ div.csl-indent {
 # ℹ more rows</code></pre>
 </div>
 </div>
-<div class="cell">
+<div class="cell" data-connection="db">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="dt">year</span>(sales_month) <span class="kw">AS</span> <span class="dt">year</span>,</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sum</span>(sales) <span class="kw">AS</span> total_sales</span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> retail_sales</span>
@@ -570,7 +569,7 @@ div.csl-indent {
 <span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(total_sales))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># Source:     SQL [?? x 2]
-# Database:   DuckDB 0.7.1 [iangow@Darwin 22.5.0:R 4.3.0/:memory:]
+# Database:   DuckDB 0.7.1 [igow@Darwin 22.5.0:R 4.2.3/:memory:]
 # Ordered by: desc(total_sales)
     year total_sales
    &lt;dbl&gt;       &lt;dbl&gt;
@@ -587,7 +586,7 @@ div.csl-indent {
 # ℹ more rows</code></pre>
 </div>
 </div>
-<div class="cell">
+<div class="cell" data-connection="db">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="dt">year</span>(sales_month) <span class="kw">AS</span> <span class="dt">year</span>,</span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sum</span>(sales) <span class="kw">AS</span> total_sales</span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> retail_sales</span>
@@ -639,7 +638,7 @@ div.csl-indent {
 <span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(total_sales)) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># Source:     SQL [5 x 2]
-# Database:   DuckDB 0.7.1 [iangow@Darwin 22.5.0:R 4.3.0/:memory:]
+# Database:   DuckDB 0.7.1 [igow@Darwin 22.5.0:R 4.2.3/:memory:]
 # Ordered by: desc(total_sales)
    year total_sales
   &lt;dbl&gt;       &lt;dbl&gt;
@@ -650,7 +649,7 @@ div.csl-indent {
 5  2016      105905</code></pre>
 </div>
 </div>
-<div class="cell">
+<div class="cell" data-connection="db">
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> kind_of_business, reason_for_null,</span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(<span class="op">*</span>) <span class="kw">AS</span> num_null</span>
 <span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> retail_sales</span>
@@ -738,7 +737,7 @@ div.csl-indent {
 <span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(num_null))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># Source:     SQL [?? x 3]
-# Database:   DuckDB 0.7.1 [iangow@Darwin 22.5.0:R 4.3.0/:memory:]
+# Database:   DuckDB 0.7.1 [igow@Darwin 22.5.0:R 4.2.3/:memory:]
 # Ordered by: desc(num_null)
    kind_of_business                                     reason_for_null num_null
    &lt;chr&gt;                                                &lt;chr&gt;              &lt;dbl&gt;
@@ -882,7 +881,7 @@ div.csl-indent {
 <span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>ctry_pops_db</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># Source:   table&lt;ctry_pops&gt; [3 x 5]
-# Database: DuckDB 0.7.1 [iangow@Darwin 22.5.0:R 4.3.0/:memory:]
+# Database: DuckDB 0.7.1 [igow@Darwin 22.5.0:R 4.2.3/:memory:]
   country       year_1980 year_1990 year_2000 year_2010
   &lt;chr&gt;             &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
 1 Canada            24593     27791     31100     34207
@@ -1123,24 +1122,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     button.classList.add('code-copy-button-checked');
     var currentTitle = button.getAttribute("title");
     button.setAttribute("title", "Copied!");
-    let tooltip;
-    if (window.bootstrap) {
-      button.setAttribute("data-bs-toggle", "tooltip");
-      button.setAttribute("data-bs-placement", "left");
-      button.setAttribute("data-bs-title", "Copied!");
-      tooltip = new bootstrap.Tooltip(button, 
-        { trigger: "manual", 
-          customClass: "code-copy-button-tooltip",
-          offset: [0, -8]});
-      tooltip.show();    
-    }
     setTimeout(function() {
-      if (tooltip) {
-        tooltip.hide();
-        button.removeAttribute("data-bs-title");
-        button.removeAttribute("data-bs-toggle");
-        button.removeAttribute("data-bs-placement");
-      }
       button.setAttribute("title", currentTitle);
       button.classList.remove('code-copy-button-checked');
     }, 1000);
@@ -1176,42 +1158,24 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       return note.innerHTML;
     });
   }
-  const findCites = (el) => {
-    const parentEl = el.parentElement;
-    if (parentEl) {
-      const cites = parentEl.dataset.cites;
-      if (cites) {
-        return {
-          el,
-          cites: cites.split(' ')
-        };
-      } else {
-        return findCites(el.parentElement)
-      }
-    } else {
-      return undefined;
-    }
-  };
   var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
   for (var i=0; i<bibliorefs.length; i++) {
     const ref = bibliorefs[i];
-    const citeInfo = findCites(ref);
-    if (citeInfo) {
-      tippyHover(citeInfo.el, function() {
-        var popup = window.document.createElement('div');
-        citeInfo.cites.forEach(function(cite) {
-          var citeDiv = window.document.createElement('div');
-          citeDiv.classList.add('hanging-indent');
-          citeDiv.classList.add('csl-entry');
-          var biblioDiv = window.document.getElementById('ref-' + cite);
-          if (biblioDiv) {
-            citeDiv.innerHTML = biblioDiv.innerHTML;
-          }
-          popup.appendChild(citeDiv);
-        });
-        return popup.innerHTML;
+    const cites = ref.parentNode.getAttribute('data-cites').split(' ');
+    tippyHover(ref, function() {
+      var popup = window.document.createElement('div');
+      cites.forEach(function(cite) {
+        var citeDiv = window.document.createElement('div');
+        citeDiv.classList.add('hanging-indent');
+        citeDiv.classList.add('csl-entry');
+        var biblioDiv = window.document.getElementById('ref-' + cite);
+        if (biblioDiv) {
+          citeDiv.innerHTML = biblioDiv.innerHTML;
+        }
+        popup.appendChild(citeDiv);
       });
-    }
+      return popup.innerHTML;
+    });
   }
 });
 </script>
