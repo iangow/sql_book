@@ -41,12 +41,9 @@ This yields the second of the two options provided, which seems to be the implic
 ## Churn, Lapse, and Other Definitions of Departure
 
 This query seems easier to follow with a separate window specification (`WINDOW w AS`) and using a CTE.
-
-**This query does not run on DuckDB because `avg(INTERVAL)` is not defined there.**
-
+Because `avg(INTERVAL)` is not defined in DuckDB, I use the `epoch()` function to convert the interval to seconds.^[In PostgreSQL, the value returned is of `interval` type, which cannot be interpreted by R in any case. The value in seconds can be, however.]
 
 ```{sql}
-#| eval: false
 #| connection: db
 WITH gap_intervals AS (
   SELECT id_bioguide, term_start,
@@ -57,15 +54,13 @@ WITH gap_intervals AS (
   WINDOW w AS (partition BY id_bioguide 
                ORDER BY term_start))
 
-SELECT avg(gap_interval) AS avg_gap
+SELECT avg(epoch(gap_interval)) AS avg_gap
 FROM gap_intervals
 WHERE gap_interval IS NOT NULL;
 ```
 Translating this query into `dplyr` is straightforward, with again most of the work being done in creation of `gap_intervals`.
 Note that we can refer to `prev` created in an earlier part of the `mutate` call in creating `gap_interval`.
 It seems that `dbplyr` detects this kind of situation and cleverly puts the calculation of `prev` into a subquery.
-
-**This query does not run on DuckDB because `avg(INTERVAL)` is not defined there.**
 
 ```{r}
 gap_intervals <-
@@ -80,13 +75,20 @@ gap_intervals <-
 ```
 
 This makes it effectively a single line of code to transform the data into the average shown above.
+Note that, after `collect()`, we use `as.duration()` from the `lubridate` package to transform the result from a number of seconds back into a duration.^[Note that the terminology of `lubridate` differs from that used by many SQL implementations.
+What the `lubridate` [cheat-sheet](https://rawgit.com/rstudio/cheatsheets/main/lubridate.pdf) calls a duration is an `interval` in PostgreSQL or DuckDB.
+What the `lubridate` cheat-sheet calls an interval is defined by a start date and an end date.]
+The duration type from `lubridate` provides a user-friendly print method that is easier for humans to interpret.
 
 ```{r}
-#| eval: false
+#| warning: false
 gap_intervals |>
-  summarize(avg_gap = mean(gap_interval, na.rm = TRUE)) |>
+  summarize(avg_gap = mean(epoch(gap_interval))) |>
+  collect() |>
+  mutate(avg_gap = as.duration(avg_gap)) |>
   kable()
 ```
+
 With `gap_intervals` in our pocket, the following query is *much* simpler than the SQL shown in the book.
 
 ```{r}
