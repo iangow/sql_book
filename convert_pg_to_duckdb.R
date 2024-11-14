@@ -11,7 +11,7 @@ pg_to_duckdb <- function(table) {
                  dbdir = "sql_book.duckdb", 
                  read_only = FALSE)
   pg_tbl <- tbl(pg, table)
-  pg_tbl %>%
+  pg_tbl |>
     copy_to(db, ., name = table,
             temporary = FALSE,
             overwrite = TRUE)
@@ -19,7 +19,7 @@ pg_to_duckdb <- function(table) {
   dbDisconnect(pg)
 }
 
-pg_to_duckdb("date_dim")
+# pg_to_duckdb("date_dim")
 pg_to_duckdb("game_users")
 pg_to_duckdb("game_actions")
 pg_to_duckdb( "game_purchases")
@@ -28,6 +28,6 @@ pg_to_duckdb("earthquakes")
 pg_to_duckdb("legislators")
 pg_to_duckdb("legislators_terms")
 pg_to_duckdb("retail_sales")
-pg_to_duckdb("stop_words")
+# pg_to_duckdb("stop_words")
 pg_to_duckdb("ufo")
-pg_to_duckdb("date_dim")
+# pg_to_duckdb("date_dim")
