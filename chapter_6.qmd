@@ -77,7 +77,7 @@ earthquakes %>%
 earthquakes %>%
   filter(!is.na(mag), place == 'Central Alaska') %>%
   select(place, mag) %>%
-  mutate(percentile = ntile(100, order_by = "mag")) %>%
+  mutate(percentile = ntile(mag, 100)) %>%
   arrange(place, desc(mag)) %>%
   collect(n = 5) %>%
   kable()
@@ -94,7 +94,7 @@ earthquakes %>%
   show_query()
 ```
 The `ntile()` offered by `dbplyr` works a little differently from other window functions.
-Rather than preceding the `mutate` with a `window_order()`, we need to specify an `order_by` argument.^[The reason for this is not clear and I have filed a feature request to make the handling of `ntile()` similar to that of other window functions.]
+Rather than preceding the `mutate` with a `window_order()`, we include the variable that we wish to sort by (`mag`) as the first argument to `ntile()`.
 
 ```{r}
 cen_ak_quartiles <-
@@ -102,7 +102,7 @@ cen_ak_quartiles <-
   filter(!is.na(mag), place == 'Central Alaska') %>%
   select(place, mag) %>%
   group_by(place) %>%
-  mutate(ntile = ntile(4, order_by = "mag"))
+  mutate(ntile = ntile(mag, 4))
 
 cen_ak_quartiles %>%
   group_by(place, ntile) %>%
