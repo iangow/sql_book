@@ -1,73 +1,100 @@
-# Cohorts
+# Cohort Analysis
+
+In Chapter 3 we covered time series analysis.
+With those techniques in hand, we will now turn to a related type of analysis with many business and other applications: cohort analysis.
+
+I remember the first time I encountered a cohort analysis.
+I was working at my first data analyst job, at a small startup.
+I was reviewing a purchase analysis I'd worked on with the CEO, and he suggested that I break up the customer base by cohorts to see whether behavior was changing over time.
+I assumed it was some fancy business school thing and probably useless, but he was the CEO, so of course I humored him.
+Turns out it wasn't just a lark.
+Breaking populations into cohorts and following them over time is a powerful way to analyze your data and avoid various biases.
+Cohorts can provide clues to how subpopulations differ from each other and how they change over time.
+
+In this chapter, we'll first take a look at what cohorts are and at the building blocks of certain types of cohort analysis.
+After an introduction to the legislators data set used for the examples, we'll learn how to construct a retention analysis and deal with various challenges such as defining the cohort and handling sparse data.
+Next, we'll cover survivorship, returnship, and cumulative calculations, all of which are similar to retention analysis in the way the SQL code is structured.
+Finally, we'll look at how to combine cohort analysis with cross-sectional analysis to understand the makeup of populations over time.
 
 ## Cohorts: A Useful Analysis Framework
 
-Chapter 4 examines the fascinating topic of cohorts, where a cohort is a group of observations (often people) who acquire a shared characteristic at (approximately) the same time.
-For example, children entering kindergarten in New Zealand in 2017 or the Harvard MBA Class of 2002.
+Before we get into the code, I will define what cohorts are, consider the types of questions we can answer with this type of analysis, and describe the components of any cohort analysis.
 
-While cohort analysis has some attractive features, I guess that data do not often come in a format that facilitates such analysis.
-Instead, as is the case with the *legislators* data set studied in Chapter 4, the data analyst needs to rearrange the data to support cohort analysis.
+A *cohort* is a group of individuals who share some characteristic of interest, described below, at the time we start observing them. Cohort members are often people but can be any type of entity we want to study: companies, products, or physical world phenomena. Individuals in a cohort may be aware of their membership, just as children in a first-grade class are aware they are part of a peer group of first graders, or participants in a drug trial are aware they are part of a group receiving a treatment. At other times, entities are grouped into cohorts virtually, as when a software company groups all customers acquired in a certain year to study how long they remain customers. It's always important to consider the ethical implications of cohorting entities without their awareness, if any different treatment is to be applied to them.
 
-I found Chapter 4 a little confusing on a first pass through it.^[In writing this sentence, I am still working through the chapter.]
-The chapter launches into some SQL code intended to create cohorts, but it's a little unclear why we're doing what we're doing, and we quickly see that our cohort analysis does not make sense (e.g., we have more of our original cohort in period 5 than we had in period 4) and we must have done something wrong.
-I think I see the idea Cathy is going for here: one needs to think carefully about how to arrange the data to avoid subtle mistakes.
-The challenge I see is that it's not obvious that everyone would make the same mistake and one is too deep in the weeds of the code to really see the forest for the trees.
+*Cohort analysis* is a useful way to compare groups of entities over time.
+Many important behaviors take weeks, months, or years to occur or evolve, and cohort analysis is a way to understand these changes.
+Cohort analysis provides a framework for detecting correlations between cohort characteristics and these long-term trends, which can lead to hypotheses about the causal drivers.
+For example, customers acquired through a marketing campaign may have different long-term purchase patterns than those who were persuaded by a friend to try a company's products. 
+Cohort analysis can be used to monitor new cohorts of users or customers and assess how they compare to previous cohorts.
+Such monitoring can provide an early alert signal that something has gone wrong (or right) for new customers.
+Cohort analysis is also used to mine historical data.
+A/B tests, discussed in Chapter 7, are the gold standard for determining causality, but we can't go back in time and run every test for every question about the past in which we are interested.
+We should of course be cautious about attaching causal meaning to cohort analysis and instead use cohort analysis as a way to understand customers and generate hypotheses that can be tested rigorously in the future.
 
-So before I launch into the code, I will spend a little time thinking about things conceptually.
-I will start with a different example from that used in Chapter 4, but one that I think brings out some of the issues.
+Cohort analyses have three components: the cohort grouping, a time series of data over which the cohort is observed, and an aggregate metric that measures an action done by cohort members.
 
-For some reason I associate cohort analysis with life expectancy.
-The people who are born today form a cohort and one might ask: How long do we expect members of this cohort to live?
-One often hears life expectancy statistics quoted as something like: "In Australia, a boy born in 2018–2020 can expect to live to the age of 81.2 years and a girl would be expected to live to 85.3 years compared to 51.1 for boys and 54.8 years for girls born in in 1891–1900."^[See [here](https://www.aihw.gov.au/reports/life-expectancy-death/deaths-in-australia/contents/life-expectancy) for the source for these data.]
+*Cohort grouping* is often based on a start date: the customer's first purchase or subscription date, the date a student started school, and so on.
+However, cohorts can also be formed around other characteristics that are either innate or changing over time.
+Innate qualities include birth year and country of origin, or the year a company was founded. Characteristics that can change over time include city of residence and marital status.
+When these are used, we need to be careful to cohort only on the value on the starting date, or else entities can jump between cohort groups.
 
-The people who construct the life expectancies for the children must be veritable polymaths.
-They need to anticipate future developments in medical care and technology.
-Skin cancer is a significant cause of death in Australia, due to a mismatch between the median complexion and the intensity of the sun.
-But the analysts calculating life expectancy need to think about how medical technology is likely to affect rates of death from carcinoma in the future.
-I can imagine whole-body scanners a bit like the scanners in US airports that detect skin cancers before they become problematic.
-These analysts also need to understand how road safety will evolve.
-Will children today all be in driverless vehicles in fifty years time and will accidents then be a rarity?
-And what about war?
-The data analyst needs to be able to forecast the possibility of World War III breaking out and shortening life spans.
-Who are these people?
+::: {.callout-tip}
+## Cohort or Segment?
 
-Of course it seems unlikely these *über*-analysts exist.
-Rather they surely do something more prosaic.
-Here is my *guess* as to how life expectancies are constructed.^[I made no effort to research how they are constructed because (1) I am lazy and (2) my imagined version is probably better for my current purposes.]
-I guess that the data analyst gathers data on cohorts notionally formed at some point in the past and then looks at survival rates for that cohort over some period, then aggregates those data into a life expectancy.
+These two terms are often used in similar ways, or even interchangeably, but it's worth drawing a distinction between them for the sake of clarity.
+A *cohort* is a group of users (or other entities) who have a common starting date and are followed over time.
+A *segment* is a grouping of users who share a common characteristic or set of characteristics at a point in time, regardless of their starting date.
+Similar to cohorts, segments can be based on innate factors such as age or on behavioral characteristics.
+A segment of users that signs up in the same month can be put into a cohort and followed over time.
+Or different groupings of users can be explored with cohort analysis so that you can see which ones have the most valuable characteristics.
+The analyses we'll cover in this chapter, such as retention, can help put concrete data behind marketing segments.
+:::
 
-For example, the data analyst might gather data on people who turned 21 in 2018 and then data on whether those people surived to their 22nd birthday.
-The proportion of such people who make their 22nd birthday could be interpreted as a survival probability $p_{21}$.
-Repeat that for each age-based cohort to get probabilities $\left\{p_i: i = 0, 1, \dots, 119, 120 \right\}$.
-Now to find the median life expectancy, we could calculate something like this:^[There are some details I'm glossing over here, such as the fact that there will be some $j$ where the cumulative survival probability is just above one-half, but where that for $j + 1$ is just below one-half, so some interpolation will be required.]
+The second component of any cohort analysis is the *time series*.
+This is a series of purchases, logins, interactions, or other actions that are taken by the customers or entities to be cohorted.
+It's important that the time series covers the entire life span of the entities, or there will be *survivorship bias* in early cohorts.
+Survivorship bias occurs when only customers who have stayed are in the data set; churned customers are excluded because they are no longer around, so the rest of the customers appear to be of higher quality or fit in comparison to newer cohorts (see "Survivorship Bias").
+It's also important to have a time series that is long enough for the entities to complete the action of interest.
+For example, if customers tend to purchase once a month, a time series of several months is needed.
+If, on the other hand, purchases happen only once a year, a time series of several years would be preferable.
+Inevitably, more recently acquired customers will not have had as long to complete actions as those customers who were acquired further in the past.
+In order to normalize, cohort analysis usually measures the number of periods that have elapsed from a starting date, rather than calendar months.
+In this way, cohorts can be compared in period 1, period 2, and so on to see how they evolve over time, regardless of which month the action actually occurred.
+The intervals may be days, weeks, months, or years.
 
-$$ \left\{j: \arg \min_{i} \left(\prod_{0}^{i} p_i\right) \leq \frac{1}{2} \right\} $$
-So we have a (fairly) well-defined procedure here.
-There are obviously some details to be worked out.
-For example, do we focus on one year (2018 in this case)? Or collect data over multiple years?
-Does it make sense to form cohorts by years?
-Or would grouping into larger cohorts (e.g., 20--25) make more sense?
-Do we identify people by birthdays?
-Or just use some kind of census date?
-(People who are 21 on 1 July might have just turned 21, or might be about to turn 22.)
+The aggregate metric should be related to the actions that matter to the health of the organization, such as customers continuing to use or purchase the product.
+Metric values are aggregated across the cohort, usually with sum, count, or average, though any relevant aggregation works.
+The result is a time series that can then be used to understand changes in behavior over time.
 
-But what exactly have we calculated?
-In a sense it's a nonsensical number.
-Why would survival rates for 88-year-olds in 2018 be relevant for the life expectancy of newborns today, who will face a very different world when they turn 88 in 2111.
-First, perhaps the analysts really don't calculate it in this way (though I'm doubtful they are polymaths).
-Second, even though it's a "meaningless" number, it probably still has attractive properties, such as the ability to represent in a one or two numbers a lot about the quality of life in Australia.
+In this chapter, I'll cover four types of cohort analysis: retention, survivorship, returnship or repeat purchase behavior, and cumulative behavior.
 
-A final note is that it is not clear to me where the "51.1 for boys and 54.8 years for girls born in in 1891--1900" values come from.
-Are these the equivalent life expectancies calculated using data available around 1900?
-Or are these the observed lifespans of people born in 1891--1900?
-If the latter, how accurate were the former as estimates of these values?
+Retention
+: Retention is concerned with whether the cohort member has a record in the time series on a particular date, expressed as a number of periods from the starting date.
+This is useful in any kind of organization in which repeated actions are expected, from playing an online game to using a product or renewing a subscription, and it helps to answer questions about how sticky or engaging a product is and how many entities can be expected to appear on future dates.
+
+Survivorship
+: Survivorship is concerned with how many entities remained in the data set for a certain length of time or longer, regardless of the number or frequency of actions up to that time.
+Survivorship is useful for answering questions about the proportion of the population that can be expected to remain—either in a positive sense by not churning or passing away, or in a negative sense by not graduating or fulfilling some requirement.
+
+Returnship
+: Returnship or repeat purchase behavior is concerned with whether an action has happened more than some minimum threshold of times---often simply more than once---during a fixed window of time.
+This type of analysis is useful in situations in which the behavior is intermittent and unpredictable, such as in retail, where it characterizes the share of repeat purchasers in each cohort within a fixed time window.
+
+Cumulative
+: Cumulative calculations are concerned with the total number or amounts measured at one or more fixed time windows, regardless of when they happened during that window.
+Cumulative calculations are often used in calculations of customer lifetime value (LTV or CLTV).
+
+The four types of cohort analysis allow us to compare subgroups and understand how they differ over time in order to make better product, marketing, and financial decisions.
+The calculations for the different types are similar, so we will set the stage with retention, and then I'll show how to modify retention code to calculate the other types.
+Before we dive into constructing our cohort analysis, let’s take a look at the data set we’ll be using for the examples in this chapter.
+
 
 ## The Legislators Data Set
 
-Now that we understand cohorts, let's move onto the *legislators* data set.
-
 ```{r}
 #| warning: false
+#| include: false
 library(DBI)
 library(tidyverse)
 library(dbplyr)
@@ -76,128 +103,840 @@ library(knitr)
 ```
 
 ```{r}
-pg <- dbConnect(duckdb::duckdb(), 
-                dbdir = "sql_book.duckdb", 
-                read_only = TRUE)
-```
-
-```{r}
-legislators_terms <- tbl(pg, "legislators_terms")
-```
-
-```{r}
-first_terms <- 
-  legislators_terms %>%
-  group_by(id_bioguide) %>%
-  summarize(first_term = min(term_start, na.rm = TRUE))
-
-cohorts <-
-  legislators_terms %>%
-  inner_join(first_terms, by = "id_bioguide") %>%
-  mutate(period = date_part('year', age(term_start, first_term))) %>%
-  group_by(period) %>%
-  summarize(cohort_retained = n_distinct(id_bioguide)) 
-
-cohorts %>%
-  arrange(period) %>%
-  collect(n = 10) %>%
-  kable()
-```
-
-```{r}
-#| lobel: retained_data
-retained_data <-
-  cohorts %>%
-  window_order(period) %>%
-  mutate(cohort_size = first(cohort_retained)) %>%
-  mutate(pct_retained = cohort_retained * 1.0/cohort_size) %>%
-  select(period, cohort_size, cohort_retained, pct_retained) 
-
-retained_data %>%
-  collect(n = 10) %>%
-  kable(digits = 3)
-```
-
-```{r}
-retained_data %>%
-  ggplot(aes(x = period, y = pct_retained)) +
-  geom_line()
-```
-
-```{r}
-retained_data %>%
-  select(period, pct_retained) %>%
-  filter(period <= 4) %>%
-  collect() %>%
-  arrange(period) %>%
-  pivot_wider(names_from = period, 
-              names_prefix = "yr",
-              values_from = pct_retained) %>%
-  collect() %>%
-  kable()
-```
-
-## Adjusting Time Series to Increase Retention Accuracy
-
-```{r}
-#| label: cohorts
-year_ends <- 
-  tibble(date = seq(as.Date("1770-12-31"), 
-                    as.Date("2030-12-31"), 
-                    by = "year")) %>%
-  copy_inline(pg, .)
-
-cohorts <-
-  first_terms %>%
-  inner_join(legislators_terms, by = join_by(id_bioguide)) %>%
-  left_join(year_ends, 
-            by = join_by(between(y$date, x$term_start, x$term_end))) %>%
-  mutate(period = date_part('year', age(date, first_term))) %>%
-  select(id_bioguide, first_term, term_start, term_end, date, period) 
-
-cohorts %>%
-  collect(n = 10) %>%
-  kable()
-```
-
-```{r}
-cohorts_retained <-
-  cohorts %>%
-  mutate(period = coalesce(date_part('year', age(date, first_term)), 0)) %>%
-  select(period, id_bioguide) %>%
-  distinct() %>%
-  group_by(period) %>%
-  summarize(cohort_retained = n()) 
-
-pct_retained <-
-  cohorts_retained %>%
-  window_order(period) %>%
-  mutate(cohort_size = first(cohort_retained),
-         cohort_retained = as.double(cohort_retained),
-         pct_retained = cohort_retained/cohort_size) 
-
-pct_retained %>%
-  arrange(period) %>%
-  collect(n = 10) %>%
-  kable()
-
-pct_retained %>%
-  ggplot(aes(x = period, y = pct_retained)) + 
-  geom_line()
-```
-
-```{r}
-first_terms %>%
-  inner_join(legislators_terms, by = join_by(id_bioguide)) %>%
-  mutate(term_end = 
-           case_when(term_type == 'rep' ~ term_start + years(2),
-                     term_type == 'sen' ~ term_start + years(6))) %>%
-  select(id_bioguide, first_term, term_start, term_end)  %>%
-  collect(n = 10) %>%
-  kable()
+#| include: false
+db <- dbConnect(duckdb::duckdb())
 ```
 
 ```{r}
 #| include: false
-dbDisconnect(pg, shutdown = TRUE)
+load_parquet <- function (conn, table, data_dir = "data") {
+    file_path <- file.path(data_dir, paste0(table, ".parquet"))
+    df_sql <- paste0("SELECT * FROM read_parquet('", file_path, 
+        "')")
+    dplyr::tbl(conn, dplyr::sql(df_sql)) |>
+      compute(name = table)
+}
+```
+
+```{r}
+#| include: false
+legislators_terms <- load_parquet(db, "legislators_terms")
+legislators <- load_parquet(db, "legislators")
+```
+
+The SQL examples in this chapter will use a data set of past and present members of the United States Congress maintained in a GitHub repository.
+In the US, Congress is responsible for writing laws or legislation, so its members are also known as legislators.
+Since the data set is a JSON file, I have applied some transformations to produce a more suitable data model for analysis, and I have posted data in a format suitable for following along with the examples in the book's GitHub [legislators folder](https://oreil.ly/H2tYP).
+
+The source repository has an excellent data dictionary, so I won't repeat all the details here.
+I will provide a few details, however, that should help those who aren't familiar with the US government to follow along with the analyses in this chapter.
+
+Congress has two chambers, the Senate ("sen" in the data set) and the House of Representatives ("rep").
+Each state has two senators, and they are elected for six-year terms.
+Representatives are allocated to states based on population; each representative has a district that they alone represent.
+Representatives are elected for two-year terms.
+Actual terms in either chamber can be shorter in the event that the legislator dies or is elected or appointed to a higher office.
+Legislators accumulate power and influence via leadership positions the longer they are in office, and thus standing for re-election is common. Finally, a legislator may belong to a political party, or they may be an "independent".
+In the modern era, the vast majority of legislators are Democrats or Republicans, and the rivalry between the two parties is well known.
+Legislators occasionally change parties while in office.
+
+For the analyses, we’ll make use of two tables: `legislators` and `legislators_terms`.
+The `legislators` table contains a list of all the people included in the data set, with birthday, gender, and a set of ID fields that can be used to look up the person in other data sets.
+The `legislators_terms` table contains a record for each term in office for each legislator, with start and end date, and other attributes such as chamber and 
+`id_bioguide` field is used as the unique identifier of a legislator and appears in each table.
+@tbl-leg-sample shows a sample of the legislators data.
+@tbl-leg-terms-sample shows a sample of the legislators_terms data.
+
+```{r}
+#| include: false
+library(tinytable)
+
+options(tinytable_theme_spacing_rowsep = 0.0)
+options(tinytable_theme_spacing_colsep = 0.1)
+```
+
+```{r}
+#| echo: false
+#| label: tbl-leg-sample
+#| tbl-cap: Sample of the `legislators` table
+legislators |>
+  select(full_name, first_name, last_name, birthday, gender,
+         id_bioguide, id_govtrack) |>
+  collect(n = 19) |>
+  tt() |>
+  style_tt(fontsize = 0.8) |>
+  theme_tt("spacing")
+```
+
+```{r}
+#| echo: false
+#| label: tbl-leg-terms-sample
+#| tbl-cap: Sample of the `legislators_terms` table
+legislators_terms |>
+  select(id_bioguide, term_id, term_type, term_start, term_end, 
+         state, district, party) |>
+  collect(n = 19) |>
+  tt() |>
+  style_tt(fontsize = 0.8) |>
+  theme_tt("spacing")
+```
+Now that we have an understanding of what cohort analysis is and of the data set we’ll be using for examples, let's get into how to write SQL for retention analysis.
+The key question SQL will help us answer is: once representatives take office, how long do they keep their jobs?
+
+## Retention
+
+One of the most common types of cohort analysis is retention analysis. To retain is to keep or continue something. Many skills need to be practiced to be retained. Businesses usually want their customers to keep purchasing their products or using their services, since retaining customers is more profitable than acquiring new ones. Employers want to retain their employees, because recruiting replacements is expensive and time consuming. Elected officials seek reelection in order to continue working on the priorities of their constituents.
+
+The main question in retention analysis is whether the starting size of the cohort—number of subscribers or employees, amount spent, or another key metric—will remain constant, decay, or increase over time. When there is an increase or a decrease, the amount and speed of change are also interesting questions. In most retention analyses, the starting size will tend to decay over time, since a cohort can lose but cannot gain new members once it is formed. Revenue is an interesting exception, since a cohort of customers can spend more in subsequent months than they did in the first month collectively, even if some of them churn.
+
+Retention analysis uses the count of entities or sum of money or actions present in the data set for each period from the starting date, and it normalizes by dividing this number by the count or sum of entities, money, or actions in the first time period. The result is expressed as a percentage, and retention in the starting period is always 100%. Over time, retention based on counts generally declines and can never exceed 100%, whereas money- or action-based retention, while often declining, can increase and be greater than 100% in a time period. Retention analysis output is typically displayed in either table or graph form, which is referred to as a retention curve. We’ll see a number of examples of retention curves later in this chapter.
+
+Graphs of retention curves can be used to compare cohorts. The first characteristic to pay attention to is the shape of the curve in the initial few periods, where there is often an initial steep drop. For many consumer apps, losing half a cohort in the first few months is common. A cohort with a curve that is either more or less steep than others can indicate changes in the product or customer acquisition source that merit further investigation. A second characteristic to look for is whether the curve flattens after some number of periods or continues declining rapidly to zero. A flattening curve indicates that there is a point in time from which most of the cohort that remains stays indefinitely. A retention curve that inflects upward, sometimes called a smile curve, can occur if cohort members return or reactivate after falling out of the data set for some period. Finally, retention curves that measure subscription revenue are monitored for signs of increasing revenue per customer over time, a sign of a healthy SaaS software business.
+
+This section will show how to create a retention analysis, add cohort groupings from the time series itself and other tables, and handle missing and sparse data that can occur in time series data. With this framework in hand, you’ll learn in the subsequent section how to make modifications to create the other related types of cohort analysis. As a result, this section on retention will be the longest one in the chapter, as you build up code and develop your intuition about the calculations.
+
+### SQL for a Basic Retention Curve
+
+```{sql, connection = db}
+SELECT id_bioguide, min(term_start) AS first_term
+FROM legislators_terms 
+GROUP BY 1;
+```
+The next step is to put this code into a subquery and `JOIN` it to the time series.
+The `age` function is applied to calculate the intervals between each `term_start` and the `first_term` for each legislator.
+Applying the `date_part` functions to the result, with year, transforms this into the number of yearly periods.
+Since elections happen every two or six years, we’ll use years as the time interval to calculate the periods.
+We could use a shorter interval, but in this data set there is little fluctuation daily or weekly.
+The count of legislators with records for that period is the number retained:
+
+```{sql, connection = db}
+SELECT date_part('year', age(b.term_start,a.first_term)) as period,
+  count(distinct a.id_bioguide) as cohort_retained
+FROM
+(
+    SELECT id_bioguide, min(term_start) as first_term
+    FROM legislators_terms 
+    GROUP BY 1
+) a
+JOIN legislators_terms b 
+ON a.id_bioguide = b.id_bioguide 
+GROUP BY 1
+ORDER BY 1;
+```
+
+::: {.callout-tip}
+In databases that support the `datediff` function, the `date_part`-and-`age` construction can be replaced by this simpler function:
+
+```
+datediff('year', first_term, term_start)
+```
+
+Some databases, such as Oracle, place the `date_part` last:
+
+```
+datediff(first_term, term_start, 'year')
+```
+:::
+
+Now that we have the periods and the number of legislators retained in each, the final step is to calculate the total `cohort_size` and populate it in each row so that the `cohort_retained` can be divided by it.
+The `first_value` window function returns the first record in the `PARTITION BY` clause, according to the ordering set in the `ORDER BY`, a convenient way to get the cohort size in each row.
+In this case, the `cohort_size` comes from the first record in the entire data set, so the `PARTITION BY` is omitted:
+
+```sql
+first_value(cohort_retained) over (order by period) as cohort_size
+```
+
+To find the percent retained, divide the `cohort_retained` value by this same calculation:
+
+```{sql}
+#| connection: db
+#| output.var: retained_data
+SELECT period,
+  first_value(cohort_retained) over (order by period) as cohort_size,
+  cohort_retained,
+  cohort_retained / first_value(cohort_retained) over (order by period) as pct_retained
+FROM
+(
+    SELECT date_part('year',age(b.term_start,a.first_term)) as period,
+    count(distinct a.id_bioguide) as cohort_retained
+    FROM
+    (
+        SELECT id_bioguide, min(term_start) as first_term
+        FROM legislators_terms 
+        GROUP BY 1
+    ) a
+    JOIN legislators_terms b on a.id_bioguide = b.id_bioguide 
+    GROUP BY 1
+) aa
+```
+
+We now have a retention calculation, and we can see that there is a big drop-off between the 100% of legislators retained in period 0, or on their start date, and the share with another term record that starts a year later.
+Graphing the results, as in @fig-retained, demonstrates how the curve flattens and eventually goes to zero, as even the longest-serving legislators eventually retire or die.
+
+```{r}
+#| echo: false
+#| label: fig-retained
+#| fig-cap: Retention from start of first term for US legislators
+retained_data |>
+  ggplot(aes(x = period, y = pct_retained)) +
+  geom_line() +
+  ylab("Percent Retained") +
+  xlab("Years from Start")
+```
+
+We can take the cohort retention result and reshape the data to show it in table format.
+Pivot and flatten the results using an aggregate function with a `CASE` statement; `max` is used in this example, but other aggregations such as `min` or `avg` would return the same result.
+Retention is calculated for years 0 through 4, but additional years can be added by following the same pattern:
+
+```{sql}
+#| connection: db
+SELECT cohort_size,
+  max(case when period = 0 then pct_retained end) as yr0,
+  max(case when period = 1 then pct_retained end) as yr1,
+  max(case when period = 2 then pct_retained end) as yr2,
+  max(case when period = 3 then pct_retained end) as yr3,
+  max(case when period = 4 then pct_retained end) as yr4
+FROM
+(
+    SELECT period,
+      first_value(cohort_retained) over (order by period) as cohort_size,
+      cohort_retained 
+     / first_value(cohort_retained) over (order by period) as pct_retained
+    FROM
+    (
+        SELECT 
+        date_part('year',age(b.term_start,a.first_term)) as period
+        ,count(*) as cohort_retained
+        FROM
+        (
+            SELECT id_bioguide, min(term_start) as first_term
+            FROM legislators_terms 
+            GROUP BY 1
+        ) a
+        JOIN legislators_terms b on a.id_bioguide = b.id_bioguide 
+        GROUP BY 1
+    ) aa
+) aaa
+GROUP BY 1
+```
+
+Retention appears to be quite low, and from the graph we can see that it is jagged in the first few years. 
+One reason for this is that a representative’s term lasts two years, and senators' terms last six years, but the data set only contains records for the start of new terms; thus we are missing data for years in which a legislator was still in office but did not start a new term.
+Measuring retention each year is misleading in this case.
+One option is to measure retention only on a two- or six-year cycle, but there is also another strategy we can employ to fill in the "missing" data.
+I will cover this next before returning to the topic of forming cohort groups.
+
+### Adjusting Time Series to Increase Retention Accuracy
+
+We discussed techniques for cleaning "missing" data in Chapter 2, and we will turn to those techniques in this section in order to arrive at a smoother and more truthful retention curve for the legislators. 
+When working with time series data, such as in cohort analysis, it's important to consider not only the data that is present but also whether that data accurately reflects the presence or absence of entities at each time period.
+This is particularly a problem in contexts in which an event captured in the data leads to the entity persisting for some period of time that is not captured in the data.
+For example, a customer buying a software subscription is represented in the data at the time of the transaction, but that customer is entitled to use the software for months or years and is not necessarily represented in the data over that span. 
+To correct for this, we need a way to derive the span of time in which the entity is still present, either with an explicit end date or with knowledge of the length of the subscription or term.
+Then we can say that the entity was present at any date in between those start and end dates.
+
+In the legislators data set, we have a record for a term's start date, but we are missing the notion that this "entitles" a legislator to serve for two or six years, depending on the chamber.
+To correct for this and smooth out the curve, we need to fill in the "missing" values for the years that legislators are still in office between new terms. 
+Since this data set includes a `term_end` value for each term, I'll show how to create a more accurate cohort retention analysis by filling in dates between the start and end values. 
+Then I'll show how you can impute end dates when the data set does not include an end date.
+
+Calculating retention using a start and end date defined in the data is the most accurate approach. 
+For the following examples, we will consider legislators retained in a particular year if they were still in office as of the last day of the year, December 31.
+Prior to the Twentieth Amendment to the US Constitution, terms began on March 4, but afterward the start date moved to January 3, or to a subsequent weekday if the third falls on a weekend.
+Legislators can be sworn in on other days of the year due to special off-cycle elections or appointments to fill vacant seats.
+As a result, term_start dates cluster in January but are spread across the year.
+While we could pick another day, December 31 is a strategy for normalizing around these varying start dates.
+
+The first step is to create a data set that contains a record for each December 31 that each legislator was in office. This can be accomplished by `JOIN`ing the subquery that found the `first_term` to the legislators_terms table to find the term_start and term_end for each term.
+A second `JOIN` to the `date_dim` retrieves the dates that fall between the start and end dates, restricting the returned values to `c.month_name = 'December' and c.day_of_month = 31`.
+The period is calculated as the years between the date from the `date_dim` and the `first_term`.
+Note that even though more than 11 months may have elapsed between being sworn in in January and December 31, the first year still appears as 0:
+
+```{sql}
+#| connection: db
+#| include: false
+CREATE OR REPLACE TABLE date_dim AS
+WITH dates AS 
+  (
+    SELECT generate_series::date AS date
+    FROM generate_series(DATE '1770-01-01', 
+                         DATE '2030-12-31',
+                         INTERVAL '1 day') )
+SELECT date, 
+  strftime(date, '%B') AS month_name,
+  strftime(date, '%-d') AS day_of_month
+FROM dates;
+```
+
+```{sql}
+#| connection: db
+SELECT a.id_bioguide, a.first_term,
+  b.term_start, b.term_end, c.date,
+  date_part('year',age(c.date,a.first_term)) as period
+FROM
+(
+    SELECT id_bioguide, min(term_start) as first_term
+    FROM legislators_terms 
+    GROUP BY 1
+) a
+JOIN legislators_terms b on a.id_bioguide = b.id_bioguide 
+LEFT JOIN date_dim c on c.date between b.term_start and b.term_end 
+and c.month_name = 'December' and c.day_of_month = 31
+```
+
+::: {.callout-tip}
+
+If a date dimension is not available, you can create a subquery with the necessary dates in a couple of ways. If your database supports `generate_series`, you can create a subquery that returns the desired dates:
+
+```{sql}
+#| connection: db
+#| eval: false
+SELECT generate_series::date as date
+FROM generate_series('1770-12-31'::date,
+                     '2020-12-31'::date,
+                     interval '1 year')
+```
+
+You may want to save this as a table or view for later use. 
+Alternatively, you can query the data set or any other table in the database that has a full set of dates.
+In this case, the table has all of the necessary years, but we will make a December 31 date for each year using the `make_date` function:
+
+```{sql}
+#| connection: db
+#| eval: false
+SELECT DISTINCT
+  make_date(date_part('year',term_start)::int, 12, 31) AS date
+FROM legislators_terms
+ORDER BY date
+```
+There are a number of creative ways to get the series of dates needed. Use whichever method is available and simplest within your queries.
+:::
+
+We now have a row for each date (year end) for which we would like to calculate retention.
+The next step is to calculate the `cohort_retained` for each period, which is done with a count of `id_bioguide`. 
+A `coalesce` function is used on `period` to set a default value of 0 when null.
+This handles the cases in which a legislator's term starts and ends in the same year, giving credit for serving in that year:
+
+```{sql}
+#| connection: db
+SELECT 
+coalesce(date_part('year',age(c.date,a.first_term)),0) as period,
+  count(distinct a.id_bioguide) as cohort_retained
+FROM
+(
+    SELECT id_bioguide, min(term_start) as first_term
+    FROM legislators_terms 
+    GROUP BY 1
+) a
+JOIN legislators_terms b on a.id_bioguide = b.id_bioguide 
+LEFT JOIN date_dim c on c.date between b.term_start and b.term_end 
+and c.month_name = 'December' and c.day_of_month = 31
+GROUP BY 1
+ORDER BY 1
+```
+The final step is to calculate the `cohort_size` and `pct_retained` as we did previously using `first_value` window functions:
+
+```{sql}
+#| connection: db
+#| output.var: pct_retained
+SELECT period,
+  first_value(cohort_retained) over (order by period) as cohort_size,
+  cohort_retained,
+  cohort_retained * 1.0 / 
+    first_value(cohort_retained) over (order by period) as pct_retained
+FROM
+(
+    SELECT coalesce(date_part('year',age(c.date,a.first_term)),0) as period,
+      count(distinct a.id_bioguide) as cohort_retained
+    FROM
+    (
+        SELECT id_bioguide, min(term_start) as first_term
+        FROM legislators_terms 
+        GROUP BY 1
+    ) a
+    JOIN legislators_terms b on a.id_bioguide = b.id_bioguide 
+    LEFT JOIN date_dim c on c.date between b.term_start and b.term_end 
+    and c.month_name = 'December' and c.day_of_month = 31
+    GROUP BY 1
+) aa
+```
+The results, graphed in @fig-pct-retained, are now much more accurate. Almost all legislators are still in office in year 1, and the first big drop-off occurs in year 2, when some representatives will fail to be reelected.
+
+```{r}
+#| echo: false
+#| label: fig-pct-retained
+#| fig-cap: Legislator retention after adjusting for actual years in office
+pct_retained |>
+  ggplot(aes(x = period, y = pct_retained)) + 
+  geom_line() +
+  ylab("% Retained") +
+  xlab("Period")
+```
+
+If the data set does not contain an end date, there are a couple of options for imputing one.
+One option is to add a fixed interval to the start date, when the length of a subscription or term is known.
+This can be done with date math by adding a constant interval to the `term_start`.
+Here, a `CASE` statement handles the addition for the two `term_types`:
+
+```{sql}
+#| connection: db
+SELECT a.id_bioguide, a.first_term,
+  b.term_start,
+  case when b.term_type = 'rep' then b.term_start + interval '2 years'
+      when b.term_type = 'sen' then b.term_start + interval '6 years'
+      end as term_end
+FROM
+(
+    SELECT id_bioguide, min(term_start) as first_term
+    FROM legislators_terms 
+    GROUP BY 1
+) a
+JOIN legislators_terms b on a.id_bioguide = b.id_bioguide 
+```
+
+This block of code can then be plugged into the retention code to derive the `period` and `pct_retained`.
+The drawback to this method is that it fails to capture instances in which a legislator did not complete a full term, which can happen in the event of death or appointment to a higher office.
+
+A second option is to use the subsequent starting date, minus one day, as the `term_end` date.
+This can be calculated with the `lead` window function.
+This function is similar to the `lag` function we've used previously, but rather than returning a value from a row earlier in the partition, it returns a value from a row later in the partition, as determined in the `ORDER BY` clause.
+The default is one row, which we will use here, but the function has an optional argument indicating a different number of rows. Here we find the term_start date of the subsequent term using `lead` and then subtract the interval `'1 day'` to derive the `term_end`:
+
+
+```{sql}
+#| connection: db
+SELECT a.id_bioguide, a.first_term,
+  b.term_start,
+  lead(b.term_start) over (partition by a.id_bioguide 
+                          order by b.term_start) 
+ - interval '1 day' as term_end
+FROM
+(
+    SELECT id_bioguide, min(term_start) as first_term
+    FROM legislators_terms 
+    GROUP BY 1
+) a
+JOIN legislators_terms b on a.id_bioguide = b.id_bioguide
+ORDER BY a.id_bioguide
+```
+
+This code block can then be plugged into the retention code.
+This method has a couple of drawbacks.F
+irst, when there is no subsequent term, the lead function returns null, leaving that term without a term_end.
+A default value, such as a default interval shown in the last example, could be used in such cases.
+The second drawback is that this method assumes that terms are always consecutive, with no time spent out of office.
+Although most legislators tend to serve continuously until their congressional careers end, there are certainly examples of gaps between terms spanning several years.
+
+Any time we make adjustments to fill in missing data, we need to be careful about the assumptions we make.
+In subscription- or term-based contexts, explicit start and end dates tend to be most accurate.
+Either of the two other methods shown—adding a fixed interval or setting the end date relative to the next start date—can be used when no end date is present and we have a reasonable expectation that most customers or users will stay for the duration assumed.
+
+Now that we've seen how to calculate a basic retention curve and correct for missing dates, we can start adding in cohort groups.
+Comparing retention between different groups is one of the main reasons to do cohort analysis.
+Next, I'll discuss forming groups from the time series itself, and after that, I'll discuss forming cohort groups from data in other tables.
+
+### Cohorts Derived from the Time Series Itself
+
+Now that we have SQL code to calculate retention, we can start to split the entities into cohorts. In this section, I will show how to derive cohort groupings from the time series itself. First I’ll discuss time-based cohorts based on the first date, and I’ll explain how to make cohorts based on other attributes from the time series.
+
+The most common way to create the cohorts is based on the first or minimum date or time that the entity appears in the time series. This means that only one table is necessary for the cohort retention analysis: the time series itself. Cohorting by the first appearance or action is interesting because often groups that start at different times behave differently. For consumer services, early adopters are often more enthusiastic and retain differently than later adopters, whereas in SaaS software, later adopters may retain better because the product is more mature. Time-based cohorts can be grouped by any time granularity that is meaningful to the organization, though weekly, monthly, or yearly cohorts are common. If you’re not sure what grouping to use, try running the cohort analysis with different groupings, without making the cohort sizes too small, to see where meaningful patterns emerge. Fortunately, once you know how to construct the cohorts and retention analysis, substituting different time granularities is straightforward.
+
+The first example will use yearly cohorts, and then I will demonstrate swapping in centuries. The key question we will consider is whether the era in which a legislator first took office has any correlation with their retention. Political trends and the public mood do change over time, but by how much?
+
+To calculate yearly cohorts, we first add the year of the `first_term` calculated previously to the query that finds the `period` and `cohort_retained`:
+
+```{sql}
+#| connection: db
+SELECT date_part('year',a.first_term) as first_year,
+  coalesce(date_part('year',age(c.date,a.first_term)),0) as period,
+  count(distinct a.id_bioguide) as cohort_retained
+FROM
+(
+    SELECT id_bioguide, min(term_start) as first_term
+    FROM legislators_terms 
+    GROUP BY 1
+) a
+JOIN legislators_terms b on a.id_bioguide = b.id_bioguide 
+LEFT JOIN date_dim c on c.date between b.term_start and b.term_end 
+  and c.month_name = 'December' and c.day_of_month = 31
+GROUP BY 1, 2
+ORDER BY 1, 2
+```
+
+This query is then used as the subquery, and the `cohort_size` and `pct_retained` are calculated in the outer query as previously.
+In this case, however, we need a `PARTITION BY` clause that includes `first_year` so that the `first_value` is calculated only within the set of rows for that `first_year`, rather than across the whole result set from the subquery:
+
+```{sql}
+#| connection: db
+SELECT first_year, period,
+  first_value(cohort_retained) over (partition by first_year 
+                                    order by period) as cohort_size,
+  cohort_retained,
+  cohort_retained / 
+ first_value(cohort_retained) over (partition by first_year 
+                                    order by period) as pct_retained
+FROM
+(
+    SELECT date_part('year',a.first_term) as first_year
+    ,coalesce(date_part('year',age(c.date,a.first_term)),0) as period
+    ,count(distinct a.id_bioguide) as cohort_retained
+    FROM
+    (
+        SELECT id_bioguide, min(term_start) as first_term
+        FROM legislators_terms 
+        GROUP BY 1
+    ) a
+    JOIN legislators_terms b on a.id_bioguide = b.id_bioguide 
+    LEFT JOIN date_dim c on c.date between b.term_start and b.term_end 
+    and c.month_name = 'December' and c.day_of_month = 31
+    GROUP BY 1,2
+) aa
+ORDER BY 1, 2
+```
+This data set includes over two hundred starting years, too many to easily graph or examine in a table.
+Next we'll look at a less granular interval and cohort the legislators by the century of the `first_term`.
+This change is easily made by substituting century for year in the `date_part` function in subquery `aa`.
+Recall that century names are offset from the years they represent, so that the 18th century lasted from 1700 to 1799, the 19th century lasted from 1800 to 1899, and so on.^[Well, actually the 18th century ran from 1701 to 1800. This can be confirmed by comparing output from `SELECT date_part('century', '1700-12-31'::date)` with that from `SELECT date_part('century', '1701-01-01'::date)`.]
+The partitioning in the `first_value` function changes to the `first_century` field:
+
+```{sql}
+#| connection: db
+#| output.var: cen_pct_retaineds
+SELECT first_century, period
+,first_value(cohort_retained) over (partition by first_century 
+                                    order by period) as cohort_size
+,cohort_retained
+,cohort_retained / 
+ first_value(cohort_retained) over (partition by first_century 
+                                    order by period) as pct_retained
+FROM
+(
+    SELECT date_part('century',a.first_term) as first_century
+    ,coalesce(date_part('year',age(c.date,a.first_term)),0) as period
+    ,count(distinct a.id_bioguide) as cohort_retained
+    FROM
+    (
+        SELECT id_bioguide, min(term_start) as first_term
+        FROM legislators_terms 
+        GROUP BY 1
+    ) a
+    JOIN legislators_terms b on a.id_bioguide = b.id_bioguide 
+    LEFT JOIN date_dim c on c.date between b.term_start and b.term_end 
+    and c.month_name = 'December' and c.day_of_month = 31
+    GROUP BY 1,2
+) aa
+ORDER BY 1,2
+```
+The results are graphed in @fig-cen-pct-retained.
+Retention in the early years has been higher for those first elected in the 20th or 21st century.
+The 21st century is still underway, and thus many of those legislators have not had the opportunity to stay in office for five or more years, though they are still included in the denominator. 
+We might want to consider removing the 21st century from the analysis, but I've left it here to demonstrate how the retention curve drops artificially due to this circumstance.
+
+```{r}
+#| echo: false
+#| label: fig-cen-pct-retained
+#| fig-cap: Legislator retention by century in which first term began
+cen_pct_retaineds |>
+  collect() |>
+  mutate(first_century = factor(first_century)) |>
+  ggplot(aes(x = period, y = pct_retained,
+             color = first_century,
+             linetype = first_century,
+             group = first_century)) + 
+  geom_line() +
+  ylab("% Retained") +
+  xlab("Period")
+```
+
+Cohorts can be defined from other attributes in a time series besides the first date, with options depending on the values in the table.
+The `legislators_terms` table has a state field, indicating which state the person is representing for that term.
+We can use this to create cohorts, and we will base them on the first state in order to ensure that anyone who has represented multiple states appears in the data only once.
+
+::: {.callout-warning}
+
+When cohorting on an attribute that can change over time, it's important to ensure that each entity is assigned only one value.
+Otherwise the entity may be represented in multiple cohorts, introducing bias into the analysis.
+Usually the value from the earliest record in the data set is used.
+
+:::
+
+To find the first state for each legislator, we can use the `first_value` window function.
+In this example, we'll also turn the `min` function into a window function to avoid a lengthy `GROUP BY` clause:
+
+```{sql}
+#| connection: db
+SELECT distinct id_bioguide,
+  min(term_start) over (partition by id_bioguide) as first_term,
+  first_value(state) over (partition by id_bioguide 
+                          order by term_start) as first_state
+FROM legislators_terms 
+```
+We can then plug this code into our retention code to find the retention by `first_state`:
+
+```{sql}
+#| connection: db
+#| output.var: state_pct_retaineds
+SELECT first_state, period
+,first_value(cohort_retained) over (partition by first_state 
+                                    order by period) as cohort_size
+,cohort_retained
+,cohort_retained / 
+ first_value(cohort_retained) over (partition by first_state 
+                                    order by period) as pct_retained
+FROM
+(
+    SELECT a.first_state
+    ,coalesce(date_part('year',age(c.date,a.first_term)),0) as period
+    ,count(distinct a.id_bioguide) as cohort_retained
+    FROM
+    (
+        SELECT distinct id_bioguide
+        ,min(term_start) over (partition by id_bioguide) as first_term
+        ,first_value(state) over (partition by id_bioguide order by term_start) 
+         as first_state
+        FROM legislators_terms 
+    ) a
+    JOIN legislators_terms b on a.id_bioguide = b.id_bioguide 
+    LEFT JOIN date_dim c on c.date between b.term_start and b.term_end 
+    and c.month_name = 'December' and c.day_of_month = 31
+    GROUP BY 1,2
+) aa
+;
+```
+
+```{r}
+#| echo: false
+state_pct_retaineds |> head() |> tt()
+```
+
+The retention curves for the five states with the highest total number of legislators are graphed in Figure 4-6.
+Those elected in Illinois and Massachusetts have the highest retention, while New Yorkers have the lowest retention. Determining the reasons why would be an interesting offshoot of this analysis.
+
+```{r}
+#| echo: false
+#| label: fig-state-pct-retaineds
+#| fig-cap: "Legislator retention by first state: top five states by total legislators"
+top_5_states <- c("NY", "PA", "OH", "IL", "MA")
+
+state_pct_retaineds |>
+  filter(first_state %in% top_5_states) |>
+  ggplot(aes(x = period, 
+             y = pct_retained,
+             color = first_state,
+             linetype = first_state,
+             group = first_state)) + 
+  geom_line()
+```
+
+Defining cohorts from the time series is relatively straightforward using a `min` date for each entity and then converting that date into a month, year, or century as appropriate for the analysis.
+Switching between month and year or other levels of granularity also is straightforward, allowing for multiple options to be tested in order to find a grouping that is meaningful for the organization.
+Other attributes can be used for cohorting with the `first_value` window function. Next, we’ll turn to cases in which the cohorting attribute comes from a table other than that of the time series.
+
+### Defining the Cohort from a Separate Table
+
+Often the characteristics that define a cohort exist in a table separate from the one that contains the time series.
+For example, a database might have a customer table with information such as acquisition source or registration date by which customers can be cohorted. 
+Adding in attributes from other tables, or even subqueries, is relatively straightforward and can be done in retention analysis and related analyses discussed later in the chapter.
+
+For this example, we'll consider whether the gender of the legislator has any impact on their retention.
+The `legislators` table has a gender field, where F means female and M means male, that we can use to cohort the legislators.
+To do this, we'll `JOIN` the `legislators` table in as alias `d` to add gender to the calculation of `cohort_retained`, in place of year or century:
+
+```{sql}
+#| connection: db
+SELECT d.gender
+,coalesce(date_part('year',age(c.date,a.first_term)),0) as period
+,count(distinct a.id_bioguide) as cohort_retained
+FROM
+(
+    SELECT id_bioguide, min(term_start) as first_term
+    FROM legislators_terms 
+    GROUP BY 1
+) a
+JOIN legislators_terms b on a.id_bioguide = b.id_bioguide 
+LEFT JOIN date_dim c on c.date between b.term_start and b.term_end 
+and c.month_name = 'December' and c.day_of_month = 31
+JOIN legislators d on a.id_bioguide = d.id_bioguide
+GROUP BY 1, 2
+ORDER BY 2, 1
+```
+It's immediately clear that many more males than females have served legislative terms. 
+We can now calculate the `percent_retained` so we can compare the retention for these groups:
+
+```{sql}
+#| connection: db
+#| output.var: gender_retained
+SELECT gender, period
+,first_value(cohort_retained) over (partition by gender 
+                                    order by period) as cohort_size
+,cohort_retained
+,cohort_retained/ 
+ first_value(cohort_retained) over (partition by gender 
+                                    order by period) as pct_retained
+FROM
+(
+    SELECT d.gender
+    ,coalesce(date_part('year',age(c.date,a.first_term)),0) as period
+    ,count(distinct a.id_bioguide) as cohort_retained
+    FROM
+    (
+        SELECT id_bioguide, min(term_start) as first_term
+        FROM legislators_terms 
+        GROUP BY 1
+    ) a
+    JOIN legislators_terms b on a.id_bioguide = b.id_bioguide 
+    LEFT JOIN date_dim c on c.date between b.term_start and b.term_end 
+    and c.month_name = 'December' and c.day_of_month = 31
+    JOIN legislators d on a.id_bioguide = d.id_bioguide
+    GROUP BY 1,2
+) aa
+ORDER BY 2, 1
+```
+
+We can see from the results graphed in @fig-gender-retained that retention is higher for female legislators than for their male counterparts for periods 2 through 29.
+The first female legislator did not take office until 1917, when Jeannette Rankin joined the House as a Republican representative from Montana.
+As we saw earlier, retention has increased in more recent centuries.
+
+```{r}
+#| echo: false
+#| label: fig-gender-retained
+#| fig-cap: "Legislator retention by gender"
+gender_retained |>
+  ggplot(aes(x = period, 
+             y = pct_retained,
+             color = gender,
+             linetype = gender,
+             group = gender)) + 
+  geom_line()
+```
+To make a fairer comparison, we might restrict the legislators included in the analysis to only those whose `first_term` started since there have been women in Congress.
+We can do this by adding a `WHERE` filter to subquery `aa`.
+Here the results are also restricted to those who started before 2000, to ensure the cohorts have had at least 20 possible years to stay in office:
+
+```{sql}
+#| connection: db
+#| output.var: gender_retained_fairer
+SELECT gender, period
+,first_value(cohort_retained) over (partition by gender 
+                                    order by period) as cohort_size
+,cohort_retained
+,cohort_retained / 
+ first_value(cohort_retained) over (partition by gender 
+                                    order by period) as pct_retained
+FROM
+(
+    SELECT d.gender
+    ,coalesce(date_part('year',age(c.date,a.first_term)),0) as period
+    ,count(distinct a.id_bioguide) as cohort_retained
+    FROM
+    (
+        SELECT id_bioguide, min(term_start) as first_term
+        FROM legislators_terms 
+        GROUP BY 1
+    ) a
+    JOIN legislators_terms b on a.id_bioguide = b.id_bioguide 
+    LEFT JOIN date_dim c on c.date between b.term_start and b.term_end 
+    and c.month_name = 'December' and c.day_of_month = 31
+    JOIN legislators d on a.id_bioguide = d.id_bioguide
+    WHERE a.first_term between '1917-01-01' and '1999-12-31'
+    GROUP BY 1,2
+) aa
+```
+
+Male legislators still outnumber female legislators, but by a smaller margin. The retention for the cohorts is graphed in @fig-gender-retained-fairer.
+With the revised cohorts, male legislators have higher retention through year 7, but starting in year 12, female legislators have higher retention.
+The difference between the two gender-based cohort analyses underscores the importance of setting up appropriate cohorts and ensuring that they have comparable amounts of time to be present or complete other actions of interest.
+To further improve this analysis, we could cohort by both starting year or decade and gender, in order to control for additional changes in retention through the 20th century and into the 21st century.
+
+```{r}
+#| echo: false
+#| label: fig-gender-retained-fairer
+#| fig-cap: "Legislator retention by gender: cohorts from 1917 to 1999"
+gender_retained_fairer |>
+  ggplot(aes(x = period, 
+             y = pct_retained,
+             color = gender,
+             linetype = gender,
+             group = gender)) + 
+  geom_line()
+```
+
+Cohorts can be defined in multiple ways, from the time series and from other tables.
+With the framework we've developed, subqueries, views, or other derived tables can be swapped in, opening up a whole range of calculations to be the basis of a cohort.
+Multiple criteria, such as starting year and gender, can be used.
+One caution when dividing populations into cohorts based on multiple criteria is that this can lead to sparse cohorts, where some of the defined groups are too small and are not represented in the data set for all time periods.
+The next section will discuss methods for overcoming this challenge.
+
+### Dealing with Sparse Cohorts
+
+In the ideal data set, every cohort has some action or record in the time series for every period of interest.
+We’ve already seen how "missing" dates can occur due to subscriptions or terms lasting over multiple periods, and we looked at how to correct for them using a date dimension to infer intermediate dates.
+Another issue can arise when, due to grouping criteria, the cohort becomes too small and as a result is represented only sporadically in the data.
+A cohort may disappear from the result set, when we would prefer it to appear with a zero retention value.
+This problem is called sparse cohorts, and it can be worked around with the careful use of `LEFT JOIN`s.
+
+To demonstrate this, let's attempt to cohort female legislators by the first state they represented to see if there are any differences in retention.
+We've already seen that there have been relatively few female legislators.
+Cohorting them further by state is highly likely to create some sparse cohorts in which there are very few members.
+Before making code adjustments, let's add `first_state` (calculated in the section on deriving cohorts from the time series) into our previous gender example and look at the results:
+
+```{sql}
+#| connection: db
+#| output.var: gender_retained_sparse
+SELECT first_state, gender, period
+,first_value(cohort_retained) over (partition by first_state, gender 
+                                    order by period) as cohort_size
+,cohort_retained
+,cohort_retained / 
+ first_value(cohort_retained) over (partition by first_state, gender 
+                                    order by period) as pct_retained
+FROM
+(
+    SELECT a.first_state, d.gender
+    ,coalesce(date_part('year',age(c.date,a.first_term)),0) as period
+    ,count(distinct a.id_bioguide) as cohort_retained
+    FROM
+    (
+        SELECT distinct id_bioguide
+        ,min(term_start) over (partition by id_bioguide) as first_term
+        ,first_value(state) over (partition by id_bioguide 
+                                  order by term_start) as first_state
+        FROM legislators_terms 
+    ) a
+    JOIN legislators_terms b on a.id_bioguide = b.id_bioguide 
+    LEFT JOIN date_dim c on c.date between b.term_start and b.term_end 
+    and c.month_name = 'December' and c.day_of_month = 31
+    JOIN legislators d on a.id_bioguide = d.id_bioguide
+    WHERE a.first_term between '1917-01-01' and '1999-12-31'
+    GROUP BY 1,2,3
+) aa
+ORDER BY 1, 3, 2
+```
+
+Graphing the results for the first 20 periods, as in @fig-gender-retained-sparse, reveals the sparse cohorts.
+Alaska did not have any female legislators, while Arizona's female retention curve disappears after year 3.
+Only California, a large state with many legislators, has complete retention curves for both genders.
+This pattern repeats for other small and large states.
+
+```{r}
+#| echo: false
+#| label: fig-gender-retained-sparse
+#| fig-cap: "Legislator retention by gender and first state"
+gender_retained_sparse |>
+  filter(first_state %in% c("AZ", "CA", "AK"),
+         period <= 20) |>
+  ggplot(aes(x = period, 
+             y = pct_retained,
+             color = gender,
+             linetype = gender,
+             group = gender)) + 
+  geom_line() +
+  facet_wrap(first_state ~ ., ncol = 1)
+```
+
+Now let’s look at how to ensure a record for every period so that the query returns zero values for retention instead of nulls. The first step is to query for all combinations of periods and cohort attributes, in this case first_state and gender, with the starting cohort_size for each combination. This can be done by JOINing subquery aa, which calculates the cohort, with a generate_series subquery that returns all integers from 0 to 20, with the criteria on 1 = 1. This is a handy way to force a Cartesian JOIN when the two subqueries don’t have any fields in common:
+
+```{r}
+#| include: false
+dbDisconnect(db, shutdown = TRUE)
 ```
