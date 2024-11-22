@@ -364,7 +364,8 @@ WITH dates AS
                          INTERVAL '1 day') )
 SELECT date, 
   strftime(date, '%B') AS month_name,
-  strftime(date, '%-d') AS day_of_month
+  strftime(date, '%-d') AS day_of_month,
+  year(date) AS year
 FROM dates;
 ```
 
@@ -934,7 +935,513 @@ gender_retained_sparse |>
   facet_wrap(first_state ~ ., ncol = 1)
 ```
 
-Now let’s look at how to ensure a record for every period so that the query returns zero values for retention instead of nulls. The first step is to query for all combinations of periods and cohort attributes, in this case first_state and gender, with the starting cohort_size for each combination. This can be done by JOINing subquery aa, which calculates the cohort, with a generate_series subquery that returns all integers from 0 to 20, with the criteria on 1 = 1. This is a handy way to force a Cartesian JOIN when the two subqueries don’t have any fields in common:
+Now let's look at how to ensure a record for every period so that the query returns zero values for retention instead of nulls.
+The first step is to query for all combinations of periods and cohort attributes, in this case `first_state` and `gender`, with the starting `cohort_size` for each combination.
+This can be done by `JOIN`ing subquery `aa`, which calculates the cohort, with a `generate_series` subquery that returns all integers from 0 to 20, with the criterion `on 1 = 1`.
+This is a handy way to force a Cartesian `JOIN` when the two subqueries don't have any fields in common:
+
+```{sql}
+#| connection: db
+SELECT aa.gender, aa.first_state, cc.period, aa.cohort_size
+FROM
+(
+    SELECT b.gender, a.first_state 
+    ,count(distinct a.id_bioguide) as cohort_size
+    FROM 
+    (
+        SELECT distinct id_bioguide
+        ,min(term_start) over (partition by id_bioguide) as first_term
+        ,first_value(state) over (partition by id_bioguide 
+                                  order by term_start) as first_state
+        FROM legislators_terms 
+    ) a
+    JOIN legislators b on a.id_bioguide = b.id_bioguide
+    WHERE a.first_term between '1917-01-01' and '1999-12-31' 
+    GROUP BY 1,2
+) aa
+JOIN
+(
+    SELECT generate_series as period 
+    FROM generate_series(0,20,1)
+) cc on 1 = 1
+ORDER BY 2, 3, 1
+```
+The next step is to `JOIN` this back to the actual periods in office, with a `LEFT JOIN` to ensure all the time periods remain in the final result:
+
+```{sql}
+#| connection: db
+SELECT aaa.gender, aaa.first_state, aaa.period, aaa.cohort_size
+,coalesce(ddd.cohort_retained,0) as cohort_retained
+,coalesce(ddd.cohort_retained,0) / aaa.cohort_size as pct_retained
+FROM
+(
+    SELECT aa.gender, aa.first_state, cc.period, aa.cohort_size
+    FROM
+    (
+        SELECT b.gender, a.first_state
+        ,count(distinct a.id_bioguide) as cohort_size
+        FROM 
+        (
+            SELECT distinct id_bioguide
+            ,min(term_start) over (partition by id_bioguide) 
+             as first_term
+            ,first_value(state) over (partition by id_bioguide 
+                                      order by term_start) 
+                                      as first_state
+            FROM legislators_terms 
+        ) a
+        JOIN legislators b on a.id_bioguide = b.id_bioguide 
+        WHERE a.first_term between '1917-01-01' and '1999-12-31' 
+        GROUP BY 1,2
+    ) aa
+    JOIN
+    (
+        SELECT generate_series as period 
+        FROM generate_series(0,20,1)
+    ) cc on 1 = 1
+) aaa
+LEFT JOIN
+(
+    SELECT d.first_state, g.gender
+    ,coalesce(date_part('year',age(f.date,d.first_term)),0) as period
+    ,count(distinct d.id_bioguide) as cohort_retained
+    FROM
+    (
+        SELECT distinct id_bioguide
+        ,min(term_start) over (partition by id_bioguide) as first_term
+        ,first_value(state) over (partition by id_bioguide 
+                                  order by term_start) as first_state
+        FROM legislators_terms 
+    ) d
+    JOIN legislators_terms e on d.id_bioguide = e.id_bioguide 
+    LEFT JOIN date_dim f on f.date between e.term_start and e.term_end 
+     and f.month_name = 'December' and f.day_of_month = 31
+    JOIN legislators g on d.id_bioguide = g.id_bioguide
+    WHERE d.first_term between '1917-01-01' and '1999-12-31'
+    GROUP BY 1,2,3
+) ddd on aaa.gender = ddd.gender and aaa.first_state = ddd.first_state 
+and aaa.period = ddd.period
+```
+
+We can then pivot the results and confirm that a value exists for each cohort for each period:
+
+```{sql}
+#| connection: db
+#| echo: false
+SELECT gender, first_state
+,max(case when period = 0 then pct_retained end) as yr0
+,max(case when period = 2 then pct_retained end) as yr2
+,max(case when period = 4 then pct_retained end) as yr4
+,max(case when period = 6 then pct_retained end) as yr6
+,max(case when period = 8 then pct_retained end) as yr8
+,max(case when period = 10 then pct_retained end) as yr10
+FROM
+(
+        SELECT aaa.gender, aaa.first_state, aaa.period, aaa.cohort_size
+        ,coalesce(ddd.cohort_retained,0) as cohort_retained
+        ,coalesce(ddd.cohort_retained,0) * 1.0 / aaa.cohort_size as pct_retained
+        FROM
+        (
+        SELECT aa.gender, aa.first_state, cc.period, aa.cohort_size
+        FROM
+        (
+                SELECT b.gender, a.first_state
+                ,count(distinct a.id_bioguide) as cohort_size
+                FROM 
+                (
+                        SELECT distinct id_bioguide
+                        ,min(term_start) over (partition by id_bioguide) as first_term
+                        ,first_value(state) over (partition by id_bioguide 
+                                                  order by term_start) as first_state
+                        FROM legislators_terms 
+                ) a
+                JOIN legislators b on a.id_bioguide = b.id_bioguide 
+                WHERE a.first_term between '1917-01-01' and '1999-12-31' 
+                GROUP BY 1,2
+        ) aa
+        JOIN
+        (
+                SELECT generate_series as period 
+                FROM generate_series(0,20,1)
+        ) cc on 1 = 1
+        ) aaa
+        LEFT JOIN
+        (
+                SELECT d.first_state, g.gender
+                ,coalesce(date_part('year',age(f.date,d.first_term)),0) as period
+                ,count(distinct d.id_bioguide) as cohort_retained
+                FROM
+                (
+                        SELECT distinct id_bioguide
+                        ,min(term_start) over (partition by id_bioguide) as first_term
+                        ,first_value(state) over (partition by id_bioguide 
+                                                  order by term_start) as first_state
+                        FROM legislators_terms 
+                ) d
+                JOIN legislators_terms e on d.id_bioguide = e.id_bioguide 
+                LEFT JOIN date_dim f on f.date between e.term_start and e.term_end 
+                and f.month_name = 'December' and f.day_of_month = 31
+                JOIN legislators g on d.id_bioguide = g.id_bioguide
+                WHERE d.first_term between '1917-01-01' and '1999-12-31'
+                GROUP BY 1,2,3
+        ) ddd on aaa.gender = ddd.gender and aaa.first_state = ddd.first_state 
+        and aaa.period = ddd.period
+) a
+GROUP BY 1, 2
+ORDER BY 1, 2
+```
+Notice that at this point, the SQL code has gotten quite long.
+One of the harder parts of writing SQL for cohort retention analysis is keeping all of the logic straight and the code organized, a topic I'll discuss more in Chapter 8. 
+When building up retention code, I find it helpful to go step-by-step, checking results along the way.
+I also spot-check individual cohorts to validate that the final result is accurate.
+
+Cohorts can be defined in many ways. 
+So far, we've normalized all our cohorts to the first date they appear in the time series data.
+This isn't the only option, however, and interesting analysis can be done starting in the middle of an entity's life span.
+Before concluding our work on retention analysis, let's take a look at this additional way to define cohorts.
+
+### Defining Cohorts from Dates Other Than the First Date
+
+Usually time-based cohorts are defined from the entity's first appearance in the time series or from some other earliest date, such as a registration date. 
+However, cohorting on a different date can be useful and insightful.
+For example, we might want to look at retention across all customers using a service as of a particular date.
+This type of analysis can be used to understand whether product or marketing changes have had a long-term impact on existing customers.
+
+When using a date other than the first date, we need to take care to precisely define the criteria for inclusion in each cohort.
+One option is to pick entities present on a particular calendar date.
+This is relatively straightforward to put into SQL code, but it can be problematic if a large share of the regular user population doesn’t show up every day, causing retention to vary depending on the exact day chosen.
+One option to correct for this is to calculate retention for several starting dates and then average the results.
+
+Another option is to use a window of time such as a week or month.
+Any entity that appears in the data set during that window is included in the cohort.
+While this approach is often more representative of the business or process, the trade-off is that the SQL code will become more complex, and the query time may be slower due to more intense database calculations.
+Finding the right balance between query performance and accuracy of results is something of an art.
+
+Let's take a look at how to calculate such midstream analysis with the legislators data set by considering retention for legislators who were in office in the year 2000.
+We’ll cohort by the `term_type`, which has values of "sen" for senators and "rep" for representatives.
+The definition will include any legislator in office at any time during the year 2000: those who started prior to 2000 and whose terms ended during or after 2000 qualify, as do those who started a term in 2000.
+We can hardcode any date in 2000 as the `first_term`, since we will later check whether they were in office at some point during 2000.
+The `min_start` of the terms falling in this window is also calculated for use in a later step:
+
+
+```{sql}
+#| connection: db
+SELECT distinct id_bioguide, term_type, date '2000-01-01' as first_term
+,min(term_start) as min_start
+FROM legislators_terms 
+WHERE term_start <= '2000-12-31' and term_end >= '2000-01-01'
+GROUP BY 1,2,3
+```
+
+We can then plug this into our retention code, with two adjustments.
+First, an additional `JOIN` criterion between subquery `a` and the `legislators_terms` table is added in order to return only terms that started on or after the `min_start` date.
+Second, an additional filter is added to the `date_dim` so that it only returns dates in 2000 or later:
+
+```{sql}
+#| connection: db
+#| output.var: pct_retained_2000
+SELECT term_type, period
+,first_value(cohort_retained) over (partition by term_type order by period) 
+ as cohort_size
+,cohort_retained
+,cohort_retained / 
+ first_value(cohort_retained) over (partition by term_type order by period) 
+ as pct_retained
+FROM
+(
+    SELECT a.term_type
+    ,coalesce(date_part('year',age(c.date,a.first_term)),0) as period
+    ,count(distinct a.id_bioguide) as cohort_retained
+    FROM
+    (
+        SELECT distinct id_bioguide, term_type
+        ,date '2000-01-01' as first_term
+        ,min(term_start) as min_start
+        FROM legislators_terms 
+        WHERE term_start <= '2000-12-31' and term_end >= '2000-01-01'
+        GROUP BY 1,2,3
+    ) a
+    JOIN legislators_terms b on a.id_bioguide = b.id_bioguide 
+    and b.term_start >= a.min_start
+    LEFT JOIN date_dim c on c.date between b.term_start and b.term_end 
+    and c.month_name = 'December' and c.day_of_month = 31 
+    and c.year >= 2000
+    GROUP BY 1,2
+) aa
+ORDER BY 2, 1
+```
+
+@fig-pct-retained-2000 shows that despite longer terms for senators, retention among the two cohorts was similar, and was actually worse for senators after 10 years.
+A further analysis comparing the different years they were first elected, or other cohort attributes, might yield some interesting insights.
+
+```{r}
+#| echo: false
+#| label: fig-pct-retained-2000
+#| fig-cap: "Retention by term type for legislators in office during the year 2000"
+pct_retained_2000 |>
+  filter(period <= 20) |>
+  mutate(pct_retained = pct_retained * 100) |>
+  ggplot(aes(x = period, y = pct_retained,
+             colour = term_type, group = term_type)) +
+  geom_line()
+```
+
+A common use case for cohorting on a value other than a starting value is when trying to analyze retention after an entity has reached a threshold, such as a certain number of purchases or a certain amount spent.
+As with any cohort, it's important to take care in defining what qualifies an entity to be in a cohort and which date will be used as the starting date.
+
+Cohort retention is a powerful way to understand the behavior of entities in a time series data set.
+We've seen how to calculate retention with SQL and how to cohort based on the time series itself or on other tables, and from points in the middle of entity life span.
+We also looked at how to use functions and `JOIN`s to adjust dates within time series and compensate for sparse cohorts.
+There are several types of analyses that are related to cohort retention: analysis, survivorship, returnship, and cumulative calculations, all of which build off of the SQL code that we’ve developed for retention.
+Let's turn to them next.
+
+## Related Cohort Analyses
+
+In the last section, we learned how to write SQL for cohort retention analysis.
+Retention captures whether an entity was in a time series data set on a specific date or window of time.
+In addition to presence on a specific date, analysis is often interested in questions of how long an entity lasted, whether an entity did multiple actions, and how many of those actions occurred.
+These can all be answered with code that is similar to retention and is well suited to just about any cohorting criteria you like.
+Let's take a look at the first of these, survivorship.
+
+### Survivorship
+
+Survivorship, also called survival analysis, is concerned with questions about how long something lasts, or the duration of time until a particular event such as churn or death.
+Survivorship analysis can answer questions about the share of the population that is likely to remain past a certain amount of time.
+Cohorts can help identify or at least provide hypotheses about which characteristics or circumstances increase or decrease the survival likelihood.
+
+This is similar to a retention analysis, but instead of calculating whether an entity was present in a certain period, we calculate whether the entity is present in that period or later in the time series.
+Then the share of the total cohort is calculated.
+Typically one or more periods are chosen depending on the nature of the data set analyzed.
+For example, if we want to know the share of game players who survive for a week or longer, we can check for actions that occur after a week from starting and consider those players still surviving. On the other hand, if we are concerned about the number of students who are still in school after a certain number of years, we could look for the absence of a graduation event in a data set.
+The number of periods can be `SELECT`ed either by calculating an average or typical life span or by choosing time periods that are meaningful to the organization or process analyzed, such as a month, year, or longer time period.
+
+In this example, we'll look at the share of legislators who survived in office for a decade or more after their first term started.
+Since we don't need to know the specific dates of each term, we can start by calculating the first and last `term_start` dates, using `min` and `max` aggregations:
+
+```{sql}
+#| connection: db
+SELECT id_bioguide,
+  min(term_start) as first_term,
+  max(term_start) as last_term
+FROM legislators_terms
+GROUP BY 1
+```
+
+Next, we add to the query a `date_part` function to find the century of the `min` `term_start`, and we calculate the tenure as the number of years between the `min` and `max` `term_start`s found with the `age` function:
+
+```{sql}
+#| connection: db
+SELECT id_bioguide,
+  date_part('century', min(term_start)) as first_century,
+  min(term_start) as first_term,
+  max(term_start) as last_term,
+  date_part('year', age(max(term_start), min(term_start))) as tenure
+FROM legislators_terms
+GROUP BY 1
+```
+
+Finally, we calculate the `cohort_size` with a count of all the legislators, as well as calculating the number who survived for at least 10 years by using a `CASE` statement and `count` aggregation.
+The percent who survived is found by dividing these two values:
+
+```{sql}
+#| connection: db
+SELECT first_century
+,count(distinct id_bioguide) as cohort_size
+,count(distinct case when tenure >= 10 then id_bioguide 
+                     end) as survived_10
+,count(distinct case when tenure >= 10 then id_bioguide end) 
+ / count(distinct id_bioguide) as pct_survived_10
+FROM
+(
+    SELECT id_bioguide
+    ,date_part('century',min(term_start)) as first_century
+    ,min(term_start) as first_term
+    ,max(term_start) as last_term
+    ,date_part('year',age(max(term_start),min(term_start))) as tenure
+    FROM legislators_terms
+    GROUP BY 1
+) a
+GROUP BY 1
+;
+```
+
+Since terms may or may not be consecutive, we can also calculate the share of legislators in each century who survived for five or more total terms.
+In the subquery, add a count to find the total number of terms per legislator. 
+Then in the outer query, divide the number of legislators with five or more terms by the total cohort size:
+
+```{sql}
+#| connection: db
+SELECT first_century
+,count(distinct id_bioguide) as cohort_size
+,count(distinct case when total_terms >= 5 then id_bioguide end) 
+ as survived_5
+,count(distinct case when total_terms >= 5 then id_bioguide end)
+ / count(distinct id_bioguide) as pct_survived_5_terms
+FROM
+(
+    SELECT id_bioguide
+    ,date_part('century',min(term_start)) as first_century
+    ,count(term_start) as total_terms
+    FROM legislators_terms
+    GROUP BY 1
+) a
+GROUP BY 1
+ORDER BY 1
+```
+
+Ten years or five terms is somewhat arbitrary.
+We can also calculate the survivorship for each number of years or periods and display the results in graph or table form.
+Here, we calculate the survivorship for each number of terms from 1 to 20.
+This is accomplished through a Cartesian `JOIN` to a subquery that contains those integers derived by the `generate_series` function:
+
+
+```{sql}
+#| connection: db
+#| output.var: surv_century
+SELECT a.first_century, b.terms
+,count(distinct id_bioguide) as cohort
+,count(distinct case when a.total_terms >= b.terms then id_bioguide 
+                     end) as cohort_survived
+,count(distinct case when a.total_terms >= b.terms then id_bioguide 
+                     end)
+ / count(distinct id_bioguide) as pct_survived
+FROM
+(
+    SELECT id_bioguide
+    ,date_part('century',min(term_start)) as first_century
+    ,count(term_start) as total_terms
+    FROM legislators_terms
+    GROUP BY 1
+) a
+JOIN
+(
+    SELECT generate_series as terms 
+    FROM generate_series(1,20,1)
+) b on 1 = 1
+GROUP BY 1,2
+ORDER BY 1, 2
+```
+The results are graphed in @fig-surv-century. 
+Survivorship was highest in the 20th century, a result that agrees with results we saw previously in which retention was also highest in the 20th century.
+
+```{r}
+#| echo: false
+#| label: fig-surv-century
+#| fig-cap: "Retention by term type for legislators in office during the year 2000"
+surv_century |>
+  mutate(century = as.character(first_century)) |>
+  ggplot(aes(x = terms, y = pct_survived,
+             linetype = century)) + 
+  geom_line() +
+  ylab("% Survived") +
+  xlab("Number of Terms")
+```
+Survivorship is closely related to retention.
+While retention counts entities present in a specific number of periods from the start, survivorship considers only whether an entity was present as of a specific period or later.
+As a result, the code is simpler since it needs only the first and last dates in the time series, or a count of dates.
+Cohorting is done similar to cohorting for retention, and cohort definitions can come from within the time series or be derived from another table or subquery.
+
+Next we'll consider another type of analysis that is in some ways the inverse of survivorship.
+Rather than calculating whether an entity is present in the data set at a certain time or later, we will calculate whether an entity returns or repeats an action at a certain period or earlier. 
+This is called returnship or repeat purchase behavior.
+
+### Returnship, or Repeat Purchase Behavior
+
+Survivorship is useful for understanding how long a cohort is likely to stick around.
+Another useful type of cohort analysis seeks to understand whether a cohort member can be expected to return within a given window of time and the intensity of activity during that window.
+This is called *returnship* or *repeat purchase behavior*.
+
+For example, an ecommerce site might want to know not only how many new buyers were acquired via a marketing campaign but also whether those buyers have become repeat buyers.
+One way to figure this out is to simply calculate total purchases per customer. However, comparing customers acquired two years ago with those acquired a month ago isn't fair, since the former have had a much longer time in which to return.
+The older cohort would almost certainly appear more valuable than the newer one.
+Although this is true in a sense, it gives an incomplete picture of how the cohorts are likely to behave across their entire life span.
+
+To make fair comparisons between cohorts with different starting dates, we need to create an analysis based on a *time box*, or a fixed window of time from the first date, and consider whether cohort members returned within that window. 
+This way, every cohort has an equal amount of time under consideration, so long as we include only those cohorts for which the full window has elapsed. 
+Returnship analysis is common for retail organizations, but it can also be applied in other domains.
+For example, a university might want to see how many students enrolled in a second course, or a hospital might be interested in how many patients need follow-up medical treatments after an initial incident.
+
+To demonstrate returnship analysis, we can ask a new question of the legislators data set: how many legislators have more than one term type, and specifically, what share of them start as representatives and go on to become senators (some senators later become representatives, but that is much less common).
+Since relatively few make this transition, we'll cohort legislators by the century in which they first became a representative.
+
+The first step is to find the cohort size for each century, using the subquery and `date_part` calculations seen previously, for only those with `term_type = 'rep'`:
+
+```{sql}
+#| connection: db
+SELECT date_part('century',a.first_term) as cohort_century
+,count(id_bioguide) as reps
+FROM
+(
+    SELECT id_bioguide, min(term_start) as first_term
+    FROM legislators_terms
+    WHERE term_type = 'rep'
+    GROUP BY 1
+) a
+GROUP BY 1
+ORDER BY 1
+```
+
+Next we'll perform a similar calculation, with a `JOIN` to the `legislators_terms` table, to find the representatives who later became senators.
+This is accomplished with the clauses `b.term_type = 'sen'` and `b.term_start > a.first_term`:
+
+```{sql}
+#| connection: db
+SELECT date_part('century',a.first_term) as cohort_century
+,count(distinct a.id_bioguide) as rep_and_sen
+FROM
+(
+    SELECT id_bioguide, min(term_start) as first_term
+    FROM legislators_terms
+    WHERE term_type = 'rep'
+    GROUP BY 1
+) a
+JOIN legislators_terms b on a.id_bioguide = b.id_bioguide
+and b.term_type = 'sen' and b.term_start > a.first_term
+GROUP BY 1
+ORDER BY 1
+```
+
+Finally, we `JOIN` these two subqueries together and calculate the percent of representatives who became senators.
+A `LEFT JOIN` is used; this clause is typically recommended to ensure that all cohorts are included whether or not the subsequent event happened.
+If there is a century in which no representatives became senators, we still want to include that century in the result set:
+
+```{sql}
+#| connection: db
+SELECT aa.cohort_century
+,bb.rep_and_sen * 1.0 / aa.reps as pct_rep_and_sen
+FROM
+(
+        SELECT date_part('century',a.first_term) as cohort_century
+        ,count(id_bioguide) as reps
+        FROM
+        (
+                SELECT id_bioguide, min(term_start) as first_term
+                FROM legislators_terms
+                WHERE term_type = 'rep'
+                GROUP BY 1
+        ) a
+        WHERE first_term <= '2009-12-31'
+        GROUP BY 1
+) aa
+LEFT JOIN
+(
+        SELECT date_part('century',b.first_term) as cohort_century
+        ,count(distinct b.id_bioguide) as rep_and_sen
+        FROM
+        (
+                SELECT id_bioguide, min(term_start) as first_term
+                FROM legislators_terms
+                WHERE term_type = 'rep'
+                GROUP BY 1
+        ) b
+        JOIN legislators_terms c on b.id_bioguide = c.id_bioguide
+        and c.term_type = 'sen' and c.term_start > b.first_term
+        WHERE age(c.term_start, b.first_term) <= interval '10 years'
+        GROUP BY 1
+) bb on aa.cohort_century = bb.cohort_century
+ORDER BY 1
+```
+
 
 ```{r}
 #| include: false
