@@ -1408,6 +1408,47 @@ If there is a century in which no representatives became senators, we still want
 ```{sql}
 #| connection: db
 SELECT aa.cohort_century
+,bb.rep_and_sen / aa.reps as pct_rep_and_sen
+FROM
+(
+        SELECT date_part('century',a.first_term) as cohort_century
+        ,count(id_bioguide) as reps
+        FROM
+        (
+                SELECT id_bioguide, min(term_start) as first_term
+                FROM legislators_terms
+                WHERE term_type = 'rep'
+                GROUP BY 1
+        ) a
+        GROUP BY 1
+) aa
+LEFT JOIN
+(
+        SELECT date_part('century',b.first_term) as cohort_century
+        ,count(distinct b.id_bioguide) as rep_and_sen
+        FROM
+        (
+                SELECT id_bioguide, min(term_start) as first_term
+                FROM legislators_terms
+                WHERE term_type = 'rep'
+                GROUP BY 1
+        ) b
+        JOIN legislators_terms c on b.id_bioguide = c.id_bioguide
+        and c.term_type = 'sen' and c.term_start > b.first_term
+        GROUP BY 1
+) bb on aa.cohort_century = bb.cohort_century
+ORDER BY 1
+```
+
+Representatives from the 18th century were most likely to become senators.
+However, we have not yet applied a time box to ensure a fair comparison.
+While we can safely assume that all legislators who served in the 18th and 19th centuries are no longer living, many of those who were first elected in the 20th and 21st centuries are still in the middle of their careers.
+Adding the filter `WHERE age(c.term_start, b.first_term) <= interval '10 years'` to subquery `bb` creates a time box of 10 years.
+Note that the window can easily be made larger or smaller by changing the constant in the interval. An additional filter applied to subquery `a`, `WHERE first_term <= '2009-12-31'`, excludes those who were less than 10 years into their careers when the data set was assembled:
+
+```{sql}
+#| connection: db
+SELECT aa.cohort_century
 ,bb.rep_and_sen * 1.0 / aa.reps as pct_rep_and_sen
 FROM
 (
@@ -1442,6 +1483,159 @@ LEFT JOIN
 ORDER BY 1
 ```
 
+With this new adjustment, the 18th century still had the highest share of representatives becoming senators within 10 years, but the 21st century has the second-highest share, and the 20th century had a higher share than the 19th.
+
+Since 10 years is somewhat arbitrary, we might also want to compare several time windows. 
+One option is to run the query several times with different intervals and note the results.
+Another option is to calculate multiple windows in the same result set by using a set of `CASE` statements inside of `count distinct` aggregations to form the intervals, rather than specifying the interval in the `WHERE` clause:
+
+```{sql}
+#| connection: db
+SELECT aa.cohort_century
+,bb.rep_and_sen_5_yrs * 1.0 / aa.reps as pct_5_yrs
+,bb.rep_and_sen_10_yrs * 1.0 / aa.reps as pct_10_yrs
+,bb.rep_and_sen_15_yrs * 1.0 / aa.reps as pct_15_yrs
+FROM
+(
+    SELECT date_part('century',a.first_term) as cohort_century
+    ,count(id_bioguide) as reps
+    FROM
+    (
+        SELECT id_bioguide, min(term_start) as first_term
+        FROM legislators_terms
+        WHERE term_type = 'rep'
+        GROUP BY 1
+    ) a
+    WHERE first_term <= '2009-12-31'
+    GROUP BY 1
+) aa
+LEFT JOIN
+(
+    SELECT date_part('century',b.first_term) as cohort_century
+    ,count(distinct case when age(c.term_start,b.first_term) 
+                              <= interval '5 years' 
+                         then b.id_bioguide end) as rep_and_sen_5_yrs
+    ,count(distinct case when age(c.term_start,b.first_term) 
+                              <= interval '10 years' 
+                         then b.id_bioguide end) as rep_and_sen_10_yrs
+    ,count(distinct case when age(c.term_start,b.first_term) 
+                              <= interval '15 years' 
+                         then b.id_bioguide end) as rep_and_sen_15_yrs
+    FROM
+    (
+        SELECT id_bioguide, min(term_start) as first_term
+        FROM legislators_terms
+        WHERE term_type = 'rep'
+        GROUP BY 1
+    ) b
+    JOIN legislators_terms c on b.id_bioguide = c.id_bioguide
+    and c.term_type = 'sen' and c.term_start > b.first_term
+    GROUP BY 1
+) bb on aa.cohort_century = bb.cohort_century
+ORDER BY 1
+```
+
+With this output, we can see how the share of representatives who became senators evolved over time, both within each cohort and across cohorts.
+In addition to the table format, graphing the output often reveals interesting trends.
+In **Figure 4-12**, the cohorts based on century are replaced with cohorts based on the first decade, and the trends over 10 and 20 years are shown.
+Conversion of representatives to senators during the first few decades of the new US legislature was clearly different from patterns in the years since.
+
+Finding the repeat behavior within a fixed time box is a useful tool for comparing cohorts.
+This is particularly true when the behaviors are intermittent in nature, such as purchase behavior or content or service consumption.
+In the next section, we'll look at how to calculate not only whether an entity had a subsequent action but also how many subsequent actions they had, and we'll aggregate them with cumulative calculations.
+
+### Cumulative Calculations
+
+Cumulative cohort analysis can be used to establish cumulative lifetime value, also called customer lifetime value (the acronyms CLTV and LTV are used interchangeably), and to monitor newer cohorts in order to be able to predict what their full LTV will be.
+This is possible because early behavior is often highly correlated with long-term behavior.
+Users of a service who return frequently in their first days or weeks of using it tend to be the most likely to stay around over the long term.
+Customers who buy a second or third time early on are likely to continue purchasing over a longer time period.
+Subscribers who renew after the first month or year are often likely to stick around over many subsequent months or years.
+
+In this section, I'll mainly talk about the revenue-generating activities of customers, but this analysis can also be applied to situations in which customers or entities incur costs, such as through product returns, support interactions, or use of health-care services.
+
+With cumulative calculations, we're less concerned about whether an entity did an action on a particular date and more about the total as of a particular date.
+The cumulative calculations used in this type of analysis are most often `count`s or `sum`s.
+We will again use the time box concept to ensure apples-to-apples comparisons between cohorts.
+Let's look at the number of terms started within 10 years of the first `term_start`, cohorting the legislators by century and type of first term:
+
+```{sql}
+#| connection: db
+SELECT date_part('century',a.first_term) as century
+,first_type
+,count(distinct a.id_bioguide) as cohort
+,count(b.term_start) as terms
+FROM
+(
+    SELECT distinct id_bioguide
+    ,first_value(term_type) over (partition by id_bioguide 
+                                  order by term_start) as first_type
+    ,min(term_start) over (partition by id_bioguide) as first_term
+    ,min(term_start) over (partition by id_bioguide) 
+     + interval '10 years' as first_plus_10
+    FROM legislators_terms
+) a
+LEFT JOIN legislators_terms b on a.id_bioguide = b.id_bioguide 
+and b.term_start between a.first_term and a.first_plus_10
+GROUP BY 1,2
+ORDER BY 1, 2
+```
+
+The largest cohort is that of representatives first elected in the 19th century, but the cohort with the largest number of terms started within 10 years is that of representatives first elected in the 20th century.
+This type of calculation can be useful for understanding the overall contribution of a cohort to an organization.T
+otal sales or total repeat purchases can be valuable metrics.
+Usually, though, we want to normalize to understand the contribution on a per-entity basis.
+Calculations we might want to make include average actions per person, average order value (AOV), items per order, and orders per customer.
+To normalize by the cohort size, simply divide by the starting cohort, which we've done previously with retention, survivorship, and returnship.
+Here we do that and also pivot the results into table form for easier comparisons:
+
+```{sql}
+#| connection: db
+SELECT century
+,max(case when first_type = 'rep' then cohort end) as rep_cohort
+,max(case when first_type = 'rep' then terms_per_leg end) 
+ as avg_rep_terms
+,max(case when first_type = 'sen' then cohort end) as sen_cohort
+,max(case when first_type = 'sen' then terms_per_leg end) 
+ as avg_sen_terms
+FROM
+(
+    SELECT date_part('century',a.first_term) as century
+    ,first_type
+    ,count(distinct a.id_bioguide) as cohort
+    ,count(b.term_start) as terms
+    ,count(b.term_start) 
+     / count(distinct a.id_bioguide) as terms_per_leg
+    FROM
+    (
+        SELECT distinct id_bioguide
+        ,first_value(term_type) over (partition by id_bioguide 
+                                      order by term_start
+                                      ) as first_type
+        ,min(term_start) over (partition by id_bioguide) as first_term
+        ,min(term_start) over (partition by id_bioguide) 
+         + interval '10 years' as first_plus_10
+        FROM legislators_terms
+    ) a
+    LEFT JOIN legislators_terms b on a.id_bioguide = b.id_bioguide 
+    and b.term_start between a.first_term and a.first_plus_10
+    GROUP BY 1,2
+) aa
+GROUP BY 1
+ORDER BY 1
+```
+With the cumulative terms normalized by the cohort size, we can now confirm that representatives first elected in the 20th century had the highest average number of terms, while those who started in the 19th century had the fewest number of terms on average.
+Senators have fewer but longer terms than their representative peers, and again those who started in the 20th century have had the highest number of terms on average.
+
+Cumulative calculations are often used in customer lifetime value calculations.
+LTV is usually calculated using monetary measures, such as total dollars spent by a customer, or the gross margin (revenue minus costs) generated by a customer across their lifetime.
+To facilitate comparisons between cohorts, the "lifetime" is often chosen to reflect average customer lifetime, or periods that are convenient to analyze, such as 3, 5, or 10 years.
+The legislators data set doesn’t contain financial metrics, but swapping in dollar values in any of the preceding SQL code would be straightforward.
+Fortunately, SQL is a flexible enough language that we can adapt these templates to address a wide variety of analytical questions.
+
+Cohort analysis includes a set of techniques that can be used to answer questions related to behavior over time and how various attributes may contribute to differences between groups.
+Survivorship, returnship, and cumulative calculations all shed light on these questions.
+With a good understanding of how cohorts behave, we often have to turn our attention back to the composition or mix of cohorts over time, understanding how that can impact total retention, survivorship, returnship, or cumulative values such that these measures differ surprisingly from the individual cohorts.
 
 ```{r}
 #| include: false
