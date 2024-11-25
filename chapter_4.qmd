@@ -2002,12 +2002,14 @@ There are also interesting periodic increases in 1-to-4-year-tenure legislators 
 #| echo: false
 #| label: fig-4-14
 #| fig-cap: "Percent of legislators by number of years in office"
+df_fig_4_14 <- as_tibble(df_fig_4_14)
+
 df_fig_4_14 |>
   mutate(tenure = fct_rev(factor(tenure, 
                                  levels = c("1 to 4", "5 to 10", 
                                             "11 to 20", "21+")))) |>
   ggplot(aes(x = date, y = pct_legislators * 100,
-             fill = tenure, group = tenure)) +
+             fill = tenure)) +
   geom_area() +
   theme(legend.position = "inside", 
         legend.direction = "horizontal",
