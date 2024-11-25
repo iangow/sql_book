@@ -1537,8 +1537,67 @@ ORDER BY 1
 
 With this output, we can see how the share of representatives who became senators evolved over time, both within each cohort and across cohorts.
 In addition to the table format, graphing the output often reveals interesting trends.
-In **Figure 4-12**, the cohorts based on century are replaced with cohorts based on the first decade, and the trends over 10 and 20 years are shown.
+In @fig-decades, the cohorts based on century are replaced with cohorts based on the first decade, and the trends over 10 and 20 years are shown.
 Conversion of representatives to senators during the first few decades of the new US legislature was clearly different from patterns in the years since.
+
+```{sql}
+#| connection: db
+#| include: false
+#| output.var: df_fig_4_12
+SELECT aa.cohort_decade
+,bb.rep_and_sen_10_yrs * 1.0 / aa.reps as pct_10_yrs
+,bb.rep_and_sen_20_yrs * 1.0 / aa.reps as pct_20_yrs
+FROM
+(
+    SELECT date_part('decade',a.first_term) as cohort_decade
+    ,count(id_bioguide) as reps
+    FROM
+    (
+        SELECT id_bioguide, min(term_start) as first_term
+        FROM legislators_terms
+        WHERE term_type = 'rep'
+        GROUP BY 1
+    ) a
+    WHERE first_term <= '2009-12-31'
+    GROUP BY 1
+) aa
+LEFT JOIN
+(
+    SELECT date_part('decade',b.first_term) as cohort_decade
+    ,count(distinct case when age(c.term_start,b.first_term) 
+                              <= interval '10 years' 
+                         then b.id_bioguide end) as rep_and_sen_10_yrs
+    ,count(distinct case when age(c.term_start,b.first_term) 
+                              <= interval '20 years' 
+                         then b.id_bioguide end) as rep_and_sen_20_yrs
+    FROM
+    (
+        SELECT id_bioguide, min(term_start) as first_term
+        FROM legislators_terms
+        WHERE term_type = 'rep'
+        GROUP BY 1
+    ) b
+    JOIN legislators_terms c on b.id_bioguide = c.id_bioguide
+    and c.term_type = 'sen' and c.term_start > b.first_term
+    GROUP BY 1
+) bb on aa.cohort_decade = bb.cohort_decade
+ORDER BY 1
+```
+
+```{r}
+#| echo: false
+#| label: fig-decades
+#| fig-cap: "Trend of the share of representatives for each cohort, defined by starting decade, who later became senators"
+df_fig_4_12 |>
+  pivot_longer(cols = -cohort_decade) |>
+  mutate(period = str_replace(name, "^pct_(\\d+)_yrs", "\\1 years")) |>
+  ggplot(aes(x = cohort_decade, y = value,
+             colour = period, group = period)) +
+  geom_line() +
+  ylab("% became senator") +
+  xlab("Cohort decade")
+```
+
 
 Finding the repeat behavior within a fixed time box is a useful tool for comparing cohorts.
 This is particularly true when the behaviors are intermittent in nature, such as purchase behavior or content or service consumption.
