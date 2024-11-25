@@ -1960,16 +1960,17 @@ Here we'll group the tenures into four cohorts, where `cume_years` is less than 
 
 ```{sql}
 #| connection: db
+#| output.var: df_fig_4_14
 SELECT date, tenure
 ,legislators / sum(legislators) over (partition by date) 
  as pct_legislators 
 FROM
 (
-    SELECT date
-    ,case when cume_years <= 4 then '01 to 4'
-          when cume_years <= 10 then '05 to 10'
-          when cume_years <= 20 then '11 to 20'
-          else '21+' end as tenure
+    SELECT date,
+      case when cume_years <= 4 then '1 to 4'
+           when cume_years <= 10 then '5 to 10'
+           when cume_years <= 20 then '11 to 20'
+           else '21+' end as tenure
     ,count(distinct id_bioguide) as legislators
     FROM
     (
@@ -1996,6 +1997,26 @@ ORDER BY 1 DESC, 2
 The graphing of the results in **Figure 4-14** shows that in the early years of the country, most legislators had very little tenure.
 In more recent years, the share of legislators with 21 or more years in office has been increasing.
 There are also interesting periodic increases in 1-to-4-year-tenure legislators that may reflect shifts in political trends.
+
+```{r}
+#| echo: false
+#| label: fig-4-14
+#| fig-cap: "Percent of legislators by number of years in office"
+df_fig_4_14 |>
+  mutate(tenure = fct_rev(factor(tenure, 
+                                 levels = c("1 to 4", "5 to 10", 
+                                            "11 to 20", "21+")))) |>
+  ggplot(aes(x = date, y = pct_legislators * 100,
+             fill = tenure, group = tenure)) +
+  geom_area() +
+  theme(legend.position = "inside", 
+        legend.direction = "horizontal",
+        legend.position.inside = c(.4, .15),
+        legend.box.just = "left") +
+  ylab("") +
+  xlab("")
+```
+
 
 A cross section of a population at any point in time is made up of members from multiple cohorts.
 Creating a time series of these cross sections is another interesting way of analyzing trends.
