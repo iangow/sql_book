@@ -1807,6 +1807,7 @@ The second approach results in one row per year, with a column for each century,
 
 ```{sql}
 #| connection: db
+#| output.var: df_fig_4_13
 SELECT date
 ,coalesce(sum(case when century = 18 then legislators end)
           / sum(legislators),0) as pct_18
@@ -1837,7 +1838,34 @@ GROUP BY 1
 ORDER BY 1 DESC
 ```
 
-We can graph the output, as in **Figure 4-13**, to see how newer cohorts of legislators gradually overtake older cohorts, until they themselves are replaced by new cohorts.
+```{r}
+#| include: false
+int_to_century <- function(vec) {
+  x <- scales::label_ordinal()(as.integer(vec))
+  fct_rev(as.factor(x))
+}
+```
+
+```{r}
+#| echo: false
+#| label: fig-4-13
+#| fig-cap: "Percent of legislators each year, by century first elected"
+df_fig_4_13 |>
+  pivot_longer(cols = -date) |>
+  mutate(century = str_replace(name, "^pct_(\\d+)", "\\1")) |>
+  mutate(century = int_to_century(century)) |>
+  ggplot(aes(x = date, y = value * 100,
+             fill = century, group = century)) +
+  geom_area() +
+  theme(legend.position = "inside", 
+        legend.direction = "horizontal",
+        legend.position.inside = c(.4, .85),
+        legend.box.just = "left") +
+  ylab("") +
+  xlab("")
+```
+
+We can graph the output, as in @fig-4-13, to see how newer cohorts of legislators gradually overtake older cohorts, until they themselves are replaced by new cohorts.
 
 Rather than cohorting on `first_term`, we can cohort on tenure instead.
 Finding the share of customers who are relatively new, are of medium tenure, or are long-term customers at various points in time can be insightful.
